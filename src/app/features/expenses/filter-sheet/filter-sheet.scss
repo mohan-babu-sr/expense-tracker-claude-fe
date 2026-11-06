@@ -1,0 +1,17 @@
+@use 'variables' as v;
+
+.sheet {
+  padding: v.$space-2 0 calc(#{v.$space-4} + env(safe-area-inset-bottom));
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: v.$space-4;
+}
+
+.sheet__title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}

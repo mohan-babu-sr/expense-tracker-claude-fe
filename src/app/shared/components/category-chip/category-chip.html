@@ -1,0 +1,10 @@
+<!-- [fontIcon] instead of <mat-icon>name</mat-icon>: the icon is drawn by CSS (::before), so the element has
+     no text. Otherwise a closed mat-select showing this chip reads "restaurantFood" (option textContent). -->
+<span class="category-chip__dot" aria-hidden="true">
+  <mat-icon [fontIcon]="icon()" />
+</span>
+@if (mode() === 'chip') {
+  <span class="category-chip__name">{{ name() }}</span>
+} @else {
+  <span class="cdk-visually-hidden">{{ name() }}</span>
+}

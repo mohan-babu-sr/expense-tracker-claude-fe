@@ -1,0 +1,99 @@
+// Global styles — design §6.
+// Component styles should use `@use 'variables' as v;` / `@use 'mixins' as m;`
+// (resolved via angular.json → stylePreprocessorOptions.includePaths).
+@use '@angular/material' as mat;
+
+// ---------------------------------------------------------------------------
+// Material 3 theme: emits all `--mat-sys-*` CSS variables (colors, typography, elevation…)
+// that Material components and our own component styles read.
+// ---------------------------------------------------------------------------
+html {
+  height: 100%;
+  // Light/dark theme (R11, design §6). mat.theme emits every token as `light-dark(light, dark)`,
+  // so `color-scheme` alone decides which half is used. Default = follow the device ("System").
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Budget status colors (R8 AC3) — mapped onto theme roles, so no hard-coded hex values.
+  // Always shown together with text/icons, never color alone (NFR5).
+  --budget-ok: var(--mat-sys-primary);
+  --budget-warning: var(--mat-sys-tertiary);
+  --budget-danger: var(--mat-sys-error);
+
+  // Text/icons drawn ON a category color. Category colors are light 300 shades (data, same in both
+  // themes), so they need dark ink in dark mode too. "Fixed" roles don't flip with the theme.
+  --category-on-color: var(--mat-sys-on-primary-fixed);
+}
+
+// Explicit choice from Settings → SettingsService sets <html data-theme="light|dark">
+// (also set before Angular starts by the script in index.html, so there's no flash).
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+// ---------------------------------------------------------------------------
+// Resets
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; // no grey flash on tap (mobile)
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%; // never cause horizontal scroll at 360px (R10 AC4)
+}
+
+// ---------------------------------------------------------------------------
+// Error snackbar (NotificationService.error → panelClass 'snackbar-error'), NFR2.
+// ---------------------------------------------------------------------------
+.snackbar-error {
+  @include mat.snack-bar-overrides(
+    (
+      container-color: var(--mat-sys-error-container),
+      supporting-text-color: var(--mat-sys-on-error-container),
+      button-color: var(--mat-sys-error),
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Full-screen dialog on mobile (R1 AC4). Opened with
+// { width: '100vw', maxWidth: '100vw', height: '100dvh', panelClass: 'full-screen-dialog' }.
+// ---------------------------------------------------------------------------
+.full-screen-dialog {
+  @include mat.dialog-overrides(
+    (
+      container-shape: 0,
+    )
+  );
+
+  .mat-mdc-dialog-content {
+    max-height: none; // let the content fill the screen instead of the default 65vh
+  }
+}

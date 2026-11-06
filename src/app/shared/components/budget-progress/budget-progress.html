@@ -1,0 +1,26 @@
+<div class="budget-progress" [class]="'budget-progress--' + status()">
+  <div class="budget-progress__top">
+    <div class="budget-progress__label"><ng-content /></div>
+    <span class="budget-progress__amounts">
+      {{ spent() | inrCurrency: false }} / {{ budget() | inrCurrency: false }} · {{ percent() }}%
+    </span>
+  </div>
+
+  <mat-progress-bar
+    mode="determinate"
+    [value]="barValue()"
+    [attr.aria-label]="'Budget used ' + percent() + '%'"
+  />
+
+  <div class="budget-progress__status">
+    <mat-icon aria-hidden="true">{{ statusText().icon }}</mat-icon>
+    <span>
+      {{ statusText().label }}
+      @if (status() === 'danger') {
+        · {{ overBy() | inrCurrency: false }} over
+      } @else {
+        · {{ left() | inrCurrency: false }} left
+      }
+    </span>
+  </div>
+</div>

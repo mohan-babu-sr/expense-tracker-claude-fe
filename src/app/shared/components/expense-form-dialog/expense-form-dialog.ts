@@ -1,0 +1,159 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { Observable, catchError, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
+import { errorMessage } from '../../../core/interceptors/error.interceptor';
+import { skipErrorSnackbar } from '../../../core/interceptors/http-context.tokens';
+import { CategoryService } from '../../../core/services/category.service';
+import { ExpenseService } from '../../../core/services/expense.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { DEFAULT_USER, PAYMENT_METHODS, USERS } from '../../constants';
+import { Expense, ExpenseInput, ExpenseUser, PaymentMethod } from '../../models';
+import { fromIsoDate, toIsoDate } from '../../utils/date.utils';
+import { twoDecimals } from '../../utils/validators';
+
+export interface ExpenseFormData {
+  /** Present = edit mode (R3); absent = add (R1). */
+  expense?: Expense;
+}
+
+/**
+ * Add / edit expense form (R1, R3) — shared because Dashboard AND Expenses open it.
+ * Open with the static helper so laptop gets a dialog and mobile a full-screen sheet (R1 AC4):
+ *
+ *   ExpenseFormDialog.open(dialog, isMobile, { expense }).subscribe(saved => …)
+ */
+@Component({
+  selector: 'app-expense-form-dialog',
+  standalone: false,
+  templateUrl: './expense-form-dialog.html',
+  styleUrl: './expense-form-dialog.scss',
+})
+export class ExpenseFormDialog {
+  private readonly data = inject<ExpenseFormData>(MAT_DIALOG_DATA);
+  private readonly dialogRef = inject<MatDialogRef<ExpenseFormDialog, Expense>>(MatDialogRef);
+  private readonly expenseService = inject(ExpenseService);
+  private readonly notification = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly isEdit = !!this.data.expense;
+  protected readonly saving = signal(false);
+  protected readonly paymentMethods = PAYMENT_METHODS;
+  protected readonly users = USERS;
+  protected readonly today = new Date();
+  protected readonly categories = toSignal(inject(CategoryService).getAll(), { initialValue: [] });
+
+  protected readonly form = inject(FormBuilder).group({
+    amount: [this.data.expense?.amount ?? (null as number | null), [Validators.required, Validators.min(0.01), twoDecimals]],
+    categoryId: [this.data.expense?.categoryId ?? '', Validators.required],
+    date: [this.data.expense ? fromIsoDate(this.data.expense.date) : new Date(), Validators.required],
+    merchant: [this.data.expense?.merchant ?? '', Validators.maxLength(50)],
+    note: [this.data.expense?.note ?? '', Validators.maxLength(200)],
+    paymentMethod: [(this.data.expense?.paymentMethod ?? null) as PaymentMethod | null],
+    // R12 AC2: required; new expenses default to Mohan.
+    user: [(this.data.expense?.user ?? DEFAULT_USER) as ExpenseUser, Validators.required],
+  });
+
+  /** Chip shown in the closed category select. */
+  private readonly categoryIdValue = toSignal(this.form.controls.categoryId.valueChanges, {
+    initialValue: this.form.controls.categoryId.value,
+  });
+  protected readonly selectedCategory = computed(() =>
+    this.categories().find((c) => c.id === this.categoryIdValue()),
+  );
+
+  /**
+   * Merchant suggestions (R1 AC1a): wait 300ms after typing stops, skip repeats, and
+   * switchMap cancels the previous request if the user keeps typing.
+   */
+  protected readonly merchantOptions$: Observable<string[]> = this.form.controls.merchant.valueChanges.pipe(
+    startWith(this.form.controls.merchant.value ?? ''),
+    debounceTime(300),
+    distinctUntilChanged(),
+    switchMap((q) => this.expenseService.merchants((q ?? '').trim()).pipe(catchError(() => of([])))),
+    takeUntilDestroyed(this.destroyRef),
+  );
+
+  /** Laptop: 520px dialog. Mobile: full-screen (R1 AC4, design §5). Emits the saved expense. */
+  static open(dialog: MatDialog, isMobile: boolean, data: ExpenseFormData = {}): Observable<Expense | undefined> {
+    const config: MatDialogConfig<ExpenseFormData> = isMobile
+      ? { data, width: '100vw', maxWidth: '100vw', height: '100dvh', panelClass: 'full-screen-dialog' }
+      : { data, width: '520px', maxWidth: 'calc(100vw - 32px)' };
+    return dialog
+      .open<ExpenseFormDialog, ExpenseFormData, Expense>(ExpenseFormDialog, { ...config, autoFocus: 'first-tabbable' })
+      .afterClosed();
+  }
+
+  protected error(field: keyof typeof this.form.controls): string {
+    const e = this.form.controls[field].errors;
+    if (!e) return '';
+    if (e['server']) return e['server'];
+    switch (field) {
+      case 'amount':
+        if (e['required']) return 'Amount is required';
+        if (e['min']) return 'Amount must be greater than 0';
+        if (e['decimals']) return 'Use at most 2 decimals (paise)';
+        return 'Enter a valid amount';
+      case 'categoryId':
+        return 'Choose a category';
+      case 'date':
+        if (e['matDatepickerMax']) return 'Date cannot be in the future';
+        if (e['matDatepickerParse']) return 'Enter a date as dd/mm/yyyy';
+        return 'Date is required';
+      case 'merchant':
+        return 'At most 50 characters';
+      case 'note':
+        return 'At most 200 characters';
+      case 'user':
+        return 'Choose who spent it';
+      default:
+        return 'Invalid value';
+    }
+  }
+
+  protected save(): void {
+    if (this.form.invalid || this.saving()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const v = this.form.getRawValue();
+    const input: ExpenseInput = {
+      amount: Number(v.amount),
+      categoryId: v.categoryId!,
+      date: toIsoDate(v.date!),
+      merchant: v.merchant?.trim() || null,
+      note: v.note?.trim() || null,
+      paymentMethod: v.paymentMethod || null,
+      user: v.user ?? DEFAULT_USER,
+    };
+
+    this.saving.set(true);
+    const request = this.data.expense
+      ? this.expenseService.update(this.data.expense.id, input, skipErrorSnackbar())
+      : this.expenseService.create(input, skipErrorSnackbar());
+
+    request.subscribe({
+      next: (saved) => {
+        this.notification.success(this.isEdit ? 'Expense updated' : 'Expense added'); // R1 AC3
+        this.dialogRef.close(saved);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        // Server validation (400) → show each message under its field (NFR3); otherwise snackbar.
+        const fieldErrors: Record<string, string> | undefined = err.error?.errors;
+        let mapped = false;
+        for (const [field, message] of Object.entries(fieldErrors ?? {})) {
+          const control = this.form.get(field);
+          if (control) {
+            control.setErrors({ server: message });
+            control.markAsTouched();
+            mapped = true;
+          }
+        }
+        if (!mapped) this.notification.error(errorMessage(err));
+      },
+    });
+  }
+}

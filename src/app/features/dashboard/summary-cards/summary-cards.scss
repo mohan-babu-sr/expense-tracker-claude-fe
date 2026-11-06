@@ -1,0 +1,75 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Mobile-first: one column (R7 AC5); laptop: as many ≥ 160px columns as fit — all 5 in one row
+// on a typical laptop (≈ 980px of content), 3 + 2 at the 960px breakpoint.
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$space-3;
+
+  @include m.laptop {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+.card {
+  @include m.card-surface;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+.card--primary {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.card__label {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  font: var(--mat-sys-label-large);
+  opacity: 0.85;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.card__value {
+  @include m.truncate;
+  font: var(--mat-sys-headline-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__value--chip {
+  font: var(--mat-sys-title-medium);
+}
+
+.card__sub {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.card__change {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+  font: var(--mat-sys-title-small);
+
+  &--up {
+    color: var(--mat-sys-error);
+  }
+
+  &--down {
+    color: var(--mat-sys-primary);
+  }
+
+  &--neutral {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

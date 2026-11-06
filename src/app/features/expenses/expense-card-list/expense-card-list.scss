@@ -1,0 +1,34 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.day + .day {
+  margin-top: v.$space-4;
+}
+
+.day__header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 v.$space-2;
+  padding: 0 v.$space-2;
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.day__total {
+  font-variant-numeric: tabular-nums;
+}
+
+.day__card {
+  @include m.card-surface;
+  padding: v.$space-1;
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: v.$space-4;
+
+  button {
+    @include m.touch-target;
+  }
+}

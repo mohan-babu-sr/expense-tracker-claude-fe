@@ -1,0 +1,120 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.section {
+  @include m.card-surface;
+
+  @include m.laptop {
+    max-width: 720px;
+  }
+
+  & + & {
+    margin-top: v.$space-4;
+  }
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-4;
+  font: var(--mat-sys-title-medium);
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.theme-picker {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.theme-picker__legend {
+  padding: 0;
+  font: var(--mat-sys-title-small);
+}
+
+.theme-picker__hint {
+  margin: v.$space-1 0 v.$space-3;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Three equal tiles; fits 360px phones (≈ 90px each) and caps their width on laptops.
+.theme-picker__options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: v.$space-2;
+
+  @include m.laptop {
+    grid-template-columns: repeat(3, 140px);
+  }
+}
+
+.theme-option {
+  @include m.touch-target;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-1;
+  min-height: 80px;
+  padding: v.$space-3 v.$space-2;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: v.$radius-md;
+  color: var(--mat-sys-on-surface-variant);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  // Keyboard focus ring on the visually hidden radio → shown on its tile.
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+
+  &:has(input:checked) {
+    border-color: transparent;
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    box-shadow: inset 0 0 0 2px var(--mat-sys-primary);
+
+    .theme-option__label {
+      font-weight: 700;
+    }
+
+    .theme-option__check {
+      visibility: visible;
+    }
+  }
+}
+
+.theme-option__icon {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+}
+
+.theme-option__label {
+  @include m.truncate;
+  max-width: 100%;
+  font: var(--mat-sys-label-large);
+}
+
+.theme-option__check {
+  position: absolute;
+  top: v.$space-1;
+  right: v.$space-1;
+  visibility: hidden;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  color: var(--mat-sys-primary);
+}

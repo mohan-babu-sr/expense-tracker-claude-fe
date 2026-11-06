@@ -1,0 +1,9 @@
+@use 'variables' as v;
+
+// Mobile FAB: fixed bottom-right, just above the bottom nav (and the iPhone home bar).
+.fab {
+  position: fixed;
+  right: v.$space-4;
+  bottom: calc(#{v.$bottom-nav-height} + #{v.$space-4} + env(safe-area-inset-bottom));
+  z-index: 20;
+}

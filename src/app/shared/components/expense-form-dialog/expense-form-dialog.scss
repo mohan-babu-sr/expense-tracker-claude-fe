@@ -1,0 +1,54 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// The form wraps title, content and actions so the submit button works with Enter.
+// Column flex + flex:1 content: in the full-screen (mobile) dialog the actions stay at the bottom.
+:host {
+  display: block;
+  height: 100%;
+}
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.expense-form__header {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+}
+
+// Close (X) only on mobile full-screen, where there's no backdrop to tap.
+.expense-form__close {
+  margin-left: -(v.$space-3);
+
+  @include m.laptop {
+    display: none;
+  }
+}
+
+.expense-form__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  // First field needs room for its floating label.
+  > mat-form-field:first-child {
+    margin-top: v.$space-2;
+  }
+}
+
+.expense-form__amount input {
+  font: var(--mat-sys-title-large);
+}
+
+.expense-form__actions {
+  padding-bottom: calc(#{v.$space-3} + env(safe-area-inset-bottom));
+}

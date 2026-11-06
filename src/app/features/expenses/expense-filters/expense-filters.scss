@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Inline (laptop): one row that wraps when the window is narrower.
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+// Material's default toggle is 40px tall → raise to the 44px touch minimum (R10 AC4).
+mat-button-toggle-group {
+  @include mat.button-toggle-overrides(
+    (
+      height: v.$touch-target,
+    )
+  );
+}
+
+.filters__period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.filters__range {
+  width: 260px;
+}
+
+.filters__field {
+  width: 180px;
+}
+
+// Only short names ("Everyone", "Abhinaya") → narrower, keeps the laptop bar to two rows.
+.filters__field--user {
+  width: 150px;
+}
+
+.filters__search {
+  flex: 1;
+  min-width: 200px;
+}
+
+// Stacked (mobile bottom sheet): every control full width, one per row.
+:host(.stacked) {
+  .filters,
+  .filters__period {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters__range,
+  .filters__field,
+  .filters__search {
+    width: 100%;
+  }
+
+  mat-button-toggle-group {
+    width: 100%;
+
+    mat-button-toggle {
+      flex: 1;
+    }
+  }
+
+  app-month-picker {
+    align-self: center;
+  }
+
+  .filters__clear {
+    @include m.touch-target;
+    align-self: flex-start;
+  }
+}

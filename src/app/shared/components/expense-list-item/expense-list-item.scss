@@ -1,0 +1,59 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.expense-item {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+// The whole row is one big tap target (R10: ≥ 44px) — a real <button> for keyboard users.
+.expense-item__main {
+  @include m.touch-target;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: v.$space-3;
+  min-width: 0;
+  padding: v.$space-2;
+  border: 0;
+  border-radius: v.$radius-sm;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+  }
+}
+
+.expense-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.expense-item__title {
+  @include m.truncate;
+  font: var(--mat-sys-title-small);
+}
+
+.expense-item__meta {
+  @include m.truncate;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.expense-item__amount {
+  flex: none;
+  font: var(--mat-sys-title-small);
+  font-variant-numeric: tabular-nums; // digits line up in a column
+}

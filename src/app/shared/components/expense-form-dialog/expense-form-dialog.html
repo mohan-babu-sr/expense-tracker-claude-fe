@@ -1,0 +1,108 @@
+<form class="expense-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <div class="expense-form__header" mat-dialog-title>
+    <button mat-icon-button type="button" mat-dialog-close aria-label="Close" class="expense-form__close">
+      <mat-icon>close</mat-icon>
+    </button>
+    <span>{{ isEdit ? 'Edit expense' : 'Add expense' }}</span>
+  </div>
+
+  <mat-dialog-content class="expense-form__content">
+    <!-- Amount -->
+    <!-- floatLabel="always": the ₹ prefix would otherwise sit on top of the resting label -->
+    <mat-form-field appearance="outline" class="expense-form__amount" floatLabel="always">
+      <mat-label>Amount</mat-label>
+      <span matTextPrefix>₹&nbsp;</span>
+      <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="amount" autocomplete="off" />
+      @if (form.controls.amount.invalid) {
+        <mat-error>{{ error('amount') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Category -->
+    <mat-form-field appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="categoryId">
+        <mat-select-trigger>
+          <app-category-chip [category]="selectedCategory()" />
+        </mat-select-trigger>
+        @for (c of categories(); track c.id) {
+          <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+        }
+      </mat-select>
+      @if (form.controls.categoryId.invalid) {
+        <mat-error>{{ error('categoryId') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Date: defaults to today, future dates blocked (R1 AC1) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="picker" [max]="today" formControlName="date" placeholder="dd/mm/yyyy" />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+      @if (form.controls.date.invalid) {
+        <mat-error>{{ error('date') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Merchant with suggestions (R1 AC1a) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Shop / Merchant</mat-label>
+      <input matInput formControlName="merchant" maxlength="50" [matAutocomplete]="merchantAuto" autocomplete="off" placeholder="e.g. Swiggy, Big Bazaar, Amazon" />
+      <mat-autocomplete #merchantAuto="matAutocomplete" autoActiveFirstOption="false">
+        @for (m of merchantOptions$ | async; track m) {
+          <mat-option [value]="m">{{ m }}</mat-option>
+        }
+      </mat-autocomplete>
+      @if (form.controls.merchant.invalid) {
+        <mat-error>{{ error('merchant') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Who spent it (R12): required, defaults to Mohan -->
+    <mat-form-field appearance="outline">
+      <mat-label>User</mat-label>
+      <mat-select formControlName="user">
+        @for (u of users; track u) {
+          <mat-option [value]="u">{{ u }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.user.invalid) {
+        <mat-error>{{ error('user') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Payment method (optional) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Payment method</mat-label>
+      <mat-select formControlName="paymentMethod">
+        <mat-option [value]="null">— None —</mat-option>
+        @for (p of paymentMethods; track p.value) {
+          <mat-option [value]="p.value">
+            <!-- fontIcon: no ligature text, so the closed select shows "UPI", not "qr_code_scannerUPI" -->
+            <mat-icon [fontIcon]="p.icon" />
+            {{ p.label }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Note -->
+    <mat-form-field appearance="outline">
+      <mat-label>Note</mat-label>
+      <textarea matInput formControlName="note" maxlength="200" rows="2" cdkTextareaAutosize></textarea>
+      <mat-hint align="end">{{ form.controls.note.value?.length ?? 0 }} / 200</mat-hint>
+      @if (form.controls.note.invalid) {
+        <mat-error>{{ error('note') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="expense-form__actions">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <!-- Disabled until valid (R1 AC2) -->
+    <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>

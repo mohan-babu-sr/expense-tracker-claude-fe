@@ -1,0 +1,33 @@
+<div class="brand">
+  <mat-icon class="brand__icon" aria-hidden="true">account_balance_wallet</mat-icon>
+  <span class="brand__name">Expense Tracker</span>
+</div>
+
+<!-- Plain links instead of mat-nav-list: MatListModule drags @angular/forms + selection-list
+     code (~65 kB) into the first page load just to draw 4 links. -->
+<nav class="side-nav" aria-label="Main">
+  @for (item of items; track item.path) {
+    <a
+      class="side-nav__item"
+      [routerLink]="item.path"
+      routerLinkActive="side-nav__item--active"
+      ariaCurrentWhenActive="page"
+    >
+      <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+      <span>{{ item.label }}</span>
+    </a>
+  }
+</nav>
+
+<!-- Secondary destination pinned to the bottom (R11 AC1) -->
+<nav class="side-nav side-nav--secondary" aria-label="Secondary">
+  <a
+    class="side-nav__item"
+    [routerLink]="settings.path"
+    routerLinkActive="side-nav__item--active"
+    ariaCurrentWhenActive="page"
+  >
+    <mat-icon aria-hidden="true">{{ settings.icon }}</mat-icon>
+    <span>{{ settings.label }}</span>
+  </a>
+</nav>

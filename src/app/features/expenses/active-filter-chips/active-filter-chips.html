@@ -1,0 +1,16 @@
+@if (chips().length) {
+  <div class="chips">
+    <mat-chip-set aria-label="Active filters">
+      @for (chip of chips(); track chip.key) {
+        <mat-chip (removed)="chip.remove()">
+          <mat-icon matChipAvatar>{{ chip.icon }}</mat-icon>
+          {{ chip.label }}
+          <button matChipRemove [attr.aria-label]="'Remove filter ' + chip.label">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      }
+    </mat-chip-set>
+    <button mat-button type="button" (click)="clearAll()">Clear all</button>
+  </div>
+}

@@ -1,0 +1,27 @@
+<!-- Global loading indicator for API calls (NFR2) -->
+@if (isLoading()) {
+  <mat-progress-bar class="global-progress" mode="indeterminate" aria-label="Loading" />
+}
+
+<mat-sidenav-container class="shell" [class.shell--mobile]="isMobile()">
+  <!-- Laptop navigation. On mobile it stays closed (bottom nav is used instead). -->
+  <mat-sidenav class="shell__sidenav" mode="side" [opened]="!isMobile()" [disableClose]="true">
+    @if (!isMobile()) {
+      <app-side-nav />
+    }
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__body">
+    @if (isMobile()) {
+      <app-top-toolbar />
+    }
+
+    <main class="shell__content">
+      <router-outlet />
+    </main>
+
+    @if (isMobile()) {
+      <app-bottom-nav />
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

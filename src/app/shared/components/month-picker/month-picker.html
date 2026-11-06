@@ -1,0 +1,16 @@
+<div class="month-picker" role="group" aria-label="Select month">
+  <button mat-icon-button type="button" (click)="previous()" aria-label="Previous month" matTooltip="Previous month">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  <span class="month-picker__label" aria-live="polite">{{ date() | date: 'MMM y' }}</span>
+  <button
+    mat-icon-button
+    type="button"
+    (click)="next()"
+    [disabled]="!canGoNext()"
+    aria-label="Next month"
+    matTooltip="Next month"
+  >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

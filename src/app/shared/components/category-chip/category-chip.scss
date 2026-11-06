@@ -1,0 +1,50 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// --category-color is set from the category's saved color (see the component's host binding).
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.category-chip__dot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  // Category palette = Material 300 shades → dark icon is readable on all of them.
+  background: var(--category-color, var(--mat-sys-surface-container-highest));
+  color: var(--category-on-color); // stays dark in dark theme too (R11 AC5)
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    margin: 0; // inside a mat-option, Material adds `.mat-mdc-option .mat-icon { margin-right: 16px }`,
+    // which pushed the icon off-center (and clipped it on iOS) in every category dropdown.
+    font-size: 18px;
+    line-height: 1;
+  }
+}
+
+.category-chip__name {
+  @include m.truncate;
+  font: var(--mat-sys-body-medium);
+}
+
+// Avatar mode: bigger circle, no visible label.
+:host(.category-chip--avatar) .category-chip__dot {
+  width: 40px;
+  height: 40px;
+
+  mat-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+  }
+}

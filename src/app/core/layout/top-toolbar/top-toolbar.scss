@@ -1,0 +1,50 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Sticks to the top while the page scrolls.
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: v.$space-3;
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+.toolbar__icon {
+  color: var(--mat-sys-primary);
+}
+
+.toolbar__title {
+  @include m.truncate;
+  flex: 1;
+  font: var(--mat-sys-title-large);
+}
+
+// Round 48px icon button (≥ 44px touch target).
+.toolbar__action {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-right: -(v.$space-2);
+  border-radius: 50%;
+  color: var(--mat-sys-on-surface-variant);
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-highest);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+// On the Settings page: filled circle (shape, not only color — NFR5).
+.toolbar__action--active {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}

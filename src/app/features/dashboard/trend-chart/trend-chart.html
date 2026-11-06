@@ -1,0 +1,11 @@
+<section class="chart-card" aria-labelledby="trend-chart-title">
+  <h2 class="chart-card__title" id="trend-chart-title">Last 6 months</h2>
+  <div class="chart-card__canvas">
+    <canvas baseChart type="bar" [data]="chartData()" [options]="options" role="img" aria-label="Bar chart of spending in the last 6 months"></canvas>
+  </div>
+  <ul class="cdk-visually-hidden">
+    @for (m of data(); track m.month) {
+      <li>{{ monthName(m.month) }}: {{ m.amount | inrCurrency }}</li>
+    }
+  </ul>
+</section>

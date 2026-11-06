@@ -1,0 +1,52 @@
+<app-page-header title="Categories" subtitle="Organise your expenses your way">
+  <button mat-flat-button type="button" (click)="openDialog()">
+    <mat-icon>add</mat-icon>
+    Add category
+  </button>
+</app-page-header>
+
+@if (loaded()) {
+  @if (categories().length) {
+    <ul class="category-list" aria-label="Categories">
+      @for (category of categories(); track category.id) {
+        <li class="category-row">
+          <app-category-chip class="category-row__chip" [category]="category" />
+
+          <span class="category-row__count">
+            {{ category.expenseCount ?? 0 }} {{ category.expenseCount === 1 ? 'expense' : 'expenses' }}
+          </span>
+
+          @if (category.isSystem) {
+            <span class="category-row__tag" matTooltip="The fallback category — can be edited but not deleted">
+              <mat-icon aria-hidden="true">lock</mat-icon> System
+            </span>
+          }
+
+          <span class="category-row__actions">
+            <button mat-icon-button type="button" (click)="openDialog(category)" [attr.aria-label]="'Edit ' + category.name" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              (click)="confirmDelete(category)"
+              [disabled]="category.isSystem"
+              [attr.aria-label]="'Delete ' + category.name"
+              [matTooltip]="category.isSystem ? 'System category cannot be deleted' : 'Delete'"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <app-empty-state
+      icon="category"
+      title="No categories"
+      message="Start the server once to create the default categories, or add your own."
+      actionLabel="Add category"
+      (action)="openDialog()"
+    />
+  }
+}

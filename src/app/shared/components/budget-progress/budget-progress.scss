@@ -1,0 +1,64 @@
+@use '@angular/material' as mat;
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.budget-progress {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+
+  // One color per status (R8 AC3), from the theme-based budget variables.
+  --status-color: #{v.$budget-ok};
+
+  &--warning {
+    --status-color: #{v.$budget-warning};
+  }
+
+  &--danger {
+    --status-color: #{v.$budget-danger};
+  }
+
+  mat-progress-bar {
+    @include mat.progress-bar-overrides(
+      (
+        active-indicator-color: var(--status-color),
+        track-color: var(--mat-sys-surface-container-highest),
+        active-indicator-height: 8px,
+        track-height: 8px,
+        track-shape: 4px,
+      )
+    );
+  }
+}
+
+.budget-progress__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-1 v.$space-3;
+}
+
+.budget-progress__label {
+  min-width: 0;
+}
+
+.budget-progress__amounts {
+  font: var(--mat-sys-body-medium);
+  font-variant-numeric: tabular-nums;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.budget-progress__status {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+  font: var(--mat-sys-label-large);
+  color: var(--status-color);
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}

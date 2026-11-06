@@ -1,0 +1,44 @@
+@use '@angular/material' as mat;
+@use 'variables' as v;
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  > mat-form-field:first-child {
+    margin-top: v.$space-2;
+  }
+}
+
+.budget-form__info {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.overall-option {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+}
+
+.budget-form__actions {
+  display: flex;
+}
+
+.spacer {
+  flex: 1;
+}
+
+// Destructive action in the theme's error color, with icon + text (NFR5).
+.budget-form__remove {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--mat-sys-error),
+    )
+  );
+}

@@ -1,0 +1,16 @@
+@use '@angular/material' as mat;
+
+.confirm__message {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Destructive action uses the theme's error role (red) — the text "Delete" says it too (NFR5).
+.confirm__danger {
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--mat-sys-error),
+      filled-label-text-color: var(--mat-sys-on-error),
+    )
+  );
+}

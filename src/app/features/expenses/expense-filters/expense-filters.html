@@ -1,0 +1,76 @@
+<div class="filters" role="search" aria-label="Filter expenses">
+  <!-- Period: month OR custom date range (R6 AC1) -->
+  <div class="filters__period">
+    <mat-button-toggle-group
+      [value]="mode()"
+      (change)="onModeChange($event.value)"
+      aria-label="Period type"
+      hideSingleSelectionIndicator
+    >
+      <mat-button-toggle value="month">Month</mat-button-toggle>
+      <mat-button-toggle value="range">Range</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    @if (mode() === 'month') {
+      <app-month-picker [month]="month()" (monthChange)="onMonthChange($event)" [max]="maxMonth" />
+    } @else {
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__range">
+        <mat-label>Date range</mat-label>
+        <mat-date-range-input [rangePicker]="rangePicker" [max]="today">
+          <input matStartDate [formControl]="rangeStart" placeholder="From" />
+          <input matEndDate [formControl]="rangeEnd" placeholder="To" (dateChange)="onRangeChange()" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="rangePicker" />
+        <mat-date-range-picker #rangePicker />
+      </mat-form-field>
+    }
+  </div>
+
+  <!-- Categories (multi) + payment method (R6 AC2) -->
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__field">
+    <mat-label>Categories</mat-label>
+    <mat-select [formControl]="categoryIds" multiple (selectionChange)="onCategoriesChange($event.value)">
+      <!-- Closed select: plain comma-separated names (the chip icons use [fontIcon], so no ligature text leaks) -->
+      <mat-select-trigger>{{ selectedCategoryNames() }}</mat-select-trigger>
+      @for (c of categories(); track c.id) {
+        <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__field">
+    <mat-label>Payment</mat-label>
+    <mat-select [formControl]="paymentMethod" (selectionChange)="onPaymentChange($event.value)">
+      <mat-option [value]="null">Any</mat-option>
+      @for (p of paymentMethods; track p.value) {
+        <mat-option [value]="p.value">{{ p.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Who spent it (R12 AC4) -->
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__field filters__field--user">
+    <mat-label>User</mat-label>
+    <mat-select [formControl]="user" (selectionChange)="onUserChange($event.value)">
+      <mat-option [value]="null">Everyone</mat-option>
+      @for (u of users; track u) {
+        <mat-option [value]="u">{{ u }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Search note / merchant (R6 AC3) -->
+  @if (showSearch()) {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__search">
+      <mat-icon matIconPrefix>search</mat-icon>
+      <mat-label>Search note or merchant</mat-label>
+      <input matInput type="search" [formControl]="search" autocomplete="off" />
+    </mat-form-field>
+  }
+
+  <!-- R6 AC4 -->
+  <button mat-button type="button" class="filters__clear" (click)="clear()" [disabled]="!canClear()">
+    <mat-icon>filter_alt_off</mat-icon>
+    Clear filters
+  </button>
+</div>

@@ -1,0 +1,50 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Shared look for both chart cards (trend-chart uses the same class names).
+.chart-card {
+  @include m.card-surface;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chart-card__title {
+  margin: 0 0 v.$space-3;
+  font: var(--mat-sys-title-medium);
+}
+
+.chart-card__canvas {
+  position: relative;
+  height: 300px;
+}
+
+// Total in the middle of the doughnut (above the legend, so offset upward a little).
+.chart-card__center {
+  position: absolute;
+  inset: 0 0 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.chart-card__center-label {
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.chart-card__center-value {
+  font: var(--mat-sys-title-large);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-card__empty {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 160px;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}

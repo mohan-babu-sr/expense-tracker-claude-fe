@@ -1,0 +1,38 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+// Thin bar pinned to the very top, above everything (also above the mobile toolbar).
+.global-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1000;
+}
+
+.shell {
+  height: 100%;
+  background: var(--mat-sys-surface);
+}
+
+.shell__sidenav {
+  width: v.$side-nav-width;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+}
+
+// Mobile-first: content padding; extra bottom space so the fixed bottom nav AND the
+// "Add expense" FAB (56px + 16px gap) never cover the last item of a list.
+.shell__content {
+  padding: v.$space-4;
+  padding-bottom: calc(#{v.$bottom-nav-height} + 56px + #{v.$space-4} * 2 + env(safe-area-inset-bottom));
+
+  @include m.laptop {
+    max-width: v.$content-max-width;
+    margin: 0 auto;
+    padding: v.$space-5 v.$space-6;
+  }
+}

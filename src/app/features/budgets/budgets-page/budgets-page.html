@@ -1,0 +1,74 @@
+<app-page-header title="Budgets" subtitle="Monthly limits — they apply to every month until changed">
+  <app-month-picker [(month)]="month" />
+  <button mat-flat-button type="button" (click)="openDialog()">
+    <mat-icon>add</mat-icon>
+    Set budget
+  </button>
+</app-page-header>
+
+@if (summary()) {
+  <!-- Overall monthly budget (R8 AC5) -->
+  <section class="section" aria-labelledby="overall-title">
+    <h2 class="section__title" id="overall-title">Overall</h2>
+    @if (overall(); as o) {
+      <div class="budget-card">
+        <app-budget-progress [spent]="o.spent" [budget]="o.budget" [percent]="o.percent" [status]="o.status">
+          <span class="overall-label">
+            <mat-icon aria-hidden="true">account_balance_wallet</mat-icon>
+            All categories
+          </span>
+        </app-budget-progress>
+        <button mat-icon-button type="button" class="budget-card__edit" (click)="openDialog(o)" aria-label="Edit overall budget" matTooltip="Edit">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+    } @else {
+      <div class="hint-card">
+        <span>No overall monthly budget.</span>
+        <button mat-button type="button" (click)="setOverall()">
+          <mat-icon>add</mat-icon>
+          Set overall budget
+        </button>
+      </div>
+    }
+  </section>
+
+  <!-- Category budgets (R8 AC2, AC3) -->
+  <section class="section" aria-labelledby="cat-title">
+    <h2 class="section__title" id="cat-title">
+      By category
+      @if (overCount()) {
+        <span class="over-badge"><mat-icon aria-hidden="true">error</mat-icon> {{ overCount() }} over budget</span>
+      }
+    </h2>
+    @if (items().length) {
+      <ul class="budget-list">
+        @for (b of items(); track b.id) {
+          <li class="budget-card">
+            <app-budget-progress [spent]="b.spent" [budget]="b.budget" [percent]="b.percent" [status]="b.status">
+              <app-category-chip [category]="b.category" />
+            </app-budget-progress>
+            <button
+              mat-icon-button
+              type="button"
+              class="budget-card__edit"
+              (click)="openDialog(b)"
+              [attr.aria-label]="'Edit budget for ' + b.category?.name"
+              matTooltip="Edit"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-empty-state
+        icon="savings"
+        title="No category budgets yet"
+        message="Set a monthly limit for a category to see how much is left."
+        actionLabel="Set budget"
+        (action)="openDialog()"
+      />
+    }
+  </section>
+}

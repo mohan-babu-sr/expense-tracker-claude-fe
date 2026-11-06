@@ -1,0 +1,71 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Column filling the sidenav height, so the secondary nav can sit at the bottom.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+// margin-top: auto pushes Settings to the bottom; border = visual divider from the main pages.
+.side-nav--secondary {
+  margin-top: auto;
+  padding-top: v.$space-3;
+  padding-bottom: v.$space-4;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  padding: v.$space-5 v.$space-4;
+  color: var(--mat-sys-primary);
+}
+
+.brand__name {
+  font: var(--mat-sys-title-large);
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  padding: 0 v.$space-3;
+}
+
+// Material 3 navigation-drawer look: full-width pill, filled when active.
+.side-nav__item {
+  @include m.touch-target;
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  height: 56px;
+  padding: 0 v.$space-4;
+  border-radius: 28px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-highest);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+// Active page: filled pill + bold label (NFR5: shape + weight, not color alone).
+.side-nav__item--active {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font-weight: 700;
+
+  &:hover {
+    background: var(--mat-sys-secondary-container);
+  }
+}

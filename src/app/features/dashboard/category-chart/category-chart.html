@@ -1,0 +1,20 @@
+<section class="chart-card" aria-labelledby="cat-chart-title">
+  <h2 class="chart-card__title" id="cat-chart-title">Spending by category</h2>
+  @if (data().length) {
+    <div class="chart-card__canvas">
+      <canvas baseChart type="doughnut" [data]="chartData()" [options]="options" role="img" aria-label="Doughnut chart of spending by category"></canvas>
+      <div class="chart-card__center" aria-hidden="true">
+        <span class="chart-card__center-label">Total</span>
+        <span class="chart-card__center-value">{{ total() | inrCurrency: false }}</span>
+      </div>
+    </div>
+    <!-- Same numbers as text for screen readers (NFR5: never rely on the chart / colors alone) -->
+    <ul class="cdk-visually-hidden">
+      @for (d of data(); track d.category?.id) {
+        <li>{{ d.category?.name }}: {{ d.amount | inrCurrency }} ({{ percent(d.amount) }}%)</li>
+      }
+    </ul>
+  } @else {
+    <p class="chart-card__empty">No spending this month.</p>
+  }
+</section>

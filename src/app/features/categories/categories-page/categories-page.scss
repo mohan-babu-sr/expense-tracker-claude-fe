@@ -1,0 +1,63 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.category-list {
+  @include m.card-surface;
+  margin: 0;
+  padding: v.$space-1 0;
+  list-style: none;
+
+  @include m.laptop {
+    max-width: 720px;
+  }
+}
+
+// Mobile-first row: chip + count on the left, actions on the right.
+.category-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2 v.$space-3;
+  min-height: 56px;
+  padding: v.$space-1 v.$space-2 v.$space-1 v.$space-4;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.category-row__chip {
+  flex: 1;
+  min-width: 0;
+}
+
+.category-row__count {
+  flex: none;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.category-row__tag {
+  display: none; // hidden on small phones to save space; the disabled delete button + tooltip remain
+
+  @include m.laptop {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-1;
+    padding: 2px v.$space-2;
+    border-radius: v.$radius-sm;
+    background: var(--mat-sys-surface-container-highest);
+    font: var(--mat-sys-label-small);
+
+    mat-icon {
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+    }
+  }
+}
+
+.category-row__actions {
+  display: flex;
+  flex: none;
+}

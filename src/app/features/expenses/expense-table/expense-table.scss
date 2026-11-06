@@ -1,0 +1,90 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.table-card {
+  @include m.card-surface;
+  padding: 0;
+  overflow: hidden; // rounded corners clip the table
+}
+
+// Safety net (T20): at 960px the table used to be ~910px wide inside a ~656px card, and
+// `overflow: hidden` above silently cut off Amount + Edit/Delete. Now the table scrolls sideways
+// inside the card instead — the page itself never scrolls horizontally (R10 AC4).
+.table-scroll {
+  overflow-x: auto;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+.expense-table {
+  width: 100%;
+  background: transparent;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+// Table trick: `width: 100%` + `max-width: 0` makes this column take only the space the other
+// columns leave over (instead of growing to fit the longest merchant), so its text truncates with "…".
+.description {
+  width: 100%;
+  max-width: 0;
+  min-width: 160px;
+
+  @include m.narrow-laptop {
+    min-width: 120px; // text is truncated with "…" anyway; leaves room for User + actions at 960px
+  }
+}
+
+// Narrow laptops: halve the gaps BETWEEN columns (Material default 16px each side) so all columns
+// incl. User (R12) + actions fit without scrolling. Outer edges keep 16px to line up with the card.
+.expense-table .mat-mdc-header-cell,
+.expense-table .mat-mdc-cell {
+  @include m.narrow-laptop {
+    padding: 0 v.$space-2;
+
+    &:first-child {
+      padding-left: v.$space-4;
+    }
+
+    &:last-child {
+      padding-right: v.$space-4;
+    }
+  }
+}
+
+// Payment is the least important column → hidden on narrow laptops so Amount + actions fit.
+// (Still visible in the edit dialog and the CSV export.)
+.mat-column-paymentMethod {
+  @include m.narrow-laptop {
+    display: none;
+  }
+}
+
+.description__merchant,
+.description__note {
+  @include m.truncate;
+  display: block;
+}
+
+.description__note {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.amount {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.actions {
+  width: 104px;
+  text-align: right;
+  white-space: nowrap;
+}

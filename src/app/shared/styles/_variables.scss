@@ -1,0 +1,28 @@
+// Design tokens that are NOT colors — design §6.
+// Colors come from the Material theme (var(--mat-sys-*)) or the budget CSS variables below.
+// Usage in any component:  @use 'variables' as v;   →   padding: v.$space-4;
+
+// Spacing scale (4px grid)
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 24px;
+$space-6: 32px;
+
+// Corner radii
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+// Layout
+$bottom-nav-height: 56px;
+$side-nav-width: 240px;
+$content-max-width: 1200px;
+$touch-target: 44px; // R10 / NFR5 minimum tap size
+
+// Budget status colors (R8 AC3). Defined as CSS custom properties in styles.scss
+// so they follow the Material theme; reference them through these variables.
+$budget-ok: var(--budget-ok);
+$budget-warning: var(--budget-warning);
+$budget-danger: var(--budget-danger);

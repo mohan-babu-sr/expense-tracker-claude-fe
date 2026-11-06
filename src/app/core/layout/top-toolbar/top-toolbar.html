@@ -1,0 +1,14 @@
+<mat-toolbar class="toolbar">
+  <mat-icon class="toolbar__icon" aria-hidden="true">account_balance_wallet</mat-icon>
+  <span class="toolbar__title">{{ title() }}</span>
+  <!-- Settings entry on mobile (R11 AC1). Plain <a> styled as an icon button: keeps MatButton out of CoreModule. -->
+  <a
+    class="toolbar__action"
+    [routerLink]="settings.path"
+    routerLinkActive="toolbar__action--active"
+    ariaCurrentWhenActive="page"
+    [attr.aria-label]="settings.label"
+  >
+    <mat-icon aria-hidden="true">{{ settings.icon }}</mat-icon>
+  </a>
+</mat-toolbar>

@@ -1,0 +1,47 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Mobile-first: title and actions stack; on laptop they sit on one row.
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-4;
+
+  @include m.laptop {
+    margin-bottom: v.$space-5;
+  }
+}
+
+.page-header__text {
+  min-width: 0;
+}
+
+.page-header__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+
+  @include m.laptop {
+    font: var(--mat-sys-headline-medium);
+  }
+}
+
+.page-header__subtitle {
+  margin: v.$space-1 0 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+
+  &:empty {
+    display: none;
+  }
+}

@@ -1,0 +1,49 @@
+// Reusable mixins — design §6. Mobile-first: write base styles for mobile,
+// then override for larger screens with `@include m.laptop { ... }`.
+// Usage:  @use 'mixins' as m;
+@use 'breakpoints' as bp;
+@use 'variables' as v;
+
+/// Styles for phones / small tablets (< 960px).
+@mixin mobile {
+  @media (max-width: bp.$mobile-max) {
+    @content;
+  }
+}
+
+/// Styles for laptops and larger (≥ 960px).
+@mixin laptop {
+  @media (min-width: bp.$laptop-min) {
+    @content;
+  }
+}
+
+/// Laptop widths where the side nav leaves little content room (960–1199px), e.g. to drop table columns.
+@mixin narrow-laptop {
+  @media (min-width: bp.$laptop-min) and (max-width: bp.$wide-laptop-max) {
+    @content;
+  }
+}
+
+/// Minimum 44×44px tap area (R10, NFR5).
+@mixin touch-target {
+  min-width: v.$touch-target;
+  min-height: v.$touch-target;
+}
+
+/// Card-like surface using Material 3 theme tokens (no hard-coded colors).
+@mixin card-surface {
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface);
+  border-radius: v.$radius-md;
+  box-shadow: var(--mat-sys-level1);
+  padding: v.$space-4;
+}
+
+/// Single-line text with "…" — the flex/grid parent needs `min-width: 0` on this item.
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}

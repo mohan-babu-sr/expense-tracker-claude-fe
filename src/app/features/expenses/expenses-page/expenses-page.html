@@ -1,0 +1,99 @@
+<app-page-header title="Expenses" [subtitle]="subtitle()">
+  <!-- R9: exports exactly what the current filters show. Icon-only on mobile to save space. -->
+  @if (isMobile()) {
+    <button
+      mat-icon-button
+      type="button"
+      (click)="exportCsv()"
+      [disabled]="exporting() || total() === 0"
+      aria-label="Export to CSV"
+      matTooltip="Export to CSV"
+    >
+      <mat-icon>download</mat-icon>
+    </button>
+  } @else {
+    <button mat-stroked-button type="button" (click)="exportCsv()" [disabled]="exporting() || total() === 0">
+      <mat-icon>download</mat-icon>
+      {{ exporting() ? 'Exporting…' : 'Export CSV' }}
+    </button>
+  }
+  <app-add-expense-button (saved)="reload()" />
+</app-page-header>
+
+<!-- Filters (R6): inline bar on laptop; search + "Filters" bottom sheet on mobile (AC5) -->
+@if (isMobile()) {
+  <div class="mobile-filters">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mobile-filters__search">
+      <mat-icon matIconPrefix>search</mat-icon>
+      <mat-label>Search note or merchant</mat-label>
+      <input matInput type="search" autocomplete="off" [value]="searchText()" (input)="onSearchInput($any($event.target).value)" />
+    </mat-form-field>
+    <button
+      mat-stroked-button
+      type="button"
+      class="mobile-filters__button"
+      (click)="openFilterSheet()"
+      [matBadge]="activeFilterCount() || null"
+      [attr.aria-label]="'Filters' + (activeFilterCount() ? ', ' + activeFilterCount() + ' active' : '')"
+    >
+      <mat-icon>tune</mat-icon>
+      Filters
+    </button>
+  </div>
+} @else {
+  <div class="filter-bar">
+    <app-expense-filters layout="inline" />
+  </div>
+}
+<app-active-filter-chips />
+
+@if (loaded()) {
+  @if (total() > 0) {
+    <!-- Total of ALL expenses matching the current filter, not just this page (R2 AC3) -->
+    <div class="summary" role="status">
+      <span class="summary__count">{{ total() }} {{ total() === 1 ? 'expense' : 'expenses' }}</span>
+      <span class="summary__total">
+        Total <strong>{{ totalAmount() | inrCurrency }}</strong>
+      </span>
+    </div>
+
+    @if (isMobile()) {
+      <app-expense-card-list
+        [expenses]="items()"
+        [hasMore]="hasMore()"
+        [loadingMore]="loadingMore()"
+        (loadMore)="onLoadMore()"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      />
+    } @else {
+      <app-expense-table
+        [expenses]="items()"
+        [total]="total()"
+        [pageIndex]="pageIndex()"
+        [pageSize]="pageSize()"
+        (page)="onPage($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      />
+    }
+  } @else if (activeFilterCount() > 0) {
+    <app-empty-state
+      icon="filter_alt_off"
+      title="No matching expenses"
+      message="Nothing matches these filters. Try changing or clearing them."
+      actionLabel="Clear filters"
+      actionIcon="filter_alt_off"
+      (action)="clearFilters()"
+    />
+  } @else {
+    <!-- R2 AC4 -->
+    <app-empty-state
+      icon="receipt_long"
+      title="No expenses yet"
+      message="Nothing recorded for this period. Add your first expense to start tracking."
+      actionLabel="Add expense"
+      (action)="onAdd()"
+    />
+  }
+}

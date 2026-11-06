@@ -1,0 +1,11 @@
+@if (isMobile()) {
+  <button mat-fab extended class="fab" type="button" (click)="open()" aria-label="Add expense">
+    <mat-icon>add</mat-icon>
+    Add
+  </button>
+} @else {
+  <button mat-flat-button type="button" (click)="open()">
+    <mat-icon>add</mat-icon>
+    Add expense
+  </button>
+}

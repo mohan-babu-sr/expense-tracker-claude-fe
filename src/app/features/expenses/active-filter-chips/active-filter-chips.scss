@@ -1,0 +1,9 @@
+@use 'variables' as v;
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+}

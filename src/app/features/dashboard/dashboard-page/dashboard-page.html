@@ -1,0 +1,43 @@
+<app-page-header title="Dashboard" [subtitle]="subtitle()">
+  <app-month-picker [(month)]="month" />
+  <app-add-expense-button (saved)="load()" />
+</app-page-header>
+
+@if (data(); as d) {
+  <!-- Over-budget warning (R8 AC4): icon + words + error colors -->
+  @if (d.overBudget.length) {
+    <div class="banner" role="alert">
+      <mat-icon aria-hidden="true">warning</mat-icon>
+      <span class="banner__text">
+        <strong>Over budget:</strong> {{ overBudgetText() }}
+      </span>
+      <a mat-button routerLink="/budgets" class="banner__link">View budgets</a>
+    </div>
+  }
+
+  <!-- R7 AC1 -->
+  <app-summary-cards [data]="d" />
+
+  <!-- R7 AC2 + AC3 -->
+  <div class="charts">
+    <app-category-chart [data]="d.byCategory" />
+    <app-trend-chart [data]="d.last6Months" />
+  </div>
+
+  <!-- R7 AC4 -->
+  <section class="recent" aria-labelledby="recent-title">
+    <div class="recent__header">
+      <h2 class="recent__title" id="recent-title">Recent expenses</h2>
+      <a mat-button routerLink="/expenses">View all</a>
+    </div>
+    @if (d.recent.length) {
+      <div class="recent__list">
+        @for (e of d.recent; track e.id) {
+          <app-expense-list-item [expense]="e" [showActions]="false" (edit)="onEdit($event)" />
+        }
+      </div>
+    } @else {
+      <app-empty-state icon="receipt_long" title="No expenses this month" message="Add an expense to see it here." />
+    }
+  </section>
+}

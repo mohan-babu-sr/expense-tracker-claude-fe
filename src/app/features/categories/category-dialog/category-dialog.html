@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit category' : 'Add category' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" id="category-form">
+  <mat-dialog-content class="category-form">
+    <div class="category-form__preview" aria-hidden="true">
+      <app-category-chip [category]="preview()" />
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" maxlength="30" autocomplete="off" cdkFocusInitial />
+      <mat-hint align="end">{{ form.controls.name.value.length }} / 30</mat-hint>
+      @if (form.controls.name.invalid) {
+        <mat-error>{{ nameError() }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Native radios: keyboard (arrow keys) + screen readers work out of the box; formControlName binds them. -->
+    <fieldset class="picker">
+      <legend class="picker__legend">Icon</legend>
+      <div class="picker__grid">
+        @for (icon of icons; track icon) {
+          <label class="picker__option picker__option--icon" [title]="iconName(icon)">
+            <input type="radio" class="cdk-visually-hidden" formControlName="icon" [value]="icon" [attr.aria-label]="iconName(icon)" />
+            <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="picker">
+      <legend class="picker__legend">Color</legend>
+      <div class="picker__grid">
+        @for (color of colors; track color) {
+          <label class="picker__option picker__option--color" [title]="colorName(color)">
+            <input type="radio" class="cdk-visually-hidden" formControlName="color" [value]="color" [attr.aria-label]="colorName(color)" />
+            <!-- The swatch color is data (saved hex) → passed as a CSS variable. -->
+            <span class="picker__swatch" [style.--swatch]="color" aria-hidden="true">
+              <mat-icon>check</mat-icon>
+            </span>
+          </label>
+        }
+      </div>
+    </fieldset>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>

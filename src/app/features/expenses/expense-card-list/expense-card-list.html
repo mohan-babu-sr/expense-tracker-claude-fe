@@ -1,0 +1,21 @@
+@for (group of groups(); track group.date) {
+  <section class="day" [attr.aria-label]="group.label ?? (group.date | date: 'EEEE d MMMM')">
+    <h2 class="day__header">
+      <span>{{ group.label ?? (group.date | date: 'EEE, d MMM') }}</span>
+      <span class="day__total">{{ group.total | inrCurrency }}</span>
+    </h2>
+    <div class="day__card">
+      @for (e of group.items; track e.id) {
+        <app-expense-list-item [expense]="e" [showDate]="false" (edit)="edit.emit($event)" (delete)="delete.emit($event)" />
+      }
+    </div>
+  </section>
+}
+
+@if (hasMore()) {
+  <div class="load-more">
+    <button mat-stroked-button type="button" (click)="loadMore.emit()" [disabled]="loadingMore()">
+      {{ loadingMore() ? 'Loading…' : 'Load more' }}
+    </button>
+  </div>
+}

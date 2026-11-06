@@ -1,0 +1,35 @@
+<div class="expense-item">
+  <button
+    type="button"
+    class="expense-item__main"
+    (click)="edit.emit(expense())"
+    [attr.aria-label]="'Edit ' + title() + ', ' + (expense().amount | inrCurrency)"
+  >
+    <app-category-chip [category]="expense().category" mode="avatar" />
+
+    <span class="expense-item__text">
+      <span class="expense-item__title">{{ title() }}</span>
+      @if (meta()) {
+        <span class="expense-item__meta">{{ meta() }}</span>
+      }
+    </span>
+
+    <span class="expense-item__amount">{{ expense().amount | inrCurrency }}</span>
+  </button>
+
+  @if (showActions()) {
+    <button mat-icon-button type="button" [matMenuTriggerFor]="menu" aria-label="More actions">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" xPosition="before">
+      <button mat-menu-item (click)="edit.emit(expense())">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="delete.emit(expense())">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </mat-menu>
+  }
+</div>

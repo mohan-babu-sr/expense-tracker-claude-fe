@@ -1,0 +1,9 @@
+// Breakpoints — design §5/§6 (R10).
+// $mobile-max MUST match LayoutService: BreakpointObserver.observe('(max-width: 959.98px)').
+// .98 avoids a 1px gap/overlap between the mobile and laptop queries at fractional zoom levels.
+
+$mobile-max: 959.98px;
+$laptop-min: 960px;
+
+// Upper end of "narrow laptop" (960–1199px): side nav (240px) leaves only ~650–900px for content.
+$wide-laptop-max: 1199.98px;

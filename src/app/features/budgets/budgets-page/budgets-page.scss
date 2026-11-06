@@ -1,0 +1,84 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.section + .section {
+  margin-top: v.$space-5;
+}
+
+.section__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-2;
+  font: var(--mat-sys-title-medium);
+}
+
+// "2 over budget" — icon + text, error color (NFR5).
+.over-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  padding: 2px v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font: var(--mat-sys-label-medium);
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+.budget-list {
+  display: grid;
+  gap: v.$space-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  // Two columns on wide screens.
+  @include m.laptop {
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  }
+}
+
+.budget-card {
+  @include m.card-surface;
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+
+  app-budget-progress {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.budget-card__edit {
+  flex: none;
+  margin: -(v.$space-2) (-(v.$space-2)) 0 0;
+}
+
+.overall-label {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  font: var(--mat-sys-title-small);
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.hint-card {
+  @include m.card-surface;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-2;
+  color: var(--mat-sys-on-surface-variant);
+}

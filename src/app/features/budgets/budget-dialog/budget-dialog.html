@@ -1,0 +1,52 @@
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <h2 mat-dialog-title>{{ isEdit ? 'Edit budget' : 'Set budget' }}</h2>
+
+  <mat-dialog-content class="budget-form">
+    @if (nothingLeft) {
+      <p class="budget-form__info">Every category already has a budget. Edit an existing one instead.</p>
+    } @else {
+      <mat-form-field appearance="outline">
+        <mat-label>Budget for</mat-label>
+        <mat-select formControlName="target">
+          @if (showOverallOption) {
+            <mat-option [value]="overall">
+              <span class="overall-option"><mat-icon fontIcon="account_balance_wallet" /> Overall (all categories)</span>
+            </mat-option>
+          }
+          @for (c of categoryOptions(); track c.id) {
+            <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+          }
+        </mat-select>
+        @if (form.controls.target.invalid) {
+          <mat-error>Choose a category or Overall</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Monthly budget</mat-label>
+        <span matTextPrefix>₹&nbsp;</span>
+        <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="amount" autocomplete="off" />
+        <mat-hint>Applies to every month until you change it</mat-hint>
+        @if (form.controls.amount.invalid) {
+          <mat-error>{{ amountError() }}</mat-error>
+        }
+      </mat-form-field>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="budget-form__actions">
+    @if (isEdit) {
+      <button mat-button type="button" class="budget-form__remove" (click)="remove()" [disabled]="busy()">
+        <mat-icon>delete</mat-icon>
+        Remove
+      </button>
+    }
+    <span class="spacer"></span>
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    @if (!nothingLeft) {
+      <button mat-flat-button type="submit" [disabled]="form.invalid || busy()">
+        {{ busy() ? 'Saving…' : 'Save' }}
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

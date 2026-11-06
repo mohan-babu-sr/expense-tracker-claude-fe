@@ -1,0 +1,51 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.filter-bar {
+  @include m.card-surface;
+  margin-bottom: v.$space-3;
+}
+
+.mobile-filters {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+}
+
+.mobile-filters__search {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-filters__button {
+  @include m.touch-target;
+  flex: none;
+  height: 56px; // same height as the outlined search field
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+  padding: v.$space-3 v.$space-4;
+  border-radius: v.$radius-md;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.summary__count {
+  font: var(--mat-sys-body-medium);
+}
+
+.summary__total {
+  font: var(--mat-sys-body-large);
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    font: var(--mat-sys-title-medium);
+  }
+}

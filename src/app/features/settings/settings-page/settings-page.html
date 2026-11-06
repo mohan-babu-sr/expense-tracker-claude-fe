@@ -1,0 +1,34 @@
+<app-page-header title="Settings" subtitle="Saved on this device" />
+
+<!-- R11 AC4: one card per section — add new sections below as settings grow. -->
+<section class="section" aria-labelledby="appearance-title">
+  <h2 class="section__title" id="appearance-title">
+    <mat-icon aria-hidden="true">palette</mat-icon>
+    Appearance
+  </h2>
+
+  <!-- Native radios (same pattern as the category icon picker): arrow keys + screen readers work as-is. -->
+  <fieldset class="theme-picker">
+    <legend class="theme-picker__legend">Theme</legend>
+    <p class="theme-picker__hint" id="theme-hint">System follows your device's light or dark setting.</p>
+    <div class="theme-picker__options">
+      @for (option of themeOptions; track option.value) {
+        <label class="theme-option">
+          <input
+            type="radio"
+            name="theme"
+            class="cdk-visually-hidden"
+            [value]="option.value"
+            [checked]="theme() === option.value"
+            (change)="setTheme(option.value)"
+            aria-describedby="theme-hint"
+          />
+          <mat-icon class="theme-option__icon" aria-hidden="true">{{ option.icon }}</mat-icon>
+          <span class="theme-option__label">{{ option.label }}</span>
+          <!-- Selected = ring + check mark, not color alone (NFR5) -->
+          <mat-icon class="theme-option__check" aria-hidden="true">check_circle</mat-icon>
+        </label>
+      }
+    </div>
+  </fieldset>
+</section>
