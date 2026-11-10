@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, inject } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -31,6 +32,7 @@ import { TopToolbar } from './layout/top-toolbar/top-toolbar';
     MatToolbarModule,
     MatIconModule,
     MatProgressBarModule,
+    MatBadgeModule, // pending join requests on Settings (R13 AC7) — a few kB
   ],
   exports: [Shell],
 })

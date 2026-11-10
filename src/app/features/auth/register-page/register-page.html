@@ -1,0 +1,136 @@
+<app-auth-card title="Create account" subtitle="Your mobile number and group can't be changed later — only the admin can.">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (formError(); as message) {
+      <p class="auth-form__error" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        <span>{{ message }}</span>
+      </p>
+    }
+
+    <h2 class="register__section">About you</h2>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Your name</mat-label>
+      <input matInput formControlName="name" autocomplete="name" maxlength="40" />
+      @if (form.controls.name.hasError('server')) {
+        <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+      } @else {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mobile number</mat-label>
+      <span matTextPrefix>+91&nbsp;</span>
+      <input matInput type="tel" inputmode="numeric" autocomplete="username" formControlName="mobile" maxlength="16" />
+      @if (form.controls.mobile.hasError('server')) {
+        <mat-error>{{ form.controls.mobile.getError('server') }}</mat-error>
+      } @else if (form.controls.mobile.hasError('mobile')) {
+        <mat-error>Enter a 10-digit mobile number starting with 6, 7, 8 or 9</mat-error>
+      } @else {
+        <mat-error>Mobile number is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>PIN (4–6 digits)</mat-label>
+      <input
+        matInput
+        [type]="showPin() ? 'text' : 'password'"
+        inputmode="numeric"
+        autocomplete="new-password"
+        formControlName="pin"
+        maxlength="6"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="showPin.set(!showPin())"
+        [attr.aria-label]="showPin() ? 'Hide PIN' : 'Show PIN'"
+        [attr.aria-pressed]="showPin()"
+      >
+        <mat-icon>{{ showPin() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (form.controls.pin.hasError('server')) {
+        <mat-error>{{ form.controls.pin.getError('server') }}</mat-error>
+      } @else {
+        <mat-error>PIN must be 4 to 6 digits</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Confirm PIN</mat-label>
+      <input
+        matInput
+        [type]="showPin() ? 'text' : 'password'"
+        inputmode="numeric"
+        autocomplete="new-password"
+        formControlName="confirmPin"
+        maxlength="6"
+      />
+      @if (form.controls.confirmPin.hasError('mismatch')) {
+        <mat-error>PINs don't match</mat-error>
+      } @else {
+        <mat-error>Enter the PIN again</mat-error>
+      }
+    </mat-form-field>
+
+    <h2 class="register__section">Your group</h2>
+    <p class="register__help">A group is your household: everyone in it sees and adds the same expenses.</p>
+
+    <div formGroupName="group" class="auth-form">
+      <mat-button-toggle-group formControlName="mode" class="register__mode" aria-label="Group">
+        <mat-button-toggle value="create">
+          <mat-icon aria-hidden="true">group_add</mat-icon>
+          Create new
+        </mat-button-toggle>
+        <mat-button-toggle value="join">
+          <mat-icon aria-hidden="true">login</mat-icon>
+          Join existing
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      @if (mode() === 'create') {
+        <mat-form-field appearance="outline">
+          <mat-label>Group name</mat-label>
+          <input matInput formControlName="name" maxlength="40" placeholder="e.g. Home" />
+          @if (form.controls.group.controls.name.hasError('server')) {
+            <mat-error>{{ form.controls.group.controls.name.getError('server') }}</mat-error>
+          } @else {
+            <mat-error>Group name is required</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      <mat-form-field appearance="outline">
+        <mat-label>Group code</mat-label>
+        <input matInput formControlName="code" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="e.g. HOME-2026" />
+        <mat-hint>
+          @if (mode() === 'create') {
+            Choose a unique code and share it with your family so they can join.
+          } @else {
+            Ask a member of the group for its code.
+          }
+        </mat-hint>
+        @if (form.controls.group.controls.code.hasError('server')) {
+          <mat-error>{{ form.controls.group.controls.code.getError('server') }}</mat-error>
+        } @else {
+          <mat-error>6–20 letters, digits or "-"</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <button mat-flat-button class="auth-form__submit" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Creating account…' : mode() === 'create' ? 'Create account and group' : 'Create account and ask to join' }}
+    </button>
+    @if (slowFlag.slow()) {
+      <p class="auth-form__hint" role="status">Waking up the server… this can take up to a minute.</p>
+    }
+  </form>
+
+  <div authFooter>
+    <a class="auth-link" routerLink="/sign-in">I already have an account</a>
+    <a class="auth-link" routerLink="/welcome">Back</a>
+  </div>
+</app-auth-card>

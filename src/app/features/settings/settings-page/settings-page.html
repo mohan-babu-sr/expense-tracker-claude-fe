@@ -1,6 +1,177 @@
-<app-page-header title="Settings" subtitle="Saved on this device" />
+<app-page-header title="Settings" />
 
 <!-- R11 AC4: one card per section — add new sections below as settings grow. -->
+
+<!-- Account (R13 AC4) -->
+<section class="section" aria-labelledby="account-title">
+  <h2 class="section__title" id="account-title">
+    <mat-icon aria-hidden="true">account_circle</mat-icon>
+    Account
+  </h2>
+
+  @if (userMe(); as m) {
+    <form class="account__name" [formGroup]="nameForm" (ngSubmit)="saveName()" novalidate>
+      <mat-form-field appearance="outline" class="account__name-field">
+        <mat-label>Your name</mat-label>
+        <input matInput formControlName="name" maxlength="40" autocomplete="name" />
+        @if (nameForm.controls.name.hasError('server')) {
+          <mat-error>{{ nameForm.controls.name.getError('server') }}</mat-error>
+        } @else {
+          <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+      <button mat-stroked-button type="submit" [disabled]="nameForm.pristine || nameForm.invalid || savingName()">
+        Save
+      </button>
+    </form>
+
+    <!-- Read-only (R13 AC4): shown with a lock icon + text, not just greyed out (NFR5) -->
+    <dl class="account__facts">
+      <div class="account__fact">
+        <dt>Mobile number</dt>
+        <dd>+91 {{ m.user.mobile }}</dd>
+      </div>
+      <div class="account__fact">
+        <dt>Group</dt>
+        <dd>{{ m.group?.name }} <span class="account__code">({{ m.group?.code }})</span></dd>
+      </div>
+    </dl>
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">lock</mat-icon>
+      Only the admin can change your mobile number or group.
+    </p>
+
+    <mat-divider />
+
+    @if (!showPinForm()) {
+      <button mat-stroked-button type="button" class="account__action" (click)="showPinForm.set(true)">
+        <mat-icon>pin</mat-icon>
+        Change PIN
+      </button>
+    } @else {
+      <form class="account__pin" [formGroup]="pinForm" #pinDirective="ngForm" (ngSubmit)="changePin(pinDirective)" novalidate>
+        <h3 class="account__subtitle">Change PIN</h3>
+        <mat-form-field appearance="outline">
+          <mat-label>Current PIN</mat-label>
+          <input matInput type="password" inputmode="numeric" autocomplete="current-password" formControlName="currentPin" maxlength="6" />
+          @if (pinForm.controls.currentPin.hasError('server')) {
+            <mat-error>{{ pinForm.controls.currentPin.getError('server') }}</mat-error>
+          } @else {
+            <mat-error>Enter your current PIN</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>New PIN (4–6 digits)</mat-label>
+          <input matInput type="password" inputmode="numeric" autocomplete="new-password" formControlName="newPin" maxlength="6" />
+          @if (pinForm.controls.newPin.hasError('server')) {
+            <mat-error>{{ pinForm.controls.newPin.getError('server') }}</mat-error>
+          } @else {
+            <mat-error>PIN must be 4 to 6 digits</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm new PIN</mat-label>
+          <input matInput type="password" inputmode="numeric" autocomplete="new-password" formControlName="confirmPin" maxlength="6" />
+          @if (pinForm.controls.confirmPin.hasError('mismatch')) {
+            <mat-error>PINs don't match</mat-error>
+          } @else {
+            <mat-error>Enter the new PIN again</mat-error>
+          }
+        </mat-form-field>
+        <div class="account__pin-actions">
+          <button mat-button type="button" (click)="cancelPin(pinDirective)">Cancel</button>
+          <button mat-flat-button type="submit" [disabled]="savingPin()">
+            {{ savingPin() ? 'Saving…' : 'Change PIN' }}
+          </button>
+        </div>
+      </form>
+    }
+  } @else if (me(); as m) {
+    @if (m.kind === 'admin') {
+      <dl class="account__facts">
+        <div class="account__fact">
+          <dt>Signed in as</dt>
+          <dd>{{ m.username }} (admin)</dd>
+        </div>
+      </dl>
+      <a mat-stroked-button class="account__action" routerLink="/admin/password">
+        <mat-icon>password</mat-icon>
+        Change password
+      </a>
+    }
+  }
+
+  <button mat-stroked-button type="button" class="account__action account__signout" (click)="signOut()">
+    <mat-icon>logout</mat-icon>
+    Sign out
+  </button>
+</section>
+
+<!-- Group (R13 AC7) — active members only -->
+@if (group(); as g) {
+  <section class="section" aria-labelledby="group-title">
+    <h2 class="section__title" id="group-title">
+      <mat-icon aria-hidden="true">group</mat-icon>
+      {{ g.name }}
+    </h2>
+
+    <!-- Invite: share the code; joiners still need approval (R13 AC2) -->
+    <div class="group__code">
+      <dl class="account__fact">
+        <dt>Group code</dt>
+        <dd class="group__code-value">{{ g.code }}</dd>
+      </dl>
+      <button mat-stroked-button type="button" (click)="copyCode(g.code)">
+        <mat-icon>content_copy</mat-icon>
+        Copy
+      </button>
+    </div>
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      Share this code to invite someone. You approve them here before they see anything.
+    </p>
+
+    <!-- Join requests -->
+    @if (g.pending.length) {
+      <h3 class="account__subtitle">Waiting for approval ({{ g.pending.length }})</h3>
+      <ul class="people">
+        @for (p of g.pending; track p.id) {
+          <li class="person person--pending">
+            <mat-icon class="person__icon" aria-hidden="true">person_add</mat-icon>
+            <div class="person__text">
+              <span class="person__name">{{ p.name }}</span>
+              <span class="person__meta">+91 {{ p.mobile }}</span>
+            </div>
+            <div class="person__actions">
+              <button mat-button type="button" [disabled]="busyId() === p.id" (click)="reject(p)">Reject</button>
+              <button mat-flat-button type="button" [disabled]="busyId() === p.id" (click)="approve(p)">Approve</button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    <h3 class="account__subtitle">Members ({{ g.members.length }})</h3>
+    <ul class="people">
+      @for (p of g.members; track p.id) {
+        <li class="person">
+          <mat-icon class="person__icon" aria-hidden="true">{{ p.role === 'owner' ? 'star' : 'person' }}</mat-icon>
+          <div class="person__text">
+            <span class="person__name">
+              {{ p.name }}
+              @if (p.id === userMe()?.user?.id) {
+                <span class="person__you">(you)</span>
+              }
+            </span>
+            <span class="person__meta">{{ p.role === 'owner' ? 'Owner' : 'Member' }} · +91 {{ p.mobile }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+<!-- Appearance (R11) — device-local -->
 <section class="section" aria-labelledby="appearance-title">
   <h2 class="section__title" id="appearance-title">
     <mat-icon aria-hidden="true">palette</mat-icon>
@@ -10,7 +181,9 @@
   <!-- Native radios (same pattern as the category icon picker): arrow keys + screen readers work as-is. -->
   <fieldset class="theme-picker">
     <legend class="theme-picker__legend">Theme</legend>
-    <p class="theme-picker__hint" id="theme-hint">System follows your device's light or dark setting.</p>
+    <p class="theme-picker__hint" id="theme-hint">
+      System follows your device's light or dark setting. Saved on this device only.
+    </p>
     <div class="theme-picker__options">
       @for (option of themeOptions; track option.value) {
         <label class="theme-option">

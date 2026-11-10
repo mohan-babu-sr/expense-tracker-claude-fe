@@ -1,0 +1,15 @@
+<header class="auth-card__header">
+  <mat-icon class="auth-card__logo" aria-hidden="true">{{ icon() }}</mat-icon>
+  <h1 class="auth-card__title">{{ title() }}</h1>
+  @if (subtitle()) {
+    <p class="auth-card__subtitle">{{ subtitle() }}</p>
+  }
+</header>
+
+<section class="auth-card__body">
+  <ng-content />
+</section>
+
+<footer class="auth-card__footer">
+  <ng-content select="[authFooter]" />
+</footer>

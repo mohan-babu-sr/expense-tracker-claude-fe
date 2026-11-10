@@ -3,8 +3,9 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CategoryService } from '../../../core/services/category.service';
-import { PAYMENT_METHODS, USERS } from '../../../shared/constants';
-import { ExpenseUser, PaymentMethod } from '../../../shared/models';
+import { GroupService } from '../../../core/services/group.service';
+import { PAYMENT_METHODS } from '../../../shared/constants';
+import { PaymentMethod } from '../../../shared/models';
 import { currentMonth, fromIsoDate, toIsoDate } from '../../../shared/utils/date.utils';
 import { ExpenseFilterService, isDefaultFilter } from '../expense-filter.service';
 
@@ -35,7 +36,8 @@ export class ExpenseFilters {
   readonly showSearch = input(true);
 
   protected readonly paymentMethods = PAYMENT_METHODS;
-  protected readonly users = USERS;
+  /** Group members (R13 AC9). */
+  protected readonly members = inject(GroupService).members;
   protected readonly categories = toSignal(inject(CategoryService).getAll(), { initialValue: [] });
   protected readonly today = new Date();
   protected readonly maxMonth = currentMonth();
@@ -46,7 +48,7 @@ export class ExpenseFilters {
   protected readonly rangeEnd = new FormControl<Date | null>(null);
   protected readonly categoryIds = new FormControl<string[]>([], { nonNullable: true });
   protected readonly paymentMethod = new FormControl<PaymentMethod | null>(null);
-  protected readonly user = new FormControl<ExpenseUser | null>(null);
+  protected readonly user = new FormControl<string | null>(null);
   protected readonly search = new FormControl('', { nonNullable: true });
   protected readonly canClear = signal(false);
 
@@ -79,7 +81,7 @@ export class ExpenseFilters {
       this.categoryIds.setValue(f.categoryIds ?? [], { emitEvent: false });
       this.selectedIds.set(f.categoryIds ?? []);
       this.paymentMethod.setValue(f.paymentMethod ?? null, { emitEvent: false });
-      this.user.setValue(f.user ?? null, { emitEvent: false });
+      this.user.setValue(f.userId ?? null, { emitEvent: false });
       if ((f.q ?? '') !== this.search.value.trim()) this.search.setValue(f.q ?? '', { emitEvent: false });
       this.canClear.set(!isDefaultFilter(f));
     });
@@ -114,7 +116,7 @@ export class ExpenseFilters {
     this.filters.setPaymentMethod(value ?? undefined);
   }
 
-  protected onUserChange(value: ExpenseUser | null): void {
+  protected onUserChange(value: string | null): void {
     this.filters.setUser(value ?? undefined);
   }
 

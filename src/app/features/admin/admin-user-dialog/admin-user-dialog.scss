@@ -1,0 +1,23 @@
+@use 'variables' as v;
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.dialog-form__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0;
+  padding: v.$space-3;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}

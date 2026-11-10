@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Reset PIN</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="dialog-form">
+    <p class="dialog-form__intro">
+      New PIN for <strong>{{ user.name }}</strong> (+91 {{ user.mobile }}). They'll be signed out on all
+      devices; tell them the new PIN.
+    </p>
+
+    <mat-form-field appearance="outline">
+      <mat-label>New PIN (4–6 digits)</mat-label>
+      <!-- Visible on purpose: the admin reads it out to the person (no SMS, R13 AC4) -->
+      <input matInput type="text" inputmode="numeric" autocomplete="off" formControlName="pin" maxlength="6" />
+      @if (form.controls.pin.hasError('server')) {
+        <mat-error>{{ form.controls.pin.getError('server') }}</mat-error>
+      } @else {
+        <mat-error>PIN must be 4 to 6 digits</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Reset PIN' }}</button>
+  </mat-dialog-actions>
+</form>

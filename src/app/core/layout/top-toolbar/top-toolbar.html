@@ -7,8 +7,16 @@
     [routerLink]="settings.path"
     routerLinkActive="toolbar__action--active"
     ariaCurrentWhenActive="page"
-    [attr.aria-label]="settings.label"
+    [attr.aria-label]="pendingCount() ? settings.label + ' (' + pendingCount() + ' waiting for approval)' : settings.label"
   >
-    <mat-icon aria-hidden="true">{{ settings.icon }}</mat-icon>
+    <!-- Badge = join requests waiting (R13 AC7) -->
+    <mat-icon
+      aria-hidden="true"
+      [matBadge]="pendingCount()"
+      [matBadgeHidden]="!pendingCount()"
+      matBadgeSize="small"
+      matBadgeColor="warn"
+      >{{ settings.icon }}</mat-icon
+    >
   </a>
 </mat-toolbar>

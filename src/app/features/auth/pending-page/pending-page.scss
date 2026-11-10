@@ -1,0 +1,17 @@
+@use 'variables' as v;
+
+.pending__text {
+  margin: 0 0 v.$space-3;
+  font: var(--mat-sys-body-large);
+}
+
+.pending__actions {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  margin-top: v.$space-4;
+
+  button {
+    min-height: 48px;
+  }
+}

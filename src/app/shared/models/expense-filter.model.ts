@@ -1,4 +1,4 @@
-import { ExpenseUser, PaymentMethod } from './expense.model';
+import { PaymentMethod } from './expense.model';
 
 /**
  * Expense filters (design §2 "Common expense filters", R6).
@@ -13,8 +13,8 @@ export interface ExpenseFilter {
   to?: string;
   categoryIds?: string[];
   paymentMethod?: PaymentMethod;
-  /** R12 */
-  user?: ExpenseUser;
+  /** Member id (R12 v2 / R13 AC9). */
+  userId?: string;
   /** Search text in note or merchant. */
   q?: string;
 }

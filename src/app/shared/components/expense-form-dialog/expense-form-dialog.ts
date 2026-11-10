@@ -6,10 +6,12 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angu
 import { Observable, catchError, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
 import { errorMessage } from '../../../core/interceptors/error.interceptor';
 import { skipErrorSnackbar } from '../../../core/interceptors/http-context.tokens';
+import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ExpenseService } from '../../../core/services/expense.service';
+import { GroupService } from '../../../core/services/group.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { DEFAULT_USER, PAYMENT_METHODS, USERS } from '../../constants';
+import { PAYMENT_METHODS } from '../../constants';
 import { Expense, ExpenseInput, ExpenseUser, PaymentMethod } from '../../models';
 import { fromIsoDate, toIsoDate } from '../../utils/date.utils';
 import { twoDecimals } from '../../utils/validators';
@@ -41,9 +43,22 @@ export class ExpenseFormDialog {
   protected readonly isEdit = !!this.data.expense;
   protected readonly saving = signal(false);
   protected readonly paymentMethods = PAYMENT_METHODS;
-  protected readonly users = USERS;
   protected readonly today = new Date();
   protected readonly categories = toSignal(inject(CategoryService).getAll(), { initialValue: [] });
+
+  /**
+   * "Spent by" choices (R13 AC9): the group's active members. When editing an expense of someone who
+   * is no longer an active member (disabled / moved), they're kept as an option so the field isn't
+   * blank — the server accepts an unchanged member.
+   */
+  private readonly members = inject(GroupService).members;
+  protected readonly userOptions = computed<ExpenseUser[]>(() => {
+    const list: ExpenseUser[] = this.members().map(({ id, name }) => ({ id, name }));
+    const own = this.data.expense?.user;
+    return own && !list.some((u) => u.id === own.id) ? [...list, own] : list;
+  });
+  /** New expenses default to the signed-in member (R12 v2). */
+  private readonly defaultUserId = inject(AuthService).userMe()?.user.id ?? '';
 
   protected readonly form = inject(FormBuilder).group({
     amount: [this.data.expense?.amount ?? (null as number | null), [Validators.required, Validators.min(0.01), twoDecimals]],
@@ -52,8 +67,8 @@ export class ExpenseFormDialog {
     merchant: [this.data.expense?.merchant ?? '', Validators.maxLength(50)],
     note: [this.data.expense?.note ?? '', Validators.maxLength(200)],
     paymentMethod: [(this.data.expense?.paymentMethod ?? null) as PaymentMethod | null],
-    // R12 AC2: required; new expenses default to Mohan.
-    user: [(this.data.expense?.user ?? DEFAULT_USER) as ExpenseUser, Validators.required],
+    // Required; same name as the API field, so 400 field errors map onto it directly.
+    userId: [this.data.expense?.userId ?? this.defaultUserId, Validators.required],
   });
 
   /** Chip shown in the closed category select. */
@@ -106,7 +121,7 @@ export class ExpenseFormDialog {
         return 'At most 50 characters';
       case 'note':
         return 'At most 200 characters';
-      case 'user':
+      case 'userId':
         return 'Choose who spent it';
       default:
         return 'Invalid value';
@@ -126,7 +141,7 @@ export class ExpenseFormDialog {
       merchant: v.merchant?.trim() || null,
       note: v.note?.trim() || null,
       paymentMethod: v.paymentMethod || null,
-      user: v.user ?? DEFAULT_USER,
+      userId: v.userId!,
     };
 
     this.saving.set(true);

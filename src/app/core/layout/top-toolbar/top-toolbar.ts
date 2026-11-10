@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
-import { NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
+import { GroupService } from '../../services/group.service';
+import { ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
 
 /** Mobile top bar (R10): shows the current page name. */
 @Component({
@@ -14,6 +15,7 @@ import { NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
 export class TopToolbar {
   private readonly router = inject(Router);
   protected readonly settings = SETTINGS_ITEM;
+  protected readonly pendingCount = inject(GroupService).pendingCount;
 
   /** Page label for the current URL, e.g. "/expenses?x=1" → "Expenses". */
   protected readonly title = toSignal(
@@ -25,6 +27,6 @@ export class TopToolbar {
   );
 
   private titleFor(url: string): string {
-    return [...NAV_ITEMS, SETTINGS_ITEM].find((item) => url.startsWith(item.path))?.label ?? 'Expense Tracker';
+    return [...NAV_ITEMS, ...ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, SETTINGS_ITEM].find((item) => url.startsWith(item.path))?.label ?? 'Expense Tracker';
   }
 }

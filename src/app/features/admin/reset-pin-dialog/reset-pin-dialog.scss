@@ -1,0 +1,13 @@
+@use 'variables' as v;
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.dialog-form__intro {
+  margin: 0 0 v.$space-2;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}

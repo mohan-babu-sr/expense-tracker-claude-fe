@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>New group</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Group name</mat-label>
+      <input matInput formControlName="name" maxlength="40" />
+      @if (form.controls.name.hasError('server')) {
+        <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+      } @else if (form.controls.name.hasError('maxlength')) {
+        <mat-error>At most 40 characters</mat-error>
+      } @else {
+        <mat-error>Group name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Group code</mat-label>
+      <input matInput formControlName="code" maxlength="20" autocapitalize="characters" autocomplete="off" />
+      <mat-hint>6–20 letters, digits or "-". Members join with it.</mat-hint>
+      @if (form.controls.code.hasError('server')) {
+        <mat-error>{{ form.controls.code.getError('server') }}</mat-error>
+      } @else if (form.controls.code.hasError('required')) {
+        <mat-error>Group code is required</mat-error>
+      } @else {
+        <mat-error>6–20 letters, digits or "-"</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">{{ saving() ? 'Creating…' : 'Create group' }}</button>
+  </mat-dialog-actions>
+</form>

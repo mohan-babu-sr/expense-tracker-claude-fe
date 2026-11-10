@@ -1,0 +1,12 @@
+@use 'variables' as v;
+@use '../auth-form';
+
+.welcome__actions {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+.welcome__button {
+  min-height: 48px;
+}

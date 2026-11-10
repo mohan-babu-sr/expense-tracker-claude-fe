@@ -1,0 +1,171 @@
+<app-page-header title="Users" subtitle="Accounts, PINs and approvals">
+  <button mat-flat-button type="button" (click)="openUserDialog()" [disabled]="!groups().length">
+    <mat-icon>person_add</mat-icon>
+    Add user
+  </button>
+</app-page-header>
+
+<!-- Filters: search (name or mobile), status, group -->
+<div class="filters">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__search">
+    <mat-label>Search name or mobile</mat-label>
+    <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+    <input matInput type="search" [formControl]="search" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__field">
+    <mat-label>Status</mat-label>
+    <mat-select [value]="status()" (selectionChange)="status.set($event.value)">
+      <mat-option [value]="null">All</mat-option>
+      @for (s of statuses; track s) {
+        <mat-option [value]="s">{{ statusInfo[s].label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filters__field">
+    <mat-label>Group</mat-label>
+    <mat-select [value]="groupId()" (selectionChange)="setGroup($event.value)">
+      <mat-option [value]="null">All groups</mat-option>
+      @for (g of groups(); track g.id) {
+        <mat-option [value]="g.id">{{ g.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (hasFilters()) {
+    <button mat-button type="button" class="filters__clear" (click)="clearFilters()">Clear</button>
+  }
+</div>
+
+<!-- One actions menu for both layouts -->
+<ng-template #actionsMenu let-u>
+  <button
+    mat-icon-button
+    type="button"
+    [matMenuTriggerFor]="menu"
+    [disabled]="busyId() === u.id"
+    [attr.aria-label]="'Actions for ' + u.name"
+  >
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    @if (u.status === 'pending') {
+      <button mat-menu-item type="button" (click)="run(u, 'approve')">
+        <mat-icon>how_to_reg</mat-icon>
+        <span>Approve</span>
+      </button>
+      <button mat-menu-item type="button" (click)="run(u, 'reject')">
+        <mat-icon>person_remove</mat-icon>
+        <span>Reject</span>
+      </button>
+      <mat-divider />
+    }
+    <button mat-menu-item type="button" (click)="openUserDialog(u)">
+      <mat-icon>edit</mat-icon>
+      <span>Edit</span>
+    </button>
+    <button mat-menu-item type="button" (click)="resetPin(u)">
+      <mat-icon>pin</mat-icon>
+      <span>Reset PIN</span>
+    </button>
+    @if (u.status === 'active') {
+      <button mat-menu-item type="button" (click)="run(u, 'disable')">
+        <mat-icon>block</mat-icon>
+        <span>Disable</span>
+      </button>
+    } @else if (u.status === 'disabled') {
+      <button mat-menu-item type="button" (click)="run(u, 'enable')">
+        <mat-icon>check_circle</mat-icon>
+        <span>Enable</span>
+      </button>
+    }
+  </mat-menu>
+</ng-template>
+
+<ng-template #statusTag let-u>
+  <span [class]="'status status--' + u.status">
+    <mat-icon aria-hidden="true">{{ statusOf(u).icon }}</mat-icon>
+    {{ statusOf(u).label }}
+  </span>
+</ng-template>
+
+@if (loaded()) {
+  @if (users().length) {
+    @if (isMobile()) {
+      <!-- Mobile: one card per user -->
+      <ul class="user-cards" aria-label="Users">
+        @for (u of users(); track u.id) {
+          <li class="user-card">
+            <div class="user-card__main">
+              <span class="user-card__name">
+                {{ u.name }}
+                @if (u.role === 'owner') {
+                  <span class="owner">(owner)</span>
+                }
+              </span>
+              <span class="user-card__meta">+91 {{ u.mobile }} · {{ u.group?.name ?? 'No group' }}</span>
+              <ng-container *ngTemplateOutlet="statusTag; context: { $implicit: u }" />
+            </div>
+            <ng-container *ngTemplateOutlet="actionsMenu; context: { $implicit: u }" />
+          </li>
+        }
+      </ul>
+    } @else {
+      <!-- Laptop: table -->
+      <div class="table-card">
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Users table">
+          <table mat-table [dataSource]="users()" class="users-table" aria-label="Users">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let u">
+                {{ u.name }}
+                @if (u.role === 'owner') {
+                  <span class="owner">(owner)</span>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="mobile">
+              <th mat-header-cell *matHeaderCellDef>Mobile</th>
+              <td mat-cell *matCellDef="let u" class="nowrap">+91 {{ u.mobile }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="group">
+              <th mat-header-cell *matHeaderCellDef>Group</th>
+              <td mat-cell *matCellDef="let u">
+                {{ u.group?.name ?? '—' }}
+                @if (u.group) {
+                  <span class="code">{{ u.group.code }}</span>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let u">
+                <ng-container *ngTemplateOutlet="statusTag; context: { $implicit: u }" />
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Actions</span></th>
+              <td mat-cell *matCellDef="let u" class="actions">
+                <ng-container *ngTemplateOutlet="actionsMenu; context: { $implicit: u }" />
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"></tr>
+          </table>
+        </div>
+      </div>
+    }
+  } @else if (hasFilters()) {
+    <app-empty-state icon="search_off" title="No matching users" message="Try another search or clear the filters." actionLabel="Clear filters" (action)="clearFilters()" />
+  } @else if (!groups().length) {
+    <app-empty-state icon="groups" title="No groups yet" message="Create a group first, then add users to it." actionLabel="Go to Groups" (action)="goToGroups()" />
+  } @else {
+    <app-empty-state icon="person" title="No users yet" message="Add a user, or share a group code so people can register." actionLabel="Add user" (action)="openUserDialog()" />
+  }
+}

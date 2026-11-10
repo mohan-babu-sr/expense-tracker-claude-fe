@@ -1,0 +1,19 @@
+<app-auth-card title="Expense Tracker" subtitle="Track what your household spends — together.">
+  <div class="welcome__actions">
+    <a mat-flat-button routerLink="/sign-in" class="welcome__button">
+      <mat-icon>login</mat-icon>
+      Sign in
+    </a>
+    <a mat-stroked-button routerLink="/register" class="welcome__button">
+      <mat-icon>person_add</mat-icon>
+      Create account
+    </a>
+  </div>
+  <p class="auth-form__hint">
+    New here? Create an account to start a group for your family, or join one with its group code.
+  </p>
+
+  <div authFooter>
+    <a class="auth-link" routerLink="/admin-sign-in">Admin sign in</a>
+  </div>
+</app-auth-card>

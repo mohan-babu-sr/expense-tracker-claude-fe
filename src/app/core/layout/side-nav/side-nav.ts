@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
+import { Component, computed, inject } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { GroupService } from '../../services/group.service';
+import { SETTINGS_ITEM, navItemsFor } from '../nav-items';
 
 /** Laptop navigation list (R10). Active page highlighted via routerLinkActive. */
 @Component({
@@ -9,6 +11,8 @@ import { NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
   styleUrl: './side-nav.scss',
 })
 export class SideNav {
-  protected readonly items = NAV_ITEMS;
+  private readonly auth = inject(AuthService);
+  protected readonly items = computed(() => navItemsFor(this.auth.me()?.kind));
   protected readonly settings = SETTINGS_ITEM;
+  protected readonly pendingCount = inject(GroupService).pendingCount;
 }

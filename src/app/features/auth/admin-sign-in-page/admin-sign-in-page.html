@@ -1,0 +1,43 @@
+<app-auth-card title="Admin sign in" subtitle="Manage users and groups" icon="admin_panel_settings">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (formError(); as message) {
+      <p class="auth-form__error" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        <span>{{ message }}</span>
+      </p>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="username" autocapitalize="none" />
+      <mat-error>Username is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput [type]="showPassword() ? 'text' : 'password'" autocomplete="current-password" formControlName="password" />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="showPassword.set(!showPassword())"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+        [attr.aria-pressed]="showPassword()"
+      >
+        <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error>Password is required</mat-error>
+    </mat-form-field>
+
+    <button mat-flat-button class="auth-form__submit" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Signing in…' : 'Sign in' }}
+    </button>
+    @if (slowFlag.slow()) {
+      <p class="auth-form__hint" role="status">Waking up the server… this can take up to a minute.</p>
+    }
+  </form>
+
+  <div authFooter>
+    <a class="auth-link" routerLink="/welcome">Back</a>
+  </div>
+</app-auth-card>

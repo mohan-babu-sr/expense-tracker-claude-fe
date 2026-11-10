@@ -1,0 +1,140 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// ---- Filters: stacked on phones, one wrapping row on laptops ----
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.$space-2;
+  margin-bottom: v.$space-4;
+
+  @include m.laptop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+.filters__search {
+  grid-column: 1 / -1;
+
+  @include m.laptop {
+    flex: 1 1 280px;
+    max-width: 400px;
+  }
+}
+
+.filters__field {
+  min-width: 0;
+
+  @include m.laptop {
+    width: 180px;
+  }
+}
+
+.filters__clear {
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: v.$touch-target;
+}
+
+// ---- Status tag: icon + text (NFR5) ----
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  font: var(--mat-sys-label-large);
+  white-space: nowrap;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.status--active mat-icon {
+  color: var(--mat-sys-primary);
+}
+
+.status--pending mat-icon {
+  color: var(--mat-sys-tertiary);
+}
+
+.status--disabled {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.owner,
+.code {
+  margin-left: v.$space-1;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ---- Laptop table (same pattern as the expenses table) ----
+.table-card {
+  @include m.card-surface;
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+.users-table {
+  width: 100%;
+  background: transparent;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.actions {
+  width: 56px;
+  text-align: right;
+}
+
+// ---- Mobile cards ----
+.user-cards {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user-card {
+  @include m.card-surface;
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  padding: v.$space-3 v.$space-2 v.$space-3 v.$space-4;
+}
+
+.user-card__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+.user-card__name {
+  @include m.truncate;
+  font: var(--mat-sys-title-small);
+}
+
+.user-card__meta {
+  @include m.truncate;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}

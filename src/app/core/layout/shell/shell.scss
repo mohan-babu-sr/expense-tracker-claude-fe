@@ -36,3 +36,15 @@
     padding: v.$space-5 v.$space-6;
   }
 }
+
+// Auth pages (design §8.5): no nav, so no bottom space for it; a narrow centred column on every screen.
+.shell__content--bare {
+  max-width: v.$auth-content-width;
+  margin: 0 auto;
+  padding: v.$space-6 v.$space-4 calc(#{v.$space-6} + env(safe-area-inset-bottom));
+
+  @include m.laptop {
+    max-width: v.$auth-content-width;
+    padding: v.$space-6 v.$space-4;
+  }
+}

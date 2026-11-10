@@ -1,1 +1,14 @@
-<app-shell />
+@if (auth.loaded()) {
+  <app-shell />
+} @else {
+  <!-- Start-up splash (design §8.5). Plain HTML/CSS: Material isn't loaded in the root module. -->
+  <div class="splash" role="status" aria-live="polite">
+    <div class="splash__spinner" aria-hidden="true"></div>
+    <p class="splash__title">Expense Tracker</p>
+    @if (slow()) {
+      <p class="splash__hint">Waking up the server… this can take up to a minute.</p>
+    } @else {
+      <p class="splash__hint">Loading…</p>
+    }
+  </div>
+}

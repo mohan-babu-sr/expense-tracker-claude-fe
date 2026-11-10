@@ -59,16 +59,16 @@
       }
     </mat-form-field>
 
-    <!-- Who spent it (R12): required, defaults to Mohan -->
+    <!-- Who spent it (R13 AC9): a group member, defaults to the signed-in member -->
     <mat-form-field appearance="outline">
       <mat-label>User</mat-label>
-      <mat-select formControlName="user">
-        @for (u of users; track u) {
-          <mat-option [value]="u">{{ u }}</mat-option>
+      <mat-select formControlName="userId">
+        @for (u of userOptions(); track u.id) {
+          <mat-option [value]="u.id">{{ u.name }}</mat-option>
         }
       </mat-select>
-      @if (form.controls.user.invalid) {
-        <mat-error>{{ error('user') }}</mat-error>
+      @if (form.controls.userId.invalid) {
+        <mat-error>{{ error('userId') }}</mat-error>
       }
     </mat-form-field>
 

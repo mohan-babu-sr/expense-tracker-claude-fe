@@ -1,4 +1,48 @@
+@use 'variables' as v;
+
 :host {
   display: block;
   height: 100%;
+}
+
+.splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-2;
+  height: 100%;
+  padding: v.$space-4;
+  text-align: center;
+}
+
+.splash__spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: v.$space-2;
+  border: 4px solid var(--mat-sys-surface-container-highest);
+  border-top-color: var(--mat-sys-primary);
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 3s;
+  }
+}
+
+.splash__title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.splash__hint {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,0 +1,31 @@
+@use 'variables' as v;
+@use '../auth-form';
+
+.register__section {
+  margin: v.$space-2 0 v.$space-2;
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.register__help {
+  margin: 0 0 v.$space-3;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Two equal halves; fits 360px phones.
+.register__mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: v.$space-3;
+
+  mat-icon {
+    margin-right: v.$space-1;
+    vertical-align: middle;
+  }
+}
+
+// Room for the two-line hint under the group code.
+mat-hint {
+  white-space: normal;
+}

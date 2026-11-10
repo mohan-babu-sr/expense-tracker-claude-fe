@@ -25,6 +25,174 @@
   }
 }
 
+// ---- Account ----
+.account__name {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+}
+
+.account__name-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.account__name button {
+  min-height: 56px; // same height as the outlined field next to it
+}
+
+.account__facts {
+  display: grid;
+  gap: v.$space-3;
+  margin: 0 0 v.$space-2;
+
+  @include m.laptop {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.account__fact {
+  min-width: 0;
+
+  dt {
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-body-large);
+    overflow-wrap: anywhere;
+  }
+}
+
+.account__code {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.section__hint {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+  margin: 0 0 v.$space-4;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+.account__action {
+  min-height: v.$touch-target;
+  margin-top: v.$space-4;
+}
+
+.account__signout {
+  display: flex;
+}
+
+.account__subtitle {
+  margin: v.$space-4 0 v.$space-3;
+  font: var(--mat-sys-title-small);
+}
+
+.account__pin {
+  display: flex;
+  flex-direction: column;
+
+  @include m.laptop {
+    max-width: 360px;
+  }
+}
+
+.account__pin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: v.$space-2;
+}
+
+// ---- Group ----
+.group__code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-2;
+
+  .account__fact {
+    margin: 0;
+  }
+
+  button {
+    flex-shrink: 0;
+    min-height: v.$touch-target;
+  }
+}
+
+.group__code-value {
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  padding: v.$space-2 0;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+// Phones: Approve / Reject wrap onto their own line under the name.
+.person--pending {
+  flex-wrap: wrap;
+}
+
+.person__icon {
+  flex-shrink: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.person__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.person__name {
+  @include m.truncate;
+  font: var(--mat-sys-body-large);
+}
+
+.person__you,
+.person__meta {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.person__actions {
+  display: flex;
+  gap: v.$space-2;
+  margin-left: auto;
+
+  button {
+    min-height: v.$touch-target;
+  }
+}
+
+// ---- Appearance ----
 .theme-picker {
   min-width: 0;
   margin: 0;

@@ -16,7 +16,7 @@ export function toFilterParams(filter: ExpenseFilter): HttpParams {
   }
   if (filter.categoryIds?.length) params = params.set('categoryIds', filter.categoryIds.join(','));
   if (filter.paymentMethod) params = params.set('paymentMethod', filter.paymentMethod);
-  if (filter.user) params = params.set('user', filter.user);
+  if (filter.userId) params = params.set('userId', filter.userId);
   if (filter.q?.trim()) params = params.set('q', filter.q.trim());
   return params;
 }

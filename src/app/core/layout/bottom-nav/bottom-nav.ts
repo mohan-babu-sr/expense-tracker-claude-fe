@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { NAV_ITEMS } from '../nav-items';
+import { Component, computed, inject } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { navItemsFor } from '../nav-items';
 
 /** Mobile bottom navigation: 4 icon + label buttons, 56px high (R10, design §5). */
 @Component({
@@ -9,5 +10,6 @@ import { NAV_ITEMS } from '../nav-items';
   styleUrl: './bottom-nav.scss',
 })
 export class BottomNav {
-  protected readonly items = NAV_ITEMS;
+  private readonly auth = inject(AuthService);
+  protected readonly items = computed(() => navItemsFor(this.auth.me()?.kind));
 }

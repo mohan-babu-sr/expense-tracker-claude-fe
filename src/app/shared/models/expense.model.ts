@@ -3,8 +3,11 @@ import { Category } from './category.model';
 /** Must match the server enum (server/src/models/expense.model.ts). */
 export type PaymentMethod = 'Cash' | 'UPI' | 'Card' | 'NetBanking' | 'Other';
 
-/** Who spent it (R12). Must match the server enum (USERS in server/src/models/expense.model.ts). */
-export type ExpenseUser = 'Mohan' | 'Abhinaya';
+/** Who spent it, as populated by the API (R13 AC9): just the member's id + name. */
+export interface ExpenseUser {
+  id: string;
+  name: string;
+}
 
 /** Expense as returned by the API (design §1, R1–R4). */
 export interface Expense {
@@ -18,8 +21,10 @@ export interface Expense {
   merchant?: string;
   note?: string;
   paymentMethod?: PaymentMethod;
-  /** Always present: the server fills the default for older expenses (R12 AC2). */
-  user: ExpenseUser;
+  /** Member who spent it (R13 AC9). */
+  userId: string;
+  /** Populated member; null only if that account was deleted. */
+  user: ExpenseUser | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,5 +37,6 @@ export interface ExpenseInput {
   merchant?: string | null;
   note?: string | null;
   paymentMethod?: PaymentMethod | null;
-  user: ExpenseUser;
+  /** Must be an active member of the group; missing → the signed-in user (server). */
+  userId: string;
 }

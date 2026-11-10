@@ -1,0 +1,70 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.group-list {
+  @include m.card-surface;
+  margin: 0;
+  padding: 0 v.$space-4;
+  list-style: none;
+
+  @include m.laptop {
+    max-width: 720px;
+  }
+}
+
+.group-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  padding: v.$space-3 0;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.group-row__icon {
+  flex-shrink: 0;
+  color: var(--mat-sys-primary);
+}
+
+.group-row__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.group-row__name {
+  @include m.truncate;
+  font: var(--mat-sys-title-small);
+}
+
+.group-row__meta {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+
+.group-row__code {
+  font-family: monospace;
+}
+
+.group-row__pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--mat-sys-on-surface);
+
+  mat-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    color: var(--mat-sys-tertiary);
+  }
+}
+
+.group-row__link {
+  flex-shrink: 0;
+  min-height: v.$touch-target;
+}

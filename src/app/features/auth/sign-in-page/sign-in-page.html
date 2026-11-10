@@ -1,0 +1,60 @@
+<app-auth-card title="Sign in" subtitle="Use your mobile number and PIN">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (formError(); as message) {
+      <p class="auth-form__error" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        <span>{{ message }}</span>
+      </p>
+    }
+
+    <!-- type=tel + inputmode=numeric → number pad on phones; autocomplete=username lets password managers pair it with the PIN -->
+    <mat-form-field appearance="outline">
+      <mat-label>Mobile number</mat-label>
+      <span matTextPrefix>+91&nbsp;</span>
+      <input matInput type="tel" inputmode="numeric" autocomplete="username" formControlName="mobile" maxlength="16" />
+      @if (form.controls.mobile.hasError('server')) {
+        <mat-error>{{ form.controls.mobile.getError('server') }}</mat-error>
+      } @else if (form.controls.mobile.hasError('mobile')) {
+        <mat-error>Enter a 10-digit mobile number</mat-error>
+      } @else {
+        <mat-error>Mobile number is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>PIN</mat-label>
+      <input
+        matInput
+        [type]="showPin() ? 'text' : 'password'"
+        inputmode="numeric"
+        autocomplete="current-password"
+        formControlName="pin"
+        maxlength="6"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="showPin.set(!showPin())"
+        [attr.aria-label]="showPin() ? 'Hide PIN' : 'Show PIN'"
+        [attr.aria-pressed]="showPin()"
+      >
+        <mat-icon>{{ showPin() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error>PIN is required</mat-error>
+    </mat-form-field>
+
+    <button mat-flat-button class="auth-form__submit" type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Signing in…' : 'Sign in' }}
+    </button>
+    @if (slowFlag.slow()) {
+      <p class="auth-form__hint" role="status">Waking up the server… this can take up to a minute.</p>
+    }
+    <p class="auth-form__hint">Forgot your PIN? Ask the admin to reset it.</p>
+  </form>
+
+  <div authFooter>
+    <a class="auth-link" routerLink="/register">Create account</a>
+    <a class="auth-link" routerLink="/welcome">Back</a>
+  </div>
+</app-auth-card>

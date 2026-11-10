@@ -1,0 +1,7 @@
+@use 'variables' as v;
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}

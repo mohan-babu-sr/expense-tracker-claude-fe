@@ -4,23 +4,23 @@
 }
 
 <mat-sidenav-container class="shell" [class.shell--mobile]="isMobile()">
-  <!-- Laptop navigation. On mobile it stays closed (bottom nav is used instead). -->
-  <mat-sidenav class="shell__sidenav" mode="side" [opened]="!isMobile()" [disableClose]="true">
-    @if (!isMobile()) {
+  <!-- Laptop navigation. On mobile, and on bare pages, it stays closed. -->
+  <mat-sidenav class="shell__sidenav" mode="side" [opened]="!isMobile() && !bare()" [disableClose]="true">
+    @if (!isMobile() && !bare()) {
       <app-side-nav />
     }
   </mat-sidenav>
 
   <mat-sidenav-content class="shell__body">
-    @if (isMobile()) {
+    @if (isMobile() && !bare()) {
       <app-top-toolbar />
     }
 
-    <main class="shell__content">
+    <main class="shell__content" [class.shell__content--bare]="bare()">
       <router-outlet />
     </main>
 
-    @if (isMobile()) {
+    @if (isMobile() && !bare()) {
       <app-bottom-nav />
     }
   </mat-sidenav-content>

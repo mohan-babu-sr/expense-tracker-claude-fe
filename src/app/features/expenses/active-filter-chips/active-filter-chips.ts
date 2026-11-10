@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CategoryService } from '../../../core/services/category.service';
+import { GroupService } from '../../../core/services/group.service';
 import { PAYMENT_METHOD_MAP } from '../../../shared/constants';
 import { currentMonth, fromIsoDate, monthToDate } from '../../../shared/utils/date.utils';
 import { ExpenseFilterService, defaultFilter } from '../expense-filter.service';
@@ -30,6 +31,7 @@ export class ActiveFilterChips {
   private readonly filters = inject(ExpenseFilterService);
   private readonly filter = toSignal(this.filters.filter$, { initialValue: defaultFilter() });
   private readonly categories = toSignal(inject(CategoryService).getAll(), { initialValue: [] });
+  private readonly members = inject(GroupService).members;
 
   protected readonly chips = computed<FilterChip[]>(() => {
     const f = this.filter();
@@ -58,8 +60,9 @@ export class ActiveFilterChips {
       chips.push({ key: 'pay', icon: 'payments', label: PAYMENT_METHOD_MAP[f.paymentMethod].label, remove: () => s.setPaymentMethod(undefined) });
     }
 
-    if (f.user) {
-      chips.push({ key: 'user', icon: 'person', label: f.user, remove: () => s.setUser(undefined) });
+    if (f.userId) {
+      const name = this.members().find((u) => u.id === f.userId)?.name ?? 'Member';
+      chips.push({ key: 'user', icon: 'person', label: name, remove: () => s.setUser(undefined) });
     }
 
     if (f.q) {

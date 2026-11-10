@@ -1,5 +1,5 @@
 <nav class="bottom-nav" aria-label="Main">
-  @for (item of items; track item.path) {
+  @for (item of items(); track item.path) {
     <a
       class="bottom-nav__item"
       [routerLink]="item.path"

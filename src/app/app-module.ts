@@ -1,7 +1,14 @@
 import { registerLocaleData } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import localeEnIn from '@angular/common/locales/en-IN';
-import { LOCALE_ID, NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  LOCALE_ID,
+  NgModule,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -11,6 +18,7 @@ import { CoreModule } from './core/core-module';
 import { IndianDateAdapter } from './core/date/indian-date-adapter';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { AuthService } from './core/services/auth.service';
 // Indian number/date formats for pipes: 1,23,456.00 and dd/MM/yyyy (scope decision: INR only).
 registerLocaleData(localeEnIn);
 
@@ -24,6 +32,12 @@ registerLocaleData(localeEnIn);
     // HTTP + functional interceptors. Order matters: loading wraps error, so the progress bar
     // stops even when a request fails.
     provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor])),
+
+    // Start the "who am I?" check right away (R13, design §8.5). Not awaited: the app renders its splash
+    // meanwhile, and the route guards wait for the answer.
+    provideAppInitializer(() => {
+      void inject(AuthService).ensureLoaded();
+    }),
 
     // Charts are provided in DashboardModule (lazy) so Chart.js is not in the main bundle.
 

@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>{{ user ? 'Edit user' : 'Add user' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" maxlength="40" autocomplete="off" />
+      @if (form.controls.name.hasError('server')) {
+        <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+      } @else if (form.controls.name.hasError('maxlength')) {
+        <mat-error>At most 40 characters</mat-error>
+      } @else {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mobile number</mat-label>
+      <span matTextPrefix>+91&nbsp;</span>
+      <input matInput type="tel" inputmode="numeric" autocomplete="off" formControlName="mobile" maxlength="16" />
+      @if (form.controls.mobile.hasError('server')) {
+        <mat-error>{{ form.controls.mobile.getError('server') }}</mat-error>
+      } @else if (form.controls.mobile.hasError('required')) {
+        <mat-error>Mobile number is required</mat-error>
+      } @else {
+        <mat-error>Enter a 10-digit mobile number starting with 6–9</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Group</mat-label>
+      <mat-select formControlName="groupId">
+        @for (g of groups; track g.id) {
+          <mat-option [value]="g.id">{{ g.name }} ({{ g.code }})</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.groupId.hasError('server')) {
+        <mat-error>{{ form.controls.groupId.getError('server') }}</mat-error>
+      } @else {
+        <mat-error>Choose a group</mat-error>
+      }
+    </mat-form-field>
+
+    @if (!user) {
+      <mat-form-field appearance="outline">
+        <mat-label>Initial PIN (4–6 digits)</mat-label>
+        <!-- Visible on purpose: the admin tells the person their PIN (no SMS) -->
+        <input matInput type="text" inputmode="numeric" autocomplete="off" formControlName="pin" maxlength="6" />
+        <mat-hint>They can change it later in Settings.</mat-hint>
+        @if (form.controls.pin.hasError('server')) {
+          <mat-error>{{ form.controls.pin.getError('server') }}</mat-error>
+        } @else {
+          <mat-error>PIN must be 4 to 6 digits</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (signsOut()) {
+      <!-- Icon + text, not colour alone (NFR5) -->
+      <p class="dialog-form__warning" role="status">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>
+          {{ user?.name }} will be signed out and must sign in again.
+          @if (movesGroup()) {
+            Their past expenses stay with the old group.
+          }
+        </span>
+      </p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : user ? 'Save' : 'Add user' }}
+    </button>
+  </mat-dialog-actions>
+</form>

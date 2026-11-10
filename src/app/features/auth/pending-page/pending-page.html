@@ -1,0 +1,22 @@
+<app-auth-card title="Waiting for approval" icon="hourglass_top">
+  @if (me(); as m) {
+    <p class="pending__text">
+      Hi {{ m.user.name }}, you asked to join <strong>{{ m.group?.name }}</strong>
+      (code <strong>{{ m.group?.code }}</strong>).
+    </p>
+    <p class="pending__text">
+      Ask someone in that group to approve you in <strong>Settings → Group</strong>, then tap “Check again”.
+    </p>
+  }
+
+  <div class="pending__actions">
+    <button mat-flat-button type="button" (click)="checkAgain()" [disabled]="checking()">
+      <mat-icon>refresh</mat-icon>
+      {{ checking() ? 'Checking…' : 'Check again' }}
+    </button>
+    <button mat-stroked-button type="button" (click)="signOut()">
+      <mat-icon>logout</mat-icon>
+      Sign out
+    </button>
+  </div>
+</app-auth-card>

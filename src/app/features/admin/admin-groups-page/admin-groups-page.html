@@ -1,0 +1,48 @@
+<app-page-header title="Groups" subtitle="Households and their members">
+  <button mat-flat-button type="button" (click)="openDialog()">
+    <mat-icon>group_add</mat-icon>
+    New group
+  </button>
+</app-page-header>
+
+@if (loaded()) {
+  @if (groups().length) {
+    <ul class="group-list" aria-label="Groups">
+      @for (g of groups(); track g.id) {
+        <li class="group-row">
+          <mat-icon class="group-row__icon" aria-hidden="true">groups</mat-icon>
+          <div class="group-row__main">
+            <span class="group-row__name">{{ g.name }}</span>
+            <span class="group-row__meta">
+              <span class="group-row__code">{{ g.code }}</span>
+              · {{ g.memberCount }} {{ g.memberCount === 1 ? 'member' : 'members' }}
+              @if (g.pendingCount) {
+                <!-- icon + text (NFR5) -->
+                · <span class="group-row__pending">
+                  <mat-icon aria-hidden="true">hourglass_top</mat-icon>{{ g.pendingCount }} pending
+                </span>
+              }
+            </span>
+          </div>
+          <a
+            mat-stroked-button
+            class="group-row__link"
+            routerLink="/admin/users"
+            [queryParams]="{ groupId: g.id }"
+            [attr.aria-label]="'Users of ' + g.name"
+          >
+            Users
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <app-empty-state
+      icon="groups"
+      title="No groups yet"
+      message="Create a group, then add users or share its code so people can register."
+      actionLabel="New group"
+      (action)="openDialog()"
+    />
+  }
+}

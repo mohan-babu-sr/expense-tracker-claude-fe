@@ -1,0 +1,57 @@
+// Shared by the auth pages' forms (R13). Usage: @use '../auth-form';
+@use 'variables' as v;
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+// Whole-form error (wrong PIN, locked, server waking up…) — icon + text, not colour alone (NFR5).
+.auth-form__error {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-3;
+  padding: v.$space-3;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+  }
+}
+
+.auth-form__submit {
+  width: 100%;
+  min-height: v.$touch-target;
+  margin-top: v.$space-2;
+}
+
+.auth-form__hint {
+  margin: v.$space-2 0 0;
+  text-align: center;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Footer links under the card ("Create account", "Back"…)
+.auth-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: v.$touch-target;
+  padding: 0 v.$space-2;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

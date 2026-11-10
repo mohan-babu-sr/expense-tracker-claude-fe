@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, computed, effect, inject, untracked } from '@angular/core';
 import { BehaviorSubject, Observable, distinctUntilChanged } from 'rxjs';
-import { ExpenseFilter, ExpenseUser, PaymentMethod } from '../../shared/models';
+import { AuthService } from '../../core/services/auth.service';
+import { ExpenseFilter, PaymentMethod } from '../../shared/models';
 import { currentMonth } from '../../shared/utils/date.utils';
 
 /** R6 AC1 / AC4: the default is "this month, no other filters". */
@@ -18,7 +19,7 @@ export function countActiveFilters(f: ExpenseFilter): number {
   else if (f.month && f.month !== currentMonth()) n++;
   if (f.categoryIds?.length) n++;
   if (f.paymentMethod) n++;
-  if (f.user) n++;
+  if (f.userId) n++;
   if (f.q?.trim()) n++;
   return n;
 }
@@ -34,7 +35,7 @@ function normalize(f: ExpenseFilter): ExpenseFilter {
   }
   if (f.categoryIds?.length) out.categoryIds = [...f.categoryIds];
   if (f.paymentMethod) out.paymentMethod = f.paymentMethod;
-  if (f.user) out.user = f.user;
+  if (f.userId) out.userId = f.userId;
   if (f.q?.trim()) out.q = f.q.trim();
   return out;
 }
@@ -52,6 +53,16 @@ function normalize(f: ExpenseFilter): ExpenseFilter {
 @Injectable({ providedIn: 'root' })
 export class ExpenseFilterService {
   private readonly subject = new BehaviorSubject<ExpenseFilter>(defaultFilter());
+  private readonly userMe = inject(AuthService).userMe;
+  private readonly accountId = computed(() => this.userMe()?.user.id ?? null);
+
+  constructor() {
+    // Filters hold member ids, so a different account on this browser starts from the default.
+    effect(() => {
+      this.accountId();
+      untracked(() => this.clear());
+    });
+  }
 
   /** Emits only real changes (compared by value), so the list isn't re-fetched needlessly. */
   readonly filter$: Observable<ExpenseFilter> = this.subject.pipe(
@@ -84,8 +95,8 @@ export class ExpenseFilterService {
     this.set({ ...this.value, paymentMethod });
   }
 
-  setUser(user: ExpenseUser | undefined): void {
-    this.set({ ...this.value, user });
+  setUser(userId: string | undefined): void {
+    this.set({ ...this.value, userId });
   }
 
   setSearch(q: string): void {

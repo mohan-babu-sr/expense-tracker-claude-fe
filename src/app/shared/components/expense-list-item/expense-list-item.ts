@@ -39,7 +39,7 @@ export class ExpenseListItem {
   protected readonly meta = computed(() => {
     const e = this.expense();
     return [
-      e.user,
+      e.user?.name,
       e.category?.name,
       e.paymentMethod ? this.paymentLabel.transform(e.paymentMethod) : null,
       this.showDate() ? this.datePipe.transform(e.date, 'd MMM') : null,
