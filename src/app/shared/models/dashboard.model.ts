@@ -1,6 +1,7 @@
-import { BudgetStatus } from './budget.model';
+import { BudgetStatus, MemberBudget } from './budget.model';
 import { Category } from './category.model';
 import { Expense } from './expense.model';
+import { Upcoming } from './upcoming.model';
 
 export interface CategoryAmount {
   category: Category | null;
@@ -30,4 +31,10 @@ export interface Dashboard {
   recent: Expense[];
   /** Budgets with status 'danger'. */
   overBudget: BudgetStatus[];
+  /** Members whose balance is below zero (R15 AC6). */
+  overMembers: MemberBudget[];
+  /** Every active member's limit / balance for the month — "My balance" card (R15 AC6). */
+  members: MemberBudget[];
+  /** Up to 5 open items due in the next 30 days (overdue included) + total of all of them (R14 AC6). */
+  comingUp: { items: Upcoming[]; total: number };
 }

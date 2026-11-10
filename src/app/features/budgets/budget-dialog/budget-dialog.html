@@ -8,17 +8,12 @@
       <mat-form-field appearance="outline">
         <mat-label>Budget for</mat-label>
         <mat-select formControlName="target">
-          @if (showOverallOption) {
-            <mat-option [value]="overall">
-              <span class="overall-option"><mat-icon fontIcon="account_balance_wallet" /> Overall (all categories)</span>
-            </mat-option>
-          }
           @for (c of categoryOptions(); track c.id) {
             <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
           }
         </mat-select>
         @if (form.controls.target.invalid) {
-          <mat-error>Choose a category or Overall</mat-error>
+          <mat-error>Choose a category</mat-error>
         }
       </mat-form-field>
 

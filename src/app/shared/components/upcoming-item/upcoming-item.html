@@ -1,0 +1,45 @@
+<div class="upcoming-item" [class.upcoming-item--done]="isDone()">
+  <button
+    type="button"
+    class="upcoming-item__main"
+    (click)="edit.emit(item())"
+    [disabled]="isDone()"
+    [attr.aria-label]="'Edit ' + item().title + ', ' + (item().amount | inrCurrency: false) + ', ' + (item().dueDate | daysLeft)"
+  >
+    <app-category-chip class="upcoming-item__avatar" [category]="item().category" mode="avatar" />
+    <span class="upcoming-item__title">{{ item().title }}</span>
+    <span class="upcoming-item__amount">{{ item().amount | inrCurrency: false }}</span>
+    <span class="upcoming-item__meta">{{ meta() }}</span>
+    @if (isDone()) {
+      <span class="due-badge due-badge--done">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        {{ doneText() }}
+      </span>
+    } @else {
+      <span class="due-badge" [class]="'due-badge--' + level()">
+        <mat-icon aria-hidden="true">{{ levelIcon() }}</mat-icon>
+        {{ item().dueDate | daysLeft }}
+      </span>
+    }
+  </button>
+
+  @if (showActions() && !isDone()) {
+    <button mat-icon-button type="button" [matMenuTriggerFor]="menu" [attr.aria-label]="'More actions for ' + item().title">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" xPosition="before">
+      <button mat-menu-item (click)="done.emit(item())">
+        <mat-icon>task_alt</mat-icon>
+        <span>Mark done</span>
+      </button>
+      <button mat-menu-item (click)="edit.emit(item())">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="delete.emit(item())">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </mat-menu>
+  }
+</div>

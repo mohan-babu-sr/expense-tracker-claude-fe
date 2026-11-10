@@ -5,10 +5,11 @@ export interface NavItem {
   icon: string;
 }
 
-/** The 4 pages (R10). Single source for the side nav, bottom nav and toolbar title. */
+/** The 5 main pages (R10, R14). Single source for the side nav, bottom nav and toolbar title. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { path: '/expenses', label: 'Expenses', icon: 'receipt_long' },
+  { path: '/upcoming', label: 'Upcoming', icon: 'event_upcoming' },
   { path: '/budgets', label: 'Budgets', icon: 'savings' },
   { path: '/categories', label: 'Categories', icon: 'category' },
 ];
@@ -29,6 +30,6 @@ export function navItemsFor(kind: 'user' | 'admin' | undefined): readonly NavIte
 
 /**
  * Secondary destination (R11 AC1): bottom of the side nav on laptop, gear icon in the mobile
- * toolbar — deliberately NOT in the bottom nav, which keeps the 4 main pages.
+ * toolbar — deliberately NOT in the bottom nav, which keeps the 5 main pages.
  */
 export const SETTINGS_ITEM: NavItem = { path: '/settings', label: 'Settings', icon: 'settings' };

@@ -82,3 +82,66 @@
   gap: v.$space-2;
   color: var(--mat-sys-on-surface-variant);
 }
+
+.overall-label__note {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+// R15 AC5 — members see the page read-only; icon + words (NFR5).
+.read-only-hint {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-4;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+  }
+}
+
+// Member label inside budget-progress (or the no-limit row).
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  min-width: 0;
+  font: var(--mat-sys-title-small);
+
+  mat-icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.person__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.you-chip {
+  flex: none;
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-label-small);
+}
+
+.no-limit {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-1 v.$space-3;
+  min-width: 0;
+}
+
+.no-limit__text {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}

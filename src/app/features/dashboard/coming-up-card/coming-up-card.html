@@ -1,0 +1,14 @@
+<section class="coming-up" aria-labelledby="coming-up-title">
+  <div class="coming-up__header">
+    <h2 class="coming-up__title" id="coming-up-title">
+      Coming up
+      <span class="coming-up__total">{{ total() | inrCurrency: false }} in the next 30 days</span>
+    </h2>
+    <a mat-button routerLink="/upcoming">View all</a>
+  </div>
+  <ul class="coming-up__list">
+    @for (item of items(); track item.id) {
+      <li><app-upcoming-item [item]="item" [showActions]="false" (edit)="open()" /></li>
+    }
+  </ul>
+</section>

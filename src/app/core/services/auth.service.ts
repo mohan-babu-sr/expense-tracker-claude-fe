@@ -35,6 +35,11 @@ export class AuthService {
     const me = this.state();
     return me?.kind === 'user' ? (me as UserMe) : null;
   });
+  /**
+   * True for the group owner (R15 AC5) — only used to hide buttons. The server's requireOwner (403) is
+   * the real rule, so a member who edits this in DevTools still can't change anything.
+   */
+  readonly isOwner = computed(() => this.userMe()?.user.role === 'owner');
 
   /**
    * Loads `Me` once (started at app start; guards await it). Retries while the server wakes up;

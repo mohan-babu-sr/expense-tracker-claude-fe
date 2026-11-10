@@ -1,0 +1,55 @@
+<app-page-header title="Upcoming" [subtitle]="subtitle()">
+  <mat-button-toggle-group
+    [value]="status()"
+    (change)="status.set($event.value)"
+    hideSingleSelectionIndicator
+    aria-label="Show open or done items"
+  >
+    <mat-button-toggle value="open">Open</mat-button-toggle>
+    <mat-button-toggle value="done">Done</mat-button-toggle>
+  </mat-button-toggle-group>
+  <button mat-flat-button type="button" (click)="add()">
+    <mat-icon>add</mat-icon>
+    Add
+  </button>
+</app-page-header>
+
+@if (items(); as list) {
+  @if (status() === 'open') {
+    @for (g of groups(); track g.key) {
+      <section class="group" [attr.aria-labelledby]="'group-' + g.key">
+        <h2 class="group__title" [id]="'group-' + g.key" [class]="'group__title--' + g.key">
+          {{ g.title }}
+          <span class="group__count">{{ g.items.length }}</span>
+        </h2>
+        <ul class="group__list">
+          @for (item of g.items; track item.id) {
+            <li>
+              <app-upcoming-item [item]="item" (edit)="edit($event)" (done)="markDone($event)" (delete)="remove($event)" />
+            </li>
+          }
+        </ul>
+      </section>
+    } @empty {
+      <app-empty-state
+        icon="event_upcoming"
+        title="Nothing planned yet"
+        message="Add big payments or events you know are coming — insurance, car service, school fees, a wedding gift."
+        actionLabel="Add upcoming item"
+        (action)="add()"
+      />
+    }
+  } @else {
+    @if (list.length) {
+      <section class="group" aria-label="Done items">
+        <ul class="group__list">
+          @for (item of list; track item.id) {
+            <li><app-upcoming-item [item]="item" [showActions]="false" /></li>
+          }
+        </ul>
+      </section>
+    } @else {
+      <app-empty-state icon="task_alt" title="Nothing done yet" message="Items you mark as done appear here." />
+    }
+  }
+}

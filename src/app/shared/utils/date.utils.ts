@@ -29,6 +29,14 @@ export function addDaysIso(value: string, days: number): string {
   return toIsoDate(d);
 }
 
+/**
+ * Whole days from today (local calendar) to `value`: 0 = today, 1 = tomorrow, -3 = three days ago (R14 AC2).
+ * Both dates are local midnights, so rounding absorbs the 23/25-hour days of DST countries.
+ */
+export function daysUntil(value: string, today = todayIso()): number {
+  return Math.round((fromIsoDate(value).getTime() - fromIsoDate(today).getTime()) / 86_400_000);
+}
+
 /** Current month as `YYYY-MM`. */
 export function currentMonth(): string {
   return todayIso().slice(0, 7);

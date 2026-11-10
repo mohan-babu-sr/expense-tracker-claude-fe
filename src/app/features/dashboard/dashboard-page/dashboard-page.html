@@ -5,7 +5,7 @@
 
 @if (data(); as d) {
   <!-- Over-budget warning (R8 AC4): icon + words + error colors -->
-  @if (d.overBudget.length) {
+  @if (d.overBudget.length || d.overMembers.length) {
     <div class="banner" role="alert">
       <mat-icon aria-hidden="true">warning</mat-icon>
       <span class="banner__text">
@@ -17,6 +17,16 @@
 
   <!-- R7 AC1 -->
   <app-summary-cards [data]="d" />
+
+  <!-- R15 AC6 -->
+  @if (hasLimits()) {
+    <app-my-balance-card [members]="d.members" />
+  }
+
+  <!-- R14 AC6: independent of the month picker; hidden when nothing is due -->
+  @if (d.comingUp.items.length) {
+    <app-coming-up-card [items]="d.comingUp.items" [total]="d.comingUp.total" />
+  }
 
   <!-- R7 AC2 + AC3 -->
   <div class="charts">

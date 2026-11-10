@@ -24,6 +24,12 @@ const routes: Routes = [
     loadChildren: () => import('./features/expenses/expenses-module').then((m) => m.ExpensesModule),
   },
   {
+    path: 'upcoming',
+    title: 'Upcoming · Expense Tracker',
+    canMatch: [memberGuard],
+    loadChildren: () => import('./features/upcoming/upcoming-module').then((m) => m.UpcomingModule),
+  },
+  {
     path: 'budgets',
     title: 'Budgets · Expense Tracker',
     canMatch: [memberGuard],

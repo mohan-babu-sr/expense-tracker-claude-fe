@@ -1,0 +1,29 @@
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <h2 mat-dialog-title>{{ title }}</h2>
+
+  <mat-dialog-content class="limit-form">
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Monthly limit</mat-label>
+      <span matTextPrefix>₹&nbsp;</span>
+      <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="limit" autocomplete="off" />
+      <mat-hint>Every month starts fresh — no carry-over</mat-hint>
+      @if (form.controls.limit.invalid) {
+        <mat-error>{{ limitError() }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="limit-form__actions">
+    @if (hasLimit) {
+      <button mat-button type="button" class="limit-form__remove" (click)="remove()" [disabled]="busy()">
+        <mat-icon>delete</mat-icon>
+        Remove limit
+      </button>
+    }
+    <span class="spacer"></span>
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || busy()">
+      {{ busy() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>

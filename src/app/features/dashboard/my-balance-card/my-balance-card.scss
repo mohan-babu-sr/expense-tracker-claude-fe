@@ -1,0 +1,105 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Status colors come from the shared budget variables (R8 AC3) — always with an icon + words (NFR5).
+@mixin status-colors {
+  --status-color: var(--mat-sys-on-surface-variant);
+
+  &--ok {
+    --status-color: #{v.$budget-ok};
+  }
+
+  &--warning {
+    --status-color: #{v.$budget-warning};
+  }
+
+  &--danger {
+    --status-color: #{v.$budget-danger};
+  }
+}
+
+.balance {
+  @include m.card-surface;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  margin-top: v.$space-4;
+}
+
+.balance__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.balance__title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.balance__big {
+  @include status-colors;
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  font-variant-numeric: tabular-nums;
+
+  mat-icon {
+    flex: none;
+    color: var(--status-color);
+  }
+}
+
+.balance__of,
+.balance__none {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.others {
+  display: grid;
+  gap: v.$space-1;
+  margin: v.$space-2 0 0;
+  padding: v.$space-2 0 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  list-style: none;
+
+  @include m.laptop {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    column-gap: v.$space-5;
+  }
+}
+
+.others__row {
+  @include status-colors;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  min-height: 32px;
+  font: var(--mat-sys-body-medium);
+}
+
+.others__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.others__value {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: v.$space-1;
+  font-variant-numeric: tabular-nums;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    color: var(--status-color);
+  }
+}

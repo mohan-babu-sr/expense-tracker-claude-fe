@@ -1,0 +1,34 @@
+<section class="balance" aria-labelledby="balance-title">
+  <div class="balance__header">
+    <h2 class="balance__title" id="balance-title">My balance</h2>
+    <a mat-button routerLink="/budgets">Budgets</a>
+  </div>
+
+  @if (me(); as m) {
+    @if (m.limit !== null) {
+      <p class="balance__big" [class]="'balance__big--' + m.status">
+        <mat-icon aria-hidden="true">{{ icon(m) }}</mat-icon>
+        {{ m.balance | balance }}
+      </p>
+      <app-budget-progress [spent]="m.spent" [budget]="m.limit" [percent]="m.percent!" [status]="m.status!">
+        <span class="balance__of">of {{ m.limit | inrCurrency: false }} this month</span>
+      </app-budget-progress>
+    } @else {
+      <p class="balance__none">You don't have a monthly limit. Spent {{ m.spent | inrCurrency: false }}.</p>
+    }
+  }
+
+  @if (others().length) {
+    <ul class="others" aria-label="Other members">
+      @for (o of others(); track o.user.id) {
+        <li class="others__row" [class]="'others__row--' + (o.status ?? 'none')">
+          <span class="others__name">{{ o.user.name }}</span>
+          <span class="others__value">
+            <mat-icon aria-hidden="true">{{ icon(o) }}</mat-icon>
+            {{ o.balance | balance }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</section>

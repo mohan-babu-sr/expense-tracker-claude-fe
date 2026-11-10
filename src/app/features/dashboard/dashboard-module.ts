@@ -17,6 +17,8 @@ import { DashboardPage } from './dashboard-page/dashboard-page';
 import { DashboardRoutingModule } from './dashboard-routing-module';
 import { SummaryCards } from './summary-cards/summary-cards';
 import { TrendChart } from './trend-chart/trend-chart';
+import { MyBalanceCard } from './my-balance-card/my-balance-card';
+import { ComingUpCard } from './coming-up-card/coming-up-card';
 
 /**
  * Lazy-loaded dashboard feature (design §4/§5, R7, R8 AC4).
@@ -25,11 +27,27 @@ import { TrendChart } from './trend-chart/trend-chart';
  * and bar charts need are registered — Chart.js tree-shakes the rest.
  */
 @NgModule({
-  declarations: [DashboardPage, SummaryCards, CategoryChart, TrendChart],
+  declarations: [
+    DashboardPage,
+    SummaryCards,
+    CategoryChart,
+    TrendChart,
+    MyBalanceCard,
+    ComingUpCard,
+  ],
   imports: [SharedModule, DashboardRoutingModule, BaseChartDirective],
   providers: [
     provideCharts({
-      registerables: [DoughnutController, ArcElement, BarController, BarElement, CategoryScale, LinearScale, Legend, Tooltip],
+      registerables: [
+        DoughnutController,
+        ArcElement,
+        BarController,
+        BarElement,
+        CategoryScale,
+        LinearScale,
+        Legend,
+        Tooltip,
+      ],
     }),
   ],
 })

@@ -1,0 +1,37 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.group {
+  @include m.card-surface;
+
+  & + & {
+    margin-top: v.$space-4;
+  }
+}
+
+.group__title {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-1;
+  font: var(--mat-sys-title-medium);
+
+  // Overdue heading in the danger color — the items carry icon + words too (NFR5).
+  &--overdue {
+    color: v.$budget-danger;
+  }
+}
+
+.group__count {
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+}
+
+.group__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

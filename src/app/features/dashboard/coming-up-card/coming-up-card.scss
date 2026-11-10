@@ -1,0 +1,36 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.coming-up {
+  @include m.card-surface;
+  margin-top: v.$space-4;
+}
+
+.coming-up__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-2;
+  margin-bottom: v.$space-1;
+}
+
+.coming-up__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 v.$space-2;
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.coming-up__total {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.coming-up__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

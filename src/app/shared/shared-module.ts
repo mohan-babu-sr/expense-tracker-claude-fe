@@ -30,6 +30,8 @@ import { RouterModule } from '@angular/router';
 
 import { InrCurrencyPipe } from './pipes/inr-currency.pipe';
 import { PaymentMethodLabelPipe } from './pipes/payment-method-label.pipe';
+import { BalancePipe } from './pipes/balance.pipe';
+import { DaysLeftPipe } from './pipes/days-left.pipe';
 import { PageHeader } from './components/page-header/page-header';
 import { EmptyState } from './components/empty-state/empty-state';
 import { ConfirmDialog } from './components/confirm-dialog/confirm-dialog';
@@ -39,6 +41,7 @@ import { BudgetProgress } from './components/budget-progress/budget-progress';
 import { ExpenseListItem } from './components/expense-list-item/expense-list-item';
 import { ExpenseFormDialog } from './components/expense-form-dialog/expense-form-dialog';
 import { AddExpenseButton } from './components/add-expense-button/add-expense-button';
+import { UpcomingItem } from './components/upcoming-item/upcoming-item';
 
 /** Every Angular Material module the app uses (design §4). Features never import these directly. */
 const MATERIAL_MODULES = [
@@ -69,7 +72,12 @@ const MATERIAL_MODULES = [
   MatButtonToggleModule,
 ];
 
-const ANGULAR_MODULES = [CommonModule, FormsModule, ReactiveFormsModule, RouterModule];
+const ANGULAR_MODULES = [
+  CommonModule,
+  FormsModule,
+  ReactiveFormsModule,
+  RouterModule,
+];
 
 /** Reusable components + pipes (NFR6). Declared and exported here, used by every feature. */
 const DECLARATIONS = [
@@ -84,6 +92,9 @@ const DECLARATIONS = [
   AddExpenseButton,
   InrCurrencyPipe,
   PaymentMethodLabelPipe,
+  BalancePipe,
+  DaysLeftPipe,
+  UpcomingItem,
 ];
 
 /**

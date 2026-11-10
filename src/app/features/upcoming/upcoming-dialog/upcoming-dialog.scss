@@ -1,0 +1,48 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Same structure as the expense form: column flex so the actions stay at the bottom on mobile full-screen.
+:host {
+  display: block;
+  height: 100%;
+}
+
+.upcoming-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.upcoming-form__header {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+}
+
+// Close (X) only on mobile full-screen, where there is no backdrop to tap.
+.upcoming-form__close {
+  margin-left: -(v.$space-3);
+
+  @include m.laptop {
+    display: none;
+  }
+}
+
+.upcoming-form__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  > mat-form-field:first-child {
+    margin-top: v.$space-2;
+  }
+}
+
+.upcoming-form__actions {
+  padding-bottom: calc(#{v.$space-3} + env(safe-area-inset-bottom));
+}

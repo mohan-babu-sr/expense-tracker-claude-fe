@@ -7,25 +7,20 @@ import { NotificationService } from '../../../core/services/notification.service
 import { BudgetStatus, Category } from '../../../shared/models';
 import { twoDecimals } from '../../../shared/utils/validators';
 
-/** Special select value for the overall monthly budget (categoryId: null on the API). */
-export const OVERALL = 'overall';
-
 export interface BudgetDialogData {
   /** Editing this budget; absent = adding a new one. */
   existing?: BudgetStatus;
   categories: Category[];
   /** Categories that already have a budget — not offered again when adding. */
   budgetedCategoryIds: string[];
-  hasOverall: boolean;
-  /** Pre-selected target when adding (OVERALL or a category id). */
-  preset?: string;
 }
 
 export type BudgetDialogResult = 'saved' | 'removed';
 
 /**
- * Set / change / remove a monthly budget (R8 AC1, AC5).
+ * Set / change / remove a monthly category budget (R8 AC1). Owner only (R15 AC5).
  * A budget has no month: it applies to every month until changed.
+ * v3: no "Overall" option — the overall budget is the sum of the member limits (R15 AC3).
  */
 @Component({
   selector: 'app-budget-dialog',
@@ -39,22 +34,16 @@ export class BudgetDialog {
   private readonly budgetService = inject(BudgetService);
   private readonly notification = inject(NotificationService);
 
-  protected readonly overall = OVERALL;
   protected readonly isEdit = !!this.data.existing;
   protected readonly busy = signal(false);
 
-  private readonly existingTarget = this.data.existing
-    ? (this.data.existing.category?.id ?? OVERALL)
-    : (this.data.preset ?? '');
+  private readonly existingTarget = this.data.existing?.category?.id ?? '';
 
   protected readonly form = inject(FormBuilder).group({
     // Target can't be changed while editing — remove and add instead.
     target: [{ value: this.existingTarget, disabled: this.isEdit }, Validators.required],
     amount: [this.data.existing?.budget ?? (null as number | null), [Validators.required, Validators.min(0.01), twoDecimals]],
   });
-
-  /** Overall is offered unless one already exists (or it's the one being edited). */
-  protected readonly showOverallOption = !this.data.hasOverall || this.existingTarget === OVERALL;
 
   /** Categories without a budget yet (+ the one being edited). */
   protected readonly categoryOptions = computed(() =>
@@ -63,7 +52,7 @@ export class BudgetDialog {
     ),
   );
 
-  protected readonly nothingLeft = !this.isEdit && !this.showOverallOption && this.categoryOptions().length === 0;
+  protected readonly nothingLeft = !this.isEdit && this.categoryOptions().length === 0;
 
   protected amountError(): string {
     const e = this.form.controls.amount.errors;
@@ -77,7 +66,7 @@ export class BudgetDialog {
     if (this.form.invalid || this.busy()) return;
     const { target, amount } = this.form.getRawValue();
     this.run(
-      this.budgetService.save({ categoryId: target === OVERALL ? null : target!, amount: Number(amount) }),
+      this.budgetService.save({ categoryId: target!, amount: Number(amount) }),
       this.isEdit ? 'Budget updated' : 'Budget set',
       'saved',
     );

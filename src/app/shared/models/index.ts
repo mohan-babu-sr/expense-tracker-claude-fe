@@ -8,3 +8,4 @@ export * from './expense-filter.model';
 export * from './expense.model';
 export * from './group.model';
 export * from './paginated-response.model';
+export * from './upcoming.model';

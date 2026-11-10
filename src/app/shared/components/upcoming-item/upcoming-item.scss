@@ -1,0 +1,118 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Same row anatomy as expense-list-item, so both lists feel alike.
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+// Grid, so the badge can move: phone = its own line under the date (titles keep their width at 360px);
+// laptop = right column under the amount.
+.upcoming-item__main {
+  @include m.touch-target;
+  display: grid;
+  flex: 1;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'avatar title amount'
+    'avatar meta  meta'
+    'avatar badge badge';
+  align-items: center;
+  gap: 0 v.$space-3;
+  min-width: 0;
+
+  @include m.laptop {
+    grid-template-areas:
+      'avatar title amount'
+      'avatar meta  badge';
+  }
+  padding: v.$space-2;
+  border: 0;
+  border-radius: v.$radius-sm;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.upcoming-item__avatar {
+  grid-area: avatar;
+}
+
+.upcoming-item__title {
+  @include m.truncate;
+  grid-area: title;
+  font: var(--mat-sys-title-small);
+}
+
+.upcoming-item__meta {
+  @include m.truncate;
+  grid-area: meta;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.upcoming-item__amount {
+  grid-area: amount;
+  justify-self: end;
+  font: var(--mat-sys-title-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.upcoming-item--done .upcoming-item__title {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Days-left badge (R14 AC2): reuses the budget status colors — no new tokens (design §9.3).
+.due-badge {
+  --due-color: var(--mat-sys-on-surface-variant);
+  grid-area: badge;
+  justify-self: start;
+  display: inline-flex;
+  margin-top: 2px;
+
+  @include m.laptop {
+    justify-self: end;
+    margin-top: 0;
+  }
+
+  align-items: center;
+  gap: 2px;
+  color: var(--due-color);
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
+  &--soon {
+    --due-color: #{v.$budget-warning};
+  }
+
+  &--overdue {
+    --due-color: #{v.$budget-danger};
+  }
+
+  &--done {
+    --due-color: #{v.$budget-ok};
+  }
+}

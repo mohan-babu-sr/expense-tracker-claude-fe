@@ -1,13 +1,23 @@
 <app-page-header title="Budgets" subtitle="Monthly limits — they apply to every month until changed">
   <app-month-picker [(month)]="month" />
-  <button mat-flat-button type="button" (click)="openDialog()">
-    <mat-icon>add</mat-icon>
-    Set budget
-  </button>
+  @if (isOwner()) {
+    <button mat-flat-button type="button" (click)="openDialog()">
+      <mat-icon>add</mat-icon>
+      Set budget
+    </button>
+  }
 </app-page-header>
 
 @if (summary()) {
-  <!-- Overall monthly budget (R8 AC5) -->
+  <!-- R15 AC5: members see everything, read-only -->
+  @if (!isOwner()) {
+    <p class="read-only-hint">
+      <mat-icon aria-hidden="true">lock</mat-icon>
+      Only {{ ownerName() }} can change limits and budgets.
+    </p>
+  }
+
+  <!-- Overall = sum of member limits (R15 AC3) -->
   <section class="section" aria-labelledby="overall-title">
     <h2 class="section__title" id="overall-title">Overall</h2>
     @if (overall(); as o) {
@@ -15,22 +25,54 @@
         <app-budget-progress [spent]="o.spent" [budget]="o.budget" [percent]="o.percent" [status]="o.status">
           <span class="overall-label">
             <mat-icon aria-hidden="true">account_balance_wallet</mat-icon>
-            All categories
+            Family total
+            <span class="overall-label__note">sum of member limits</span>
           </span>
         </app-budget-progress>
-        <button mat-icon-button type="button" class="budget-card__edit" (click)="openDialog(o)" aria-label="Edit overall budget" matTooltip="Edit">
-          <mat-icon>edit</mat-icon>
-        </button>
       </div>
     } @else {
       <div class="hint-card">
-        <span>No overall monthly budget.</span>
-        <button mat-button type="button" (click)="setOverall()">
-          <mat-icon>add</mat-icon>
-          Set overall budget
-        </button>
+        <span>No member limits yet. The family total is the sum of everyone's monthly limit.</span>
       </div>
     }
+  </section>
+
+  <!-- Per-person limits & balances (R15 AC2, AC4) -->
+  <section class="section" aria-labelledby="people-title">
+    <h2 class="section__title" id="people-title">
+      People
+      @if (overMembers()) {
+        <span class="over-badge"><mat-icon aria-hidden="true">error</mat-icon> {{ overMembers() }} over limit</span>
+      }
+    </h2>
+    <ul class="budget-list">
+      @for (m of members(); track m.user.id) {
+        <li class="budget-card">
+          @if (m.limit !== null) {
+            <app-budget-progress [spent]="m.spent" [budget]="m.limit" [percent]="m.percent!" [status]="m.status!">
+              <ng-container *ngTemplateOutlet="person; context: { $implicit: m }" />
+            </app-budget-progress>
+          } @else {
+            <div class="no-limit">
+              <ng-container *ngTemplateOutlet="person; context: { $implicit: m }" />
+              <span class="no-limit__text">Spent {{ m.spent | inrCurrency: false }} · {{ m.balance | balance }}</span>
+            </div>
+          }
+          @if (isOwner()) {
+            <button
+              mat-icon-button
+              type="button"
+              class="budget-card__edit"
+              (click)="editLimit(m)"
+              [attr.aria-label]="(m.limit === null ? 'Set limit for ' : 'Edit limit for ') + m.user.name"
+              [matTooltip]="m.limit === null ? 'Set limit' : 'Edit'"
+            >
+              <mat-icon>{{ m.limit === null ? 'add' : 'edit' }}</mat-icon>
+            </button>
+          }
+        </li>
+      }
+    </ul>
   </section>
 
   <!-- Category budgets (R8 AC2, AC3) -->
@@ -48,20 +90,22 @@
             <app-budget-progress [spent]="b.spent" [budget]="b.budget" [percent]="b.percent" [status]="b.status">
               <app-category-chip [category]="b.category" />
             </app-budget-progress>
-            <button
-              mat-icon-button
-              type="button"
-              class="budget-card__edit"
-              (click)="openDialog(b)"
-              [attr.aria-label]="'Edit budget for ' + b.category?.name"
-              matTooltip="Edit"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
+            @if (isOwner()) {
+              <button
+                mat-icon-button
+                type="button"
+                class="budget-card__edit"
+                (click)="openDialog(b)"
+                [attr.aria-label]="'Edit budget for ' + b.category?.name"
+                matTooltip="Edit"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            }
           </li>
         }
       </ul>
-    } @else {
+    } @else if (isOwner()) {
       <app-empty-state
         icon="savings"
         title="No category budgets yet"
@@ -69,6 +113,19 @@
         actionLabel="Set budget"
         (action)="openDialog()"
       />
+    } @else {
+      <app-empty-state icon="savings" title="No category budgets yet" message="The group owner hasn't set any yet." />
     }
   </section>
 }
+
+<!-- Member name (+ "You" chip) — used both with and without a limit -->
+<ng-template #person let-m>
+  <span class="person">
+    <mat-icon aria-hidden="true">{{ m.user.role === 'owner' ? 'shield_person' : 'person' }}</mat-icon>
+    <span class="person__name">{{ m.user.name }}</span>
+    @if (m.user.id === myId()) {
+      <span class="you-chip">You</span>
+    }
+  </span>
+</ng-template>

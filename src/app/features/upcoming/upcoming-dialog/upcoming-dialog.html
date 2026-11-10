@@ -1,0 +1,81 @@
+<form class="upcoming-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <div class="upcoming-form__header" mat-dialog-title>
+    <button mat-icon-button type="button" mat-dialog-close aria-label="Close" class="upcoming-form__close">
+      <mat-icon>close</mat-icon>
+    </button>
+    <span>{{ isEdit ? 'Edit upcoming item' : 'Add upcoming item' }}</span>
+  </div>
+
+  <mat-dialog-content class="upcoming-form__content">
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" maxlength="60" autocomplete="off" placeholder="e.g. Car insurance, Car service" />
+      <mat-hint align="end">{{ form.controls.title.value?.length ?? 0 }} / 60</mat-hint>
+      @if (form.controls.title.invalid) {
+        <mat-error>{{ error('title') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- floatLabel="always": the ₹ prefix would otherwise sit on top of the resting label -->
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Estimated amount</mat-label>
+      <span matTextPrefix>₹&nbsp;</span>
+      <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="amount" autocomplete="off" />
+      @if (form.controls.amount.invalid) {
+        <mat-error>{{ error('amount') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="categoryId">
+        <mat-select-trigger>
+          <app-category-chip [category]="selectedCategory()" />
+        </mat-select-trigger>
+        @for (c of categories(); track c.id) {
+          <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+        }
+      </mat-select>
+      @if (form.controls.categoryId.invalid) {
+        <mat-error>{{ error('categoryId') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Any date: past dates show as overdue (R14 AC1) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Due date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="dd/mm/yyyy" />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+      @if (form.controls.dueDate.invalid) {
+        <mat-error>{{ error('dueDate') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Repeat</mat-label>
+      <mat-select formControlName="repeat">
+        @for (r of repeatOptions; track r.value) {
+          <mat-option [value]="r.value">{{ r.label }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Next one is added when you mark it done</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Note</mat-label>
+      <textarea matInput formControlName="note" maxlength="200" rows="2" cdkTextareaAutosize placeholder="e.g. policy no., venue, person"></textarea>
+      <mat-hint align="end">{{ form.controls.note.value?.length ?? 0 }} / 200</mat-hint>
+      @if (form.controls.note.invalid) {
+        <mat-error>{{ error('note') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="upcoming-form__actions">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>
