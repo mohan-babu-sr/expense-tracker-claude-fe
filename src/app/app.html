@@ -1,4 +1,11 @@
-@if (auth.loaded()) {
+@if (auth.loaded() && auth.unreachable()) {
+  <!-- R16 AC4: offline / API down at start-up. Not the Welcome page — the user may well still be signed in. -->
+  <div class="splash" role="alert">
+    <p class="splash__title">Can't reach the server</p>
+    <p class="splash__hint">Check your internet connection. The app continues by itself when you're back online.</p>
+    <button type="button" class="splash__button" (click)="retry()">Try again</button>
+  </div>
+} @else if (auth.loaded()) {
   <app-shell />
 } @else {
   <!-- Start-up splash (design §8.5). Plain HTML/CSS: Material isn't loaded in the root module. -->

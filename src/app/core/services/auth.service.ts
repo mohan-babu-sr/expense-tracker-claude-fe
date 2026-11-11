@@ -1,6 +1,6 @@
 import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, firstValueFrom, of, retry, tap, throwError, timer } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, of, retry, tap, throwError, timer } from 'rxjs';
 import { Me, RegisterInput, UserMe } from '../../shared/models';
 import { SKIP_AUTH_REDIRECT, SKIP_ERROR_SNACKBAR, authFormContext } from '../interceptors/http-context.tokens';
 import { API_URL } from './api-url';
@@ -24,12 +24,19 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly state = signal<Me | null>(null);
   private readonly loadedState = signal(false);
+  private readonly unreachableState = signal(false);
   private loading: Promise<void> | null = null;
 
   /** Current account, or null when signed out. */
   readonly me = this.state.asReadonly();
   /** False until the start-up "who am I?" check has answered (the app shows a splash meanwhile). */
   readonly loaded = this.loadedState.asReadonly();
+  /**
+   * True when the start-up check couldn't reach the server at all (offline, or the API is down). NOT the same as
+   * signed out — the session cookie may be perfectly valid — so the app shows "Can't reach the server" instead of
+   * the Welcome page (R16 AC4, design §11.2).
+   */
+  readonly unreachable = this.unreachableState.asReadonly();
   /** The signed-in user (not admin), or null. */
   readonly userMe = computed(() => {
     const me = this.state();
@@ -42,17 +49,21 @@ export class AuthService {
   readonly isOwner = computed(() => this.userMe()?.user.role === 'owner');
 
   /**
-   * Loads `Me` once (started at app start; guards await it). Retries while the server wakes up;
-   * any other failure counts as "signed out".
+   * Loads `Me` once (started at app start; guards await it). Retries while the server wakes up — unless the
+   * device itself says it's offline, then there's nothing to wait for. Still no answer → `unreachable`;
+   * any other failure (401) counts as "signed out".
    */
   ensureLoaded(): Promise<void> {
+    const deviceOnline = () => navigator.onLine !== false;
     this.loading ??= firstValueFrom(
       this.fetchMe().pipe(
-        retry({ count: 6, delay: (err) => (isWakingUp(err) ? timer(5000) : throwError(() => err)) }),
-        catchError(() => of(null)),
+        retry({ count: 6, delay: (err) => (isWakingUp(err) && deviceOnline() ? timer(5000) : throwError(() => err)) }),
+        map((me): { me: Me | null; unreachable: boolean } => ({ me, unreachable: false })),
+        catchError((err: unknown) => of({ me: null, unreachable: isWakingUp(err) })),
       ),
-    ).then((me) => {
+    ).then(({ me, unreachable }) => {
       this.state.set(me);
+      this.unreachableState.set(unreachable);
       this.loadedState.set(true);
     });
     return this.loading;
@@ -90,6 +101,14 @@ export class AuthService {
       catchError(() => of(null)),
       tap(() => this.clear()),
     );
+  }
+
+  /**
+   * R13 AC1a: ends EVERY session of this account (server bumps tokenVersion). Unlike logout(), a failure is
+   * NOT treated as success — the other devices would still be signed in, so the caller must know.
+   */
+  logoutAll(): Observable<unknown> {
+    return this.http.post(`${API_URL}/auth/logout-all`, null).pipe(tap(() => this.clear()));
   }
 
   /** PUT /me — own name (mobile + group can't be changed, R13 AC4). */

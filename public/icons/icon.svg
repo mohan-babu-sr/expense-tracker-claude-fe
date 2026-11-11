@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- R16 AC2 — source of truth for every app icon (design §11.2). The ₹ is drawn with strokes, not a font,
+       so it looks the same everywhere. It stays inside the central 80% circle (maskable safe zone).
+       After editing: re-render the PNGs in this folder (see design §11.2). -->
+  <rect width="512" height="512" rx="112" fill="#005cbb"/>
+  <g fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"
+     transform="translate(0 -9)">
+    <path d="M166 150H346"/>
+    <path d="M166 218H346"/>
+    <path d="M236 150C300 150 320 190 320 218C320 256 290 286 236 286H176"/>
+    <path d="M176 286L316 380"/>
+  </g>
+</svg>

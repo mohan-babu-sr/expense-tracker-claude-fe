@@ -9,6 +9,7 @@ import { skipErrorSnackbar } from '../../../core/interceptors/http-context.token
 import { errorMessage } from '../../../core/interceptors/error.interceptor';
 import { AuthService } from '../../../core/services/auth.service';
 import { GroupService } from '../../../core/services/group.service';
+import { InstallService } from '../../../core/services/install.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SettingsService, ThemePreference } from '../../../core/services/settings.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
@@ -26,6 +27,7 @@ interface ThemeOption {
  * Settings (R11, R13 AC4). One card per section; add future preferences as new sections.
  * - Account (server): name, read-only mobile + group, change PIN, sign out. The admin sees username + sign out.
  * - Group (active members only, R13 AC7): code to invite, members, join requests to approve / reject.
+ * - App (this device, R16 AC6): installed / Install app button / iPhone or browser-menu hint.
  * - Appearance (this device): theme.
  */
 @Component({
@@ -169,6 +171,41 @@ export class SettingsPage {
 
   protected signOut(): void {
     this.auth.logout().subscribe(() => void this.router.navigateByUrl('/welcome'));
+  }
+
+  // ---- Sign out of all devices (R13 AC1a) ----
+  protected readonly signingOutAll = signal(false);
+
+  protected signOutAll(): void {
+    ConfirmDialog.open(this.dialog, {
+      title: 'Sign out of all devices?',
+      message: 'You will be signed out everywhere, including this device, and will need to sign in again on each one.',
+      confirmText: 'Sign out everywhere',
+      destructive: true,
+    })
+      .pipe(
+        filter(Boolean),
+        tap(() => this.signingOutAll.set(true)),
+        switchMap(() => this.auth.logoutAll()),
+      )
+      .subscribe({
+        next: () => {
+          this.notification.success('Signed out of all devices');
+          void this.router.navigateByUrl('/welcome');
+        },
+        // Error snackbar comes from the interceptor; stay signed in so the user can retry.
+        error: () => this.signingOutAll.set(false),
+      });
+  }
+
+  // ---- App (R16 AC6) ----
+  protected readonly install = inject(InstallService);
+
+  protected installApp(): void {
+    void this.install.install().then((outcome) => {
+      // On success the browser shows its own confirmation and `appinstalled` switches this section to "Installed".
+      if (outcome === 'dismissed') this.notification.success('No problem — you can install it later from here.');
+    });
   }
 
   protected setTheme(theme: ThemePreference): void {

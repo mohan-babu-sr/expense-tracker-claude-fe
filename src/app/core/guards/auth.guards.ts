@@ -16,6 +16,9 @@ function guard(allow: (me: Me | null) => boolean): Guard {
     const auth = inject(AuthService);
     const router = inject(Router);
     await auth.ensureLoaded();
+    // Server unreachable: we don't know who this is — don't redirect (the root component shows "Can't reach
+    // the server"; the URL is kept for Try again). R16 AC4.
+    if (auth.unreachable()) return false;
     const me = auth.me();
     return allow(me) || router.parseUrl(homeUrl(me));
   };
@@ -41,6 +44,7 @@ export const adminPasswordChangedGuard: Guard = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
   await auth.ensureLoaded();
+  if (auth.unreachable()) return false;
   const me = auth.me();
   return !(me?.kind === 'admin' && me.mustChangePassword) || router.parseUrl('/admin/password');
 };

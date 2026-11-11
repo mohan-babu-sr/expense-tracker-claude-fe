@@ -90,8 +90,11 @@
   margin-top: v.$space-4;
 }
 
-.account__signout {
+// Two sign-out buttons side by side; they wrap onto two lines at 360px instead of overflowing (R10 AC4).
+.account__signout-actions {
   display: flex;
+  flex-wrap: wrap;
+  column-gap: v.$space-3;
 }
 
 .account__subtitle {

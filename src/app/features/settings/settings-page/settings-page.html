@@ -101,10 +101,23 @@
     }
   }
 
-  <button mat-stroked-button type="button" class="account__action account__signout" (click)="signOut()">
-    <mat-icon>logout</mat-icon>
-    Sign out
-  </button>
+  <div class="account__signout-actions">
+    <button mat-stroked-button type="button" class="account__action" (click)="signOut()">
+      <mat-icon>logout</mat-icon>
+      Sign out
+    </button>
+    <!-- R13 AC1a: ends every session of this account, e.g. a lost phone -->
+    <button
+      mat-stroked-button
+      type="button"
+      class="account__action"
+      [disabled]="signingOutAll()"
+      (click)="signOutAll()"
+    >
+      <mat-icon>devices</mat-icon>
+      {{ signingOutAll() ? 'Signing out…' : 'Sign out of all devices' }}
+    </button>
+  </div>
 </section>
 
 <!-- Group (R13 AC7) — active members only -->
@@ -170,6 +183,45 @@
     </ul>
   </section>
 }
+
+<!-- App (R16 AC6) — install on this device. Reuses the section/hint styles (icon + text, NFR5). -->
+<section class="section" aria-labelledby="app-title">
+  <h2 class="section__title" id="app-title">
+    <mat-icon aria-hidden="true">install_mobile</mat-icon>
+    App
+  </h2>
+
+  @if (install.isStandalone()) {
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      Installed — you're using the app.
+    </p>
+  } @else if (install.justInstalled()) {
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      Installed — open "Expenses" from your home screen or app list.
+    </p>
+  } @else if (install.canInstall()) {
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      Install the app to open it from your home screen, full-screen and faster.
+    </p>
+    <button mat-flat-button type="button" class="account__action" (click)="installApp()">
+      <mat-icon>download</mat-icon>
+      Install app
+    </button>
+  } @else if (install.isIos) {
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">ios_share</mat-icon>
+      To install on iPhone or iPad: in Safari tap Share, then "Add to Home Screen".
+    </p>
+  } @else {
+    <p class="section__hint">
+      <mat-icon aria-hidden="true">more_vert</mat-icon>
+      To install, open your browser's menu and choose "Install app" or "Add to Home screen".
+    </p>
+  }
+</section>
 
 <!-- Appearance (R11) — device-local -->
 <section class="section" aria-labelledby="appearance-title">

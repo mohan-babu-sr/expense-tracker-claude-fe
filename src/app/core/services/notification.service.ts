@@ -23,6 +23,14 @@ export class NotificationService {
   }
 
   /**
+   * A message that stays until the user acts on it or another snackbar replaces it, e.g.
+   * "A new version is available · RELOAD" (R16 AC5). Emits once when the action is clicked.
+   */
+  prompt(message: string, action: string): Observable<void> {
+    return this.snackBar.open(message, action).onAction().pipe(map(() => undefined));
+  }
+
+  /**
    * "Expense deleted · UNDO" (R4 AC2). Emits once if the user clicks Undo within `duration`;
    * completes without emitting otherwise.
    */
