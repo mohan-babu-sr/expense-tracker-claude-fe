@@ -7,34 +7,54 @@
   top: 0;
   z-index: 10;
   gap: v.$space-3;
-  background: var(--mat-sys-surface-container);
+  // v5: blends into the tinted page (same colour as the status bar meta in index.html).
+  background: v.$surface-page;
   color: var(--mat-sys-on-surface);
 }
 
+// App icon in a small rounded indigo tile (same as the side nav brand).
 .toolbar__icon {
-  color: var(--mat-sys-primary);
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
 }
 
 .toolbar__title {
   @include m.truncate;
   flex: 1;
   font: var(--mat-sys-title-large);
+  font-weight: 700;
 }
 
-// Round 48px icon button (≥ 44px touch target).
+// Round 48px icon button (≥ 44px touch target) — the ☰ menu.
 .toolbar__action {
   display: grid;
   flex: none;
   place-items: center;
   width: 48px;
   height: 48px;
-  margin-right: -(v.$space-2);
+  margin-left: -(v.$space-2);
+  padding: 0;
+  border: 0;
   border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
   color: var(--mat-sys-on-surface-variant);
-  transition: background-color 150ms ease;
+  @include m.motion(background-color);
 
   &:hover {
-    background: var(--mat-sys-surface-container-highest);
+    background: v.$surface-muted;
   }
 
   &:focus-visible {
@@ -43,8 +63,4 @@
   }
 }
 
-// On the Settings page: filled circle (shape, not only color — NFR5).
-.toolbar__action--active {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
+

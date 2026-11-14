@@ -1,22 +1,22 @@
 <mat-toolbar class="toolbar">
-  <mat-icon class="toolbar__icon" aria-hidden="true">account_balance_wallet</mat-icon>
-  <span class="toolbar__title">{{ title() }}</span>
-  <!-- Settings entry on mobile (R11 AC1). Plain <a> styled as an icon button: keeps MatButton out of CoreModule. -->
-  <a
-    class="toolbar__action"
-    [routerLink]="settings.path"
-    routerLinkActive="toolbar__action--active"
-    ariaCurrentWhenActive="page"
-    [attr.aria-label]="pendingCount() ? settings.label + ' (' + pendingCount() + ' waiting for approval)' : settings.label"
+  <!-- v5.1 (R10, design §13.8): ☰ opens the drawer with every page (Budgets, Categories, Settings…).
+       Plain <button>: keeps MatButton out of CoreModule (main bundle). -->
+  <button
+    type="button"
+    class="toolbar__action toolbar__menu"
+    (click)="menu.emit()"
+    [attr.aria-label]="pendingCount() ? 'Open menu (' + pendingCount() + ' waiting for approval)' : 'Open menu'"
   >
-    <!-- Badge = join requests waiting (R13 AC7) -->
+    <!-- Badge = join requests waiting (R13 AC7) — moved here from the old settings gear -->
     <mat-icon
       aria-hidden="true"
       [matBadge]="pendingCount()"
       [matBadgeHidden]="!pendingCount()"
       matBadgeSize="small"
       matBadgeColor="warn"
-      >{{ settings.icon }}</mat-icon
+      >menu</mat-icon
     >
-  </a>
+  </button>
+  <span class="toolbar__title">{{ title() }}</span>
+  <span class="toolbar__icon" aria-hidden="true"><mat-icon>account_balance_wallet</mat-icon></span>
 </mat-toolbar>

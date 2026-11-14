@@ -22,10 +22,10 @@
     @include mat.progress-bar-overrides(
       (
         active-indicator-color: var(--status-color),
-        track-color: var(--mat-sys-surface-container-highest),
-        active-indicator-height: 8px,
-        track-height: 8px,
-        track-shape: 4px,
+        track-color: v.$surface-muted,
+        active-indicator-height: 10px,
+        track-height: 10px,
+        track-shape: v.$radius-pill,
       )
     );
   }
@@ -44,8 +44,8 @@
 }
 
 .budget-progress__amounts {
+  @include m.amount;
   font: var(--mat-sys-body-medium);
-  font-variant-numeric: tabular-nums;
   color: var(--mat-sys-on-surface-variant);
 }
 
@@ -54,6 +54,7 @@
   align-items: center;
   gap: v.$space-1;
   font: var(--mat-sys-label-large);
+  font-weight: 600;
   color: var(--status-color);
 
   mat-icon {

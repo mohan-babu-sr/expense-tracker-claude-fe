@@ -34,7 +34,7 @@
         <ul class="rows">
           @for (s of salaries(); track s.user.id) {
             <li class="row">
-              <mat-icon class="row__icon" aria-hidden="true">{{ s.former ? 'person_off' : 'person' }}</mat-icon>
+              <span class="avatar" [class.avatar--former]="s.former" aria-hidden="true">{{ initials(s.user.name) }}</span>
               <div class="row__text">
                 <span class="row__name">
                   {{ s.user.name }}
@@ -85,12 +85,18 @@
               Preview from your regular items — amounts and ticks open when the month starts.
             </p>
           } @else {
-            <p class="card__hint">
-              <mat-icon aria-hidden="true">task_alt</mat-icon>
-              {{ paidCount() }} of {{ p.regular.length }} paid · counted in full whether ticked or not
-            </p>
+            <!-- v5.1: progress ring (conic-gradient) + the same words -->
+            <div class="progress">
+              <span class="ring" [style.--done]="paidPct() + '%'" aria-hidden="true">
+                <span class="ring__count">{{ paidCount() }}/{{ p.regular.length }}</span>
+              </span>
+              <span class="progress__text">
+                <strong>{{ paidCount() }} of {{ p.regular.length }} paid</strong>
+                <span>Counted in full whether ticked or not</span>
+              </span>
+            </div>
           }
-          <ul class="rows">
+          <ul class="rows rows--tiles">
             @for (e of p.regular; track e.itemId) {
               <li class="row" [class.row--paid]="e.paidAt">
                 @if (e.id) {

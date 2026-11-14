@@ -10,13 +10,16 @@ $space-4: 16px;
 $space-5: 24px;
 $space-6: 32px;
 
-// Corner radii
-$radius-sm: 8px;
-$radius-md: 12px;
-$radius-lg: 16px;
+// Corner radii (v5, design §13.2 — softer, "clean fintech")
+$radius-sm: 10px;
+$radius-md: 14px;
+$radius-lg: 20px;
+$radius-xl: 28px;
+$radius-pill: 999px;
 
 // Layout
-$bottom-nav-height: 56px;
+$bottom-nav-height: 64px; // v5 floating bar (design §13.3)
+$bottom-nav-gap: 12px; // space between the floating bar and the screen edges
 $side-nav-width: 240px;
 $content-max-width: 1200px;
 $auth-content-width: 440px; // Welcome / sign-in / register column (design §8.5)
@@ -27,3 +30,16 @@ $touch-target: 44px; // R10 / NFR5 minimum tap size
 $budget-ok: var(--budget-ok);
 $budget-warning: var(--budget-warning);
 $budget-danger: var(--budget-danger);
+
+// v5 surfaces & shadows (design §13.2). Defined as CSS custom properties in styles.scss (light-dark() + color-mix()
+// of theme tokens — no hex), referenced through these variables.
+$surface-page: var(--app-bg); // soft tinted page background
+$surface-card: var(--app-card); // white cards in light, raised surface in dark
+$surface-muted: var(--app-card-muted); // inset areas inside a card (tracks, chips, avatars without a colour)
+$shadow-card: var(--app-shadow-card);
+$shadow-raised: var(--app-shadow-raised); // floating bar, hero card, menus
+
+// Motion (R21 AC7) — always used through the `motion` mixin, which honours prefers-reduced-motion.
+$motion-fast: 120ms;
+$motion-base: 200ms;
+$motion-easing: cubic-bezier(0.2, 0, 0, 1); // M3 "standard"

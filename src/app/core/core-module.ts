@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -42,5 +42,8 @@ export class CoreModule {
     if (parent) {
       throw new Error('CoreModule is already loaded. Import it in AppModule only.');
     }
+    // v5 (R21, design §13.2): every <mat-icon>name</mat-icon> uses Material Symbols Rounded instead of the old
+    // Material Icons font. 'mat-ligature-font' keeps [fontIcon] working (the name is drawn via ::before).
+    inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-rounded', 'mat-ligature-font');
   }
 }

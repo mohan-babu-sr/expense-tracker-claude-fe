@@ -10,29 +10,60 @@
 
 // margin-top: auto pushes Settings to the bottom; border = visual divider from the main pages.
 .side-nav--secondary {
-  margin-top: auto;
-  padding-top: v.$space-3;
-  padding-bottom: v.$space-4;
+  margin: auto v.$space-3 0;
+  padding: v.$space-3 0 v.$space-4;
   border-top: 1px solid var(--mat-sys-outline-variant);
 }
 
+// v5 brand block: app icon in a rounded indigo tile + name (R21 AC3).
 .brand {
   display: flex;
   align-items: center;
   gap: v.$space-3;
-  padding: v.$space-5 v.$space-4;
-  color: var(--mat-sys-primary);
+  padding: v.$space-5 v.$space-5 v.$space-4;
+}
+
+.brand__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: v.$radius-md;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: v.$shadow-card;
 }
 
 .brand__name {
-  font: var(--mat-sys-title-large);
+  display: flex;
+  flex-direction: column;
+  font: var(--mat-sys-title-medium);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--mat-sys-on-surface);
+}
+
+.brand__tag {
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.side-nav__heading {
+  margin: v.$space-3 v.$space-4 v.$space-1;
+  @include m.eyebrow;
 }
 
 .side-nav {
   display: flex;
   flex-direction: column;
-  gap: v.$space-1;
+  gap: 2px;
   padding: 0 v.$space-3;
+}
+
+.side-nav--secondary {
+  padding-right: 0;
+  padding-left: 0;
 }
 
 // Material 3 navigation-drawer look: full-width pill, filled when active.
@@ -41,16 +72,17 @@
   display: flex;
   align-items: center;
   gap: v.$space-3;
-  height: 56px;
+  height: 48px;
   padding: 0 v.$space-4;
-  border-radius: 28px;
+  border-radius: v.$radius-md;
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-label-large);
   text-decoration: none;
-  transition: background-color 150ms ease;
+  @include m.motion(background-color, color);
 
   &:hover {
-    background: var(--mat-sys-surface-container-highest);
+    background: v.$surface-muted;
+    color: var(--mat-sys-on-surface);
   }
 
   &:focus-visible {
@@ -59,13 +91,18 @@
   }
 }
 
-// Active page: filled pill + bold label (NFR5: shape + weight, not color alone).
+// Active page: filled pill + filled icon + bold label (NFR5: shape + weight, not color alone).
 .side-nav__item--active {
   background: var(--mat-sys-secondary-container);
   color: var(--mat-sys-on-secondary-container);
   font-weight: 700;
 
+  mat-icon {
+    font-variation-settings: 'FILL' 1;
+  }
+
   &:hover {
     background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
   }
 }

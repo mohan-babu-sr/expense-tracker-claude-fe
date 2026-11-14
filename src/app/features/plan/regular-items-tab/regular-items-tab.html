@@ -13,10 +13,10 @@
         <mat-icon aria-hidden="true">event_repeat</mat-icon>
         Every-month items: {{ monthlyTotal() | inrCurrency: false }} a month · others count in full in the months they're due
       </p>
-      <ul class="rows">
+      <ul class="rows rows--cards">
         @for (item of list; track item.id) {
           <li class="row" [class.row--ended]="!item.nextDue">
-            <mat-icon class="row__icon" aria-hidden="true">{{ item.nextDue ? 'event_repeat' : 'event_busy' }}</mat-icon>
+            <span class="row__icon" aria-hidden="true"><mat-icon>{{ item.nextDue ? 'event_repeat' : 'event_busy' }}</mat-icon></span>
             <div class="row__text">
               <span class="row__name">{{ item.name }}</span>
               <span class="row__meta">{{ everyLabel(item.every) }} · {{ range(item) }}</span>

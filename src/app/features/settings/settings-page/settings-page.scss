@@ -291,6 +291,12 @@
 }
 
 // ---- Manage (v4) ----
+.manage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+}
+
 .manage__link {
   min-height: v.$touch-target;
 }

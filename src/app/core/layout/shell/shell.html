@@ -4,16 +4,24 @@
 }
 
 <mat-sidenav-container class="shell" [class.shell--mobile]="isMobile()">
-  <!-- Laptop navigation. On mobile, and on bare pages, it stays closed. -->
-  <mat-sidenav class="shell__sidenav" mode="side" [opened]="!isMobile() && !bare()" [disableClose]="true">
-    @if (!isMobile() && !bare()) {
-      <app-side-nav />
+  <!-- Laptop: always-open side nav. Phone (v5.1): the SAME list as a slide-in drawer opened by the toolbar ☰
+       (mode "over" = overlay with backdrop, focus trap and Esc to close). Bare pages: none. -->
+  <mat-sidenav
+    class="shell__sidenav"
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!bare() && (isMobile() ? drawerOpen() : true)"
+    (openedChange)="drawerOpen.set($event)"
+    [disableClose]="!isMobile()"
+    [autoFocus]="isMobile() ? 'first-tabbable' : false"
+  >
+    @if (!bare()) {
+      <app-side-nav (click)="onDrawerClick($event)" />
     }
   </mat-sidenav>
 
   <mat-sidenav-content class="shell__body">
     @if (isMobile() && !bare()) {
-      <app-top-toolbar />
+      <app-top-toolbar (menu)="drawerOpen.set(true)" />
     }
 
     <main class="shell__content" [class.shell__content--bare]="bare()">

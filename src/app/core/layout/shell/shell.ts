@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -16,7 +16,7 @@ function isBareRoute(snapshot: ActivatedRouteSnapshot | null): boolean {
 /**
  * App shell (R10, design §5).
  * Laptop (≥ 960px): side nav always open beside the content.
- * Mobile (< 960px): top toolbar + fixed bottom nav; the side nav is closed and not rendered.
+ * Mobile (< 960px): top toolbar + floating bottom bar; the side nav is a drawer opened by the toolbar ☰ (v5.1).
  * Bare pages (Welcome, sign in, …): no navigation at all, content centred (design §8.5).
  *
  * There is ONE <router-outlet>: the layout switches around it, so resizing the window never
@@ -33,11 +33,22 @@ export class Shell {
   protected readonly isMobile = inject(LayoutService).isMobile;
   protected readonly isLoading = inject(LoadingService).isLoading;
 
+  /** Phone drawer state (v5.1). Closes after every navigation, i.e. after tapping a page in it. */
+  protected readonly drawerOpen = signal(false);
+
+  /** A link tapped in the phone drawer closes it — also when it's the page you're already on (no navigation). */
+  protected onDrawerClick(event: MouseEvent): void {
+    if (this.isMobile() && (event.target as HTMLElement).closest('a')) this.drawerOpen.set(false);
+  }
+
   /** Starts as bare: before the first navigation finishes there's nothing to navigate to. */
   protected readonly bare = toSignal(
     this.router.events.pipe(
       filter((e) => e instanceof NavigationEnd),
-      map(() => isBareRoute(this.router.routerState.snapshot.root)),
+      map(() => {
+        this.drawerOpen.set(false);
+        return isBareRoute(this.router.routerState.snapshot.root);
+      }),
     ),
     { initialValue: true },
   );

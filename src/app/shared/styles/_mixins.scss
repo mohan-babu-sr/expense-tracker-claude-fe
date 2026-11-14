@@ -31,13 +31,18 @@
   min-height: v.$touch-target;
 }
 
-/// Card-like surface using Material 3 theme tokens (no hard-coded colors).
+/// Card surface (v5 "clean fintech", design §13.2): white card on the tinted page in light, raised surface in dark,
+/// large radius and a soft shadow. Theme tokens only (no hard-coded colors).
 @mixin card-surface {
-  background: var(--mat-sys-surface-container-low);
+  background: v.$surface-card;
   color: var(--mat-sys-on-surface);
-  border-radius: v.$radius-md;
-  box-shadow: var(--mat-sys-level1);
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-card;
   padding: v.$space-4;
+
+  @include laptop {
+    padding: v.$space-5;
+  }
 }
 
 /// Single-line text with "…" — the flex/grid parent needs `min-width: 0` on this item.
@@ -46,4 +51,60 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+}
+
+/// Money amounts: equal-width digits so columns of numbers line up (R21 AC1).
+@mixin amount {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/// Big headline number (dashboard hero, overall savings).
+@mixin amount-xl {
+  @include amount;
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  @include laptop {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+}
+
+/// Small label above a value ("SPENT THIS MONTH").
+@mixin eyebrow {
+  font: var(--mat-sys-label-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/// Transitions only when the device allows motion (R21 AC7).
+/// Usage: @include m.motion(background-color, transform);
+@mixin motion($props...) {
+  @media (prefers-reduced-motion: no-preference) {
+    transition-property: $props;
+    transition-duration: v.$motion-base;
+    transition-timing-function: v.$motion-easing;
+  }
+}
+
+/// Round tinted icon "avatar" (list rows, empty states). Pass the tint as a CSS colour (e.g. a category colour).
+@mixin icon-avatar($size: 40px, $icon: 22px) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+
+  mat-icon,
+  .mat-icon {
+    width: $icon;
+    height: $icon;
+    font-size: $icon;
+  }
 }

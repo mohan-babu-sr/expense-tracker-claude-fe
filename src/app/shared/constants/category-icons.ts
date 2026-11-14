@@ -1,5 +1,5 @@
 /**
- * Icons offered by the category icon picker (R5 AC2). All are Material Icons ligature names.
+ * Icons offered by the category icon picker (R5 AC2). All are Material Symbols names (v5: Material Symbols Rounded; `npm run icons` adds them to the font subset).
  * The first 10 match the seeded defaults (server/src/services/seed.ts).
  */
 /** Readable name for an icon ligature, e.g. `local_grocery_store` → "local grocery store" (NFR5). */

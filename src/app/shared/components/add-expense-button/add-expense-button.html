@@ -1,9 +1,5 @@
-@if (isMobile()) {
-  <button mat-fab extended class="fab" type="button" (click)="open()" aria-label="Add expense">
-    <mat-icon>add</mat-icon>
-    Add
-  </button>
-} @else {
+<!-- v5 (R10 AC3 v5): laptop only — on the phone the bottom bar's centre Add button replaces the FAB. -->
+@if (!isMobile()) {
   <button mat-flat-button type="button" (click)="open()">
     <mat-icon>add</mat-icon>
     Add expense

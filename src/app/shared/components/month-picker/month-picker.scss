@@ -1,16 +1,19 @@
 @use 'variables' as v;
 
+// v5: a floating pill (card surface + soft shadow) instead of an outlined box.
 .month-picker {
   display: inline-flex;
   align-items: center;
   gap: v.$space-1;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 24px;
-  background: var(--mat-sys-surface-container-low);
+  padding: 2px;
+  border-radius: v.$radius-pill;
+  background: v.$surface-card;
+  box-shadow: v.$shadow-card;
 }
 
 .month-picker__label {
   min-width: 84px; // fixed width so the arrows don't jump between "May" and "Sept"
   text-align: center;
   font: var(--mat-sys-title-small);
+  font-weight: 700;
 }

@@ -1,5 +1,6 @@
 <header class="auth-card__header">
-  <mat-icon class="auth-card__logo" aria-hidden="true">{{ icon() }}</mat-icon>
+  <!-- v5 brand header (R21 AC8): the icon in a raised indigo tile with a soft glow behind it -->
+  <span class="auth-card__logo" aria-hidden="true"><mat-icon>{{ icon() }}</mat-icon></span>
   <h1 class="auth-card__title">{{ title() }}</h1>
   @if (subtitle()) {
     <p class="auth-card__subtitle">{{ subtitle() }}</p>

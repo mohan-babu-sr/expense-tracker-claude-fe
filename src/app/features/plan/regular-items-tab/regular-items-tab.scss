@@ -43,3 +43,105 @@
     gap: v.$space-1;
   }
 }
+
+// ---------------------------------------------------------------------------
+// v5.1 (R21 AC11): each item is a card tile — tinted icon, name + rule, bold amount, next-due as a chip line.
+// Phone: one column; laptop: two.
+// ---------------------------------------------------------------------------
+.card {
+  @include m.laptop {
+    max-width: none;
+  }
+}
+
+.rows--cards {
+  gap: v.$space-2;
+
+  @include m.laptop {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-3;
+  }
+
+  .row {
+    align-items: flex-start;
+    padding: v.$space-3;
+    border-radius: v.$radius-md;
+    background: v.$surface-muted;
+
+    & + .row {
+      border-top: 0;
+    }
+  }
+
+  .row__icon {
+    @include m.icon-avatar(40px, 22px);
+    border-radius: v.$radius-sm;
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  .row--ended .row__icon {
+    background: v.$surface-card;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .row__name {
+    font: var(--mat-sys-title-small);
+    font-weight: 700;
+  }
+
+  .row__amount {
+    @include m.amount;
+    align-self: center;
+    font: var(--mat-sys-title-medium);
+    font-weight: 700;
+  }
+
+  .row__next {
+    align-self: flex-start;
+    margin-top: v.$space-1;
+    padding: 1px v.$space-2 1px 6px;
+    border-radius: v.$radius-pill;
+    background: v.$surface-card;
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-label-medium);
+  }
+
+  button {
+    align-self: center;
+  }
+
+  // Phone: two lines per card — icon + name/rule/next on top, amount + Edit + Delete underneath.
+  @include m.mobile {
+    .row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        'icon text   text text'
+        'icon amount edit del';
+      column-gap: v.$space-3;
+      row-gap: v.$space-1;
+    }
+
+    .row__icon {
+      grid-area: icon;
+    }
+
+    .row__text {
+      grid-area: text;
+    }
+
+    .row__amount {
+      grid-area: amount;
+      align-self: center;
+    }
+
+    button:nth-of-type(1) {
+      grid-area: edit;
+    }
+
+    button:nth-of-type(2) {
+      grid-area: del;
+    }
+  }
+}

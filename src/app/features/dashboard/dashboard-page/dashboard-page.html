@@ -1,6 +1,6 @@
 <app-page-header title="Dashboard" [subtitle]="subtitle()">
   <app-month-picker [(month)]="month" />
-  <app-add-expense-button (saved)="load()" />
+  <app-add-expense-button />
 </app-page-header>
 
 @if (data(); as d) {
@@ -9,7 +9,7 @@
     <div class="banner banner--info" role="status">
       <mat-icon aria-hidden="true">payments</mat-icon>
       <span class="banner__text">
-        <strong>Enter your salary for {{ subtitle() }}</strong> — expenses can be added once it's in.
+        <strong>Enter your salary for {{ monthLabel() }}</strong> — expenses can be added once it's in.
       </span>
       <button mat-flat-button type="button" class="banner__link" (click)="enterSalary()">Enter salary</button>
     </div>

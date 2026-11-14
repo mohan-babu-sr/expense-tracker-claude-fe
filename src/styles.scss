@@ -2,6 +2,8 @@
 // Component styles should use `@use 'variables' as v;` / `@use 'mixins' as m;`
 // (resolved via angular.json → stylePreprocessorOptions.includePaths).
 @use '@angular/material' as mat;
+@use 'theme-colors' as theme; // indigo #4F46E5 + amber #F59E0B palettes, generated (design §13.2)
+@use 'variables' as v;
 
 // ---------------------------------------------------------------------------
 // Material 3 theme: emits all `--mat-sys-*` CSS variables (colors, typography, elevation…)
@@ -15,11 +17,119 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$orange-palette,
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette, // amber = budget "warning"
       ),
-      typography: Roboto,
+      typography: (
+        plain-family: Inter,
+        brand-family: Inter,
+        regular-weight: 400,
+        medium-weight: 600,
+        bold-weight: 700,
+      ),
       density: 0,
+    )
+  );
+
+  // v5 surfaces & shadows (design §13.2). light-dark() picks the half that matches color-scheme; color-mix() makes
+  // translucent shadows from the theme's shadow token, so there are still no hard-coded colors.
+  --app-bg: light-dark(var(--mat-sys-surface-container-low), var(--mat-sys-surface));
+  --app-card: light-dark(var(--mat-sys-surface-container-lowest), var(--mat-sys-surface-container));
+  --app-card-muted: light-dark(var(--mat-sys-surface-container), var(--mat-sys-surface-container-high));
+  --app-shadow-card:
+    0 1px 2px color-mix(in srgb, var(--mat-sys-shadow) 6%, transparent),
+    0 6px 20px color-mix(in srgb, var(--mat-sys-shadow) 6%, transparent);
+  --app-shadow-raised:
+    0 2px 6px color-mix(in srgb, var(--mat-sys-shadow) 10%, transparent),
+    0 12px 32px color-mix(in srgb, var(--mat-sys-shadow) 16%, transparent);
+
+  // v5 component shapes (R21 AC6): pill buttons, rounded fields/cards/dialogs/menus.
+  @include mat.button-overrides(
+    (
+      filled-container-shape: v.$radius-pill,
+      outlined-container-shape: v.$radius-pill,
+      protected-container-shape: v.$radius-pill,
+      text-container-shape: v.$radius-pill,
+      tonal-container-shape: v.$radius-pill,
+    )
+  );
+  @include mat.fab-overrides(
+    (
+      container-shape: v.$radius-lg,
+      extended-container-shape: v.$radius-pill,
+    )
+  );
+  @include mat.card-overrides(
+    (
+      elevated-container-shape: v.$radius-lg,
+      outlined-container-shape: v.$radius-lg,
+    )
+  );
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: 12px,
+    )
+  );
+  @include mat.dialog-overrides(
+    (
+      container-shape: v.$radius-xl,
+      container-color: var(--app-card),
+      subhead-weight: 700,
+    )
+  );
+  @include mat.chips-overrides(
+    (
+      container-shape-radius: v.$radius-sm,
+    )
+  );
+  // Segmented control (v5): muted track, the selected option is a raised "thumb" (see .mat-button-toggle-group below).
+  @include mat.button-toggle-overrides(
+    (
+      shape: v.$radius-pill,
+      background-color: transparent,
+      divider-color: transparent,
+      text-color: var(--mat-sys-on-surface-variant),
+      // Dark: a raised card is too close to the track, so the selected option uses the secondary container.
+      selected-state-background-color:
+        light-dark(var(--mat-sys-surface-container-lowest), var(--mat-sys-secondary-container)),
+      selected-state-text-color: light-dark(var(--mat-sys-on-surface), var(--mat-sys-on-secondary-container)),
+    )
+  );
+  @include mat.snack-bar-overrides(
+    (
+      container-shape: v.$radius-md,
+    )
+  );
+  @include mat.menu-overrides(
+    (
+      container-shape: v.$radius-md,
+    )
+  );
+  @include mat.select-overrides(
+    (
+      container-elevation-shadow: v.$shadow-raised,
+    )
+  );
+  @include mat.datepicker-overrides(
+    (
+      calendar-container-shape: v.$radius-lg,
+    )
+  );
+  // Tables (v5): muted uppercase header row, roomier rows — every mat-table (Expenses, admin Users).
+  @include mat.table-overrides(
+    (
+      header-headline-color: var(--mat-sys-on-surface-variant),
+      header-headline-weight: 700,
+      header-headline-size: 0.75rem,
+      header-headline-tracking: 0.06em,
+      row-item-outline-color: var(--mat-sys-outline-variant),
+      header-container-height: 48px,
+      row-item-container-height: 60px,
+    )
+  );
+  @include mat.tooltip-overrides(
+    (
+      container-shape: v.$radius-sm,
     )
   );
 
@@ -56,7 +166,7 @@ html[data-theme='dark'] {
 body {
   margin: 0;
   height: 100%;
-  background-color: var(--mat-sys-surface);
+  background-color: v.$surface-page; // v5: soft tinted page, white cards on top
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
   -webkit-font-smoothing: antialiased;
@@ -97,3 +207,66 @@ canvas {
     max-height: none; // let the content fill the screen instead of the default 65vh
   }
 }
+
+// ---------------------------------------------------------------------------
+// v5 (R21): Material Symbols Rounded — the default icon font (MatIconRegistry in CoreModule).
+// The active nav item uses the filled variant: font-variation-settings 'FILL' 1.
+// ---------------------------------------------------------------------------
+.material-symbols-rounded {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+// ---------------------------------------------------------------------------
+// v5 segmented control (R21 AC6): every mat-button-toggle-group (Plan tabs, Upcoming Open/Done, Expenses
+// Month/Range). Track = muted surface; selected = raised card thumb + bold label (shape + weight, not colour only).
+// ---------------------------------------------------------------------------
+.mat-button-toggle-group.mat-button-toggle-group-appearance-standard {
+  padding: 3px;
+  border: 0;
+  background: v.$surface-muted;
+  gap: 2px;
+}
+
+.mat-button-toggle-group-appearance-standard .mat-button-toggle {
+  border-radius: v.$radius-pill;
+  overflow: hidden;
+}
+
+.mat-button-toggle-group-appearance-standard .mat-button-toggle-checked {
+  box-shadow: v.$shadow-card;
+  font-weight: 700;
+}
+
+// ---------------------------------------------------------------------------
+// v5 tables: header row on the muted surface + soft hover on rows (see table-overrides above).
+// ---------------------------------------------------------------------------
+.mat-mdc-table .mat-mdc-header-cell {
+  text-transform: uppercase;
+  background: v.$surface-muted;
+}
+
+.mat-mdc-table .mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mat-mdc-table .mat-mdc-row {
+    transition: background-color v.$motion-base v.$motion-easing;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// R21 AC9: Material's default keyboard focus is only a faint state layer. Strong focus indicators draw a clear
+// outline around the focused button / toggle / chip / list item — shown for keyboard focus only, never on tap.
+// ---------------------------------------------------------------------------
+@include mat.strong-focus-indicators(
+  (
+    border-color: var(--mat-sys-primary),
+    border-width: 3px,
+    border-radius: 999px,
+  )
+);

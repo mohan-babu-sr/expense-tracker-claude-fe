@@ -5,7 +5,7 @@ import { NotificationService } from '../../../core/services/notification.service
 import { PlanService } from '../../../core/services/plan.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { sourceOption } from '../../../shared/constants';
-import { ExtraIncome, Savings, Withdrawal } from '../../../shared/models';
+import { ExtraIncome, Savings, SavingsMonth, Withdrawal } from '../../../shared/models';
 import { monthToDate } from '../../../shared/utils/date.utils';
 import { ExtraIncomeDialog } from '../extra-income-dialog/extra-income-dialog';
 import { WithdrawalDialog } from '../withdrawal-dialog/withdrawal-dialog';
@@ -48,6 +48,13 @@ export class SavingsTab {
     WithdrawalDialog.open(this.dialog, { overall: s.overall })
       .pipe(filter(Boolean))
       .subscribe((updated) => this.savings.set(updated));
+  }
+
+  /** History bar (v5.1): share of the month's salary saved, 0–100. A short month shows a small red stub. */
+  protected sharePct(m: SavingsMonth): number {
+    if (m.salaryTotal <= 0) return 0;
+    if (m.actual < 0) return 6;
+    return Math.min(100, Math.round((m.actual / m.salaryTotal) * 100));
   }
 
   protected addExtra(): void {

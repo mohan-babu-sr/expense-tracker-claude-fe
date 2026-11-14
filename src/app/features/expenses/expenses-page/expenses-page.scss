@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @use 'variables' as v;
 @use 'mixins' as m;
 
@@ -13,39 +14,75 @@
   margin-bottom: v.$space-3;
 }
 
+// v5: pill search field on a card surface + matching pill Filters button (design §13.5).
 .mobile-filters__search {
   flex: 1;
   min-width: 0;
+  @include mat.form-field-overrides(
+    (
+      // 28px = half the 56px field height = fully round ends. NOT $radius-pill (999px): the outlined field's
+      // leading border piece is as wide as the radius, which pushed the field ~1000px off-screen (T66).
+      outlined-container-shape: 28px,
+      outlined-outline-color: transparent,
+    )
+  );
+
+  ::ng-deep .mdc-text-field--outlined {
+    background: v.$surface-card;
+    border-radius: 28px;
+    box-shadow: v.$shadow-card;
+  }
+
+  // Text sits 8px after the search glyph (Material default is 16px + the label offset).
+  ::ng-deep .mat-mdc-form-field-icon-prefix > .mat-icon {
+    padding-right: v.$space-1;
+  }
 }
 
 .mobile-filters__button {
   @include m.touch-target;
   flex: none;
   height: 56px; // same height as the outlined search field
+  background: v.$surface-card;
+  box-shadow: v.$shadow-card;
+  @include mat.button-overrides(
+    (
+      outlined-outline-color: transparent,
+    )
+  );
 }
 
+// v5: summary as a card — count on the left, the filter total big and bold on the right (R2 AC3).
 .summary {
+  @include m.card-surface;
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: v.$space-2;
   margin-bottom: v.$space-3;
   padding: v.$space-3 v.$space-4;
-  border-radius: v.$radius-md;
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
+
+  @include m.laptop {
+    padding: v.$space-4 v.$space-5;
+  }
 }
 
 .summary__count {
-  font: var(--mat-sys-body-medium);
+  @include m.eyebrow;
 }
 
 .summary__total {
-  font: var(--mat-sys-body-large);
-  font-variant-numeric: tabular-nums;
+  @include m.amount;
+  display: inline-flex;
+  align-items: baseline;
+  gap: v.$space-2;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
 
   strong {
-    font: var(--mat-sys-title-medium);
+    font: var(--mat-sys-title-large);
+    font-weight: 700;
+    color: var(--mat-sys-on-surface);
   }
 }

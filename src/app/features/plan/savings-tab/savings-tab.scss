@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @use 'variables' as v;
 @use 'mixins' as m;
 @use '../plan' as plan;
@@ -112,4 +113,112 @@
 
 .row__amount--short {
   color: v.$budget-danger;
+}
+
+// ---------------------------------------------------------------------------
+// v5.1 (R21 AC11, design §13.8)
+// ---------------------------------------------------------------------------
+
+// Overall savings = hero card (same recipe as the dashboard hero: primary + a soft sheen from theme tokens).
+.overall {
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--mat-sys-on-primary) 16%, transparent), transparent 55%),
+    var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: v.$shadow-raised;
+
+  .card__title {
+    color: inherit;
+    opacity: 0.9;
+  }
+}
+
+.overall .overall__big {
+  @include m.amount-xl;
+
+  &,
+  mat-icon {
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+// Short overall on indigo: keep the readable on-primary colour; the "Short by" words + error icon say it (NFR5).
+.overall .overall__big--short,
+.overall .overall__big--short mat-icon {
+  color: var(--mat-sys-on-primary);
+}
+
+.overall .overall__line,
+.overall .overall__month {
+  color: inherit;
+  opacity: 0.92;
+
+  mat-icon {
+    color: inherit;
+  }
+}
+
+// Buttons on the indigo card: inverse colours.
+.overall .overall__actions {
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--mat-sys-on-primary),
+      filled-label-text-color: var(--mat-sys-primary),
+      outlined-label-text-color: var(--mat-sys-on-primary),
+      outlined-outline-color: color-mix(in srgb, var(--mat-sys-on-primary) 60%, transparent),
+      outlined-disabled-label-text-color: color-mix(in srgb, var(--mat-sys-on-primary) 55%, transparent),
+      outlined-disabled-outline-color: color-mix(in srgb, var(--mat-sys-on-primary) 30%, transparent),
+    )
+  );
+}
+
+// Timeline rows: round tinted icons — money in (primary tint) / out (error tint), signs on the amounts.
+.row__icon {
+  @include m.icon-avatar(40px, 20px);
+}
+
+.row__icon--in {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.row__icon--out {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.row__icon--month {
+  border-radius: v.$radius-sm;
+  background: v.$surface-muted;
+  color: var(--mat-sys-primary);
+}
+
+.row__amount {
+  font-weight: 700;
+}
+
+.row__amount--out {
+  color: v.$budget-danger;
+}
+
+// Month rows: thin bar = share of salary saved.
+.share {
+  display: block;
+  height: 6px;
+  margin-top: v.$space-1;
+  overflow: hidden;
+  border-radius: v.$radius-pill;
+  background: v.$surface-muted;
+}
+
+.share__fill {
+  display: block;
+  height: 100%;
+  border-radius: v.$radius-pill;
+  background: var(--mat-sys-primary);
+  @include m.motion(width);
+}
+
+.share__fill--short {
+  background: v.$budget-danger;
 }

@@ -1,7 +1,9 @@
 import { Component, computed, effect, inject, output, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { SalaryDialog } from '../../../shared/components/salary-dialog/salary-dialog';
 import { everyLabel } from '../../../shared/constants';
@@ -53,9 +55,18 @@ export class MonthTab {
     return [...rows.filter((r) => r.user.id === me), ...rows.filter((r) => r.user.id !== me)];
   });
   protected readonly paidCount = computed(() => (this.plan()?.regular ?? []).filter((e) => e.paidAt).length);
+  /** For the progress ring (v5.1): share of this month's regular items ticked paid. */
+  protected readonly paidPct = computed(() => {
+    const n = this.plan()?.regular.length ?? 0;
+    return n ? Math.round((this.paidCount() / n) * 100) : 0;
+  });
   protected readonly everyLabel = everyLabel;
 
   constructor() {
+    // v5: any Add (header button, phone bar, empty state) → refresh (design §13.3).
+    inject(ExpenseEventsService)
+      .added$.pipe(takeUntilDestroyed())
+      .subscribe(() => this.load());
     effect(() => {
       this.month();
       untracked(() => this.load());
@@ -65,6 +76,12 @@ export class MonthTab {
   private load(): void {
     this.request?.unsubscribe(); // a newer month wins over a slower older request
     this.request = this.planService.get(this.month()).subscribe((p) => this.plan.set(p));
+  }
+
+  /** "Mohan Babu" → "MB", "Abhinaya" → "A" — avatar text for the salary rows. */
+  protected initials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
   }
 
   protected isMe(row: SalaryRow): boolean {

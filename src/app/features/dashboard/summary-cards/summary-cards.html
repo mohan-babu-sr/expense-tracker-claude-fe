@@ -1,36 +1,50 @@
 <div class="cards">
-  <div class="card card--primary">
-    <span class="card__label"><mat-icon aria-hidden="true">payments</mat-icon> Total spent</span>
-    <span class="card__value" data-testid="total-spent">{{ data().totalSpent | inrCurrency }}</span>
-  </div>
-
-  <div class="card">
-    <span class="card__label"><mat-icon aria-hidden="true">receipt_long</mat-icon> Expenses</span>
-    <span class="card__value" data-testid="count">{{ data().count }}</span>
-  </div>
-
-  <div class="card">
-    <span class="card__label"><mat-icon aria-hidden="true">calendar_today</mat-icon> Average per day</span>
-    <span class="card__value">{{ data().avgPerDay | inrCurrency }}</span>
-  </div>
-
-  <div class="card">
-    <span class="card__label"><mat-icon aria-hidden="true">emoji_events</mat-icon> Top category</span>
-    @if (data().topCategory; as top) {
-      <span class="card__value card__value--chip">
-        <app-category-chip [category]="top.category" />
-      </span>
-      <span class="card__sub">{{ top.amount | inrCurrency }}</span>
-    } @else {
-      <span class="card__value">—</span>
-    }
-  </div>
-
-  <div class="card">
-    <span class="card__label"><mat-icon aria-hidden="true">compare_arrows</mat-icon> vs last month</span>
-    <span class="card__change" [class]="'card__change card__change--' + change().cls">
+  <!-- v5 hero (R21 AC4): the month's total, change vs last month and a mini 6-month trend -->
+  <section class="hero" aria-labelledby="hero-label">
+    <span class="hero__label" id="hero-label">
+      <mat-icon aria-hidden="true">payments</mat-icon>
+      Spent in {{ monthName() }}
+    </span>
+    <span class="hero__value" data-testid="total-spent">{{ data().totalSpent | inrCurrency }}</span>
+    <span class="hero__change">
       <mat-icon aria-hidden="true">{{ change().icon }}</mat-icon>
       {{ change().text }}
     </span>
+
+    <!-- Decorative: the same 6 months are in the "Last 6 months" chart below, with labels and values. -->
+    <div class="hero__trend" aria-hidden="true">
+      @for (bar of trend(); track bar.month) {
+        <span class="hero__bar" [class.hero__bar--current]="bar.current">
+          <span class="hero__bar-fill" [style.height.%]="bar.height"></span>
+          <span class="hero__bar-label">{{ bar.label }}</span>
+        </span>
+      }
+    </div>
+  </section>
+
+  <div class="tile">
+    <span class="tile__icon" aria-hidden="true"><mat-icon>receipt_long</mat-icon></span>
+    <span class="tile__label">Expenses</span>
+    <span class="tile__value" data-testid="count">{{ data().count }}</span>
+  </div>
+
+  <div class="tile">
+    <span class="tile__icon" aria-hidden="true"><mat-icon>calendar_today</mat-icon></span>
+    <!-- Shorter wording than "Average per day" so it fits the half-width tile at 360px (same number). -->
+    <span class="tile__label">Daily average</span>
+    <span class="tile__value">{{ data().avgPerDay | inrCurrency }}</span>
+  </div>
+
+  <div class="tile tile--wide">
+    <span class="tile__icon" aria-hidden="true"><mat-icon>emoji_events</mat-icon></span>
+    <span class="tile__label">Top category</span>
+    @if (data().topCategory; as top) {
+      <span class="tile__value tile__value--chip">
+        <app-category-chip [category]="top.category" />
+        <span class="tile__sub">{{ top.amount | inrCurrency }}</span>
+      </span>
+    } @else {
+      <span class="tile__value">—</span>
+    }
   </div>
 </div>

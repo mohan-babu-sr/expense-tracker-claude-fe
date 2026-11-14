@@ -49,7 +49,7 @@
             @for (e of s.extraIncome; track e.id) {
               @let src = sourceOption(e.source);
               <li class="row">
-                <mat-icon class="row__icon row__icon--in" aria-hidden="true">{{ src.icon }}</mat-icon>
+                <span class="row__icon row__icon--in" aria-hidden="true"><mat-icon>{{ src.icon }}</mat-icon></span>
                 <div class="row__text">
                   <span class="row__name">
                     {{ src.label }}
@@ -84,12 +84,12 @@
           <ul class="rows">
             @for (w of s.withdrawals; track w.id) {
               <li class="row">
-                <mat-icon class="row__icon" aria-hidden="true">remove_circle_outline</mat-icon>
+                <span class="row__icon row__icon--out" aria-hidden="true"><mat-icon>south_west</mat-icon></span>
                 <div class="row__text">
                   <span class="row__name">{{ w.reason }}</span>
                   <span class="row__meta">{{ w.date | date: 'd MMM y' }} · by {{ w.recordedBy.name }}</span>
                 </div>
-                <span class="row__amount">{{ w.amount | inrCurrency: false }}</span>
+                <span class="row__amount row__amount--out">−{{ w.amount | inrCurrency: false }}</span>
                 <button mat-icon-button type="button" (click)="remove(w)" [attr.aria-label]="'Delete withdrawal ' + w.reason" matTooltip="Delete">
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -110,7 +110,7 @@
         <ul class="rows">
           @for (m of s.months; track m.month) {
             <li class="row">
-              <mat-icon class="row__icon" aria-hidden="true">{{ m.finished ? 'calendar_month' : 'schedule' }}</mat-icon>
+              <span class="row__icon row__icon--month" aria-hidden="true"><mat-icon>{{ m.finished ? 'calendar_month' : 'schedule' }}</mat-icon></span>
               <div class="row__text">
                 <span class="row__name">
                   {{ monthDate(m.month) | date: 'MMMM y' }}
@@ -124,6 +124,10 @@
                   @if (m.extra) {
                     · <span class="extra">Extra +{{ m.extra | inrCurrency: false }}</span>
                   }
+                </span>
+                <!-- v5.1: how much of the salary was saved (decorative — the amount on the right says it in words) -->
+                <span class="share" aria-hidden="true">
+                  <span class="share__fill" [class.share__fill--short]="m.actual < 0" [style.width.%]="sharePct(m)"></span>
                 </span>
               </div>
               <span class="row__amount" [class.row__amount--short]="m.actual < 0">

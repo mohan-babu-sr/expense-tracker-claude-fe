@@ -1,15 +1,33 @@
-<nav class="bottom-nav" aria-label="Main">
-  @for (item of items(); track item.path) {
-    <a
-      class="bottom-nav__item"
-      [routerLink]="item.path"
-      routerLinkActive="bottom-nav__item--active"
-      ariaCurrentWhenActive="page"
-    >
-      <span class="bottom-nav__pill">
-        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-      </span>
-      <span class="bottom-nav__label">{{ item.label }}</span>
-    </a>
+<!-- v5 (R21 AC3, design §13.3): floating bar — 2 tabs · centre Add · 2 tabs. The admin has no Add (2 tabs only). -->
+<ng-template #tab let-item>
+  <a
+    class="bottom-nav__item"
+    [routerLink]="item.path"
+    routerLinkActive="bottom-nav__item--active"
+    ariaCurrentWhenActive="page"
+  >
+    <span class="bottom-nav__pill">
+      <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+    </span>
+    <span class="bottom-nav__label">{{ item.label }}</span>
+  </a>
+</ng-template>
+
+<nav class="bottom-nav" [class.bottom-nav--with-add]="isUser()" aria-label="Main">
+  @if (isUser()) {
+    @for (item of userItems.start; track item.path) {
+      <ng-container *ngTemplateOutlet="tab; context: { $implicit: item }" />
+    }
+    <!-- Plain <button>: keeps MatButton out of CoreModule (main bundle). -->
+    <button class="bottom-nav__add" type="button" (click)="add()" [disabled]="opening()" aria-label="Add expense">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    @for (item of userItems.end; track item.path) {
+      <ng-container *ngTemplateOutlet="tab; context: { $implicit: item }" />
+    }
+  } @else {
+    @for (item of adminItems; track item.path) {
+      <ng-container *ngTemplateOutlet="tab; context: { $implicit: item }" />
+    }
   }
 </nav>

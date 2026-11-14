@@ -1,10 +1,13 @@
 @use 'variables' as v;
 @use 'mixins' as m;
 
+// Centred on the screen (the shell's bare layout gives a narrow column; this centres it vertically too).
 :host {
   display: flex;
   flex-direction: column;
-  gap: v.$space-4;
+  justify-content: center;
+  gap: v.$space-5;
+  min-height: calc(100dvh - #{v.$space-6} * 2);
 }
 
 .auth-card__header {
@@ -16,15 +19,30 @@
 }
 
 .auth-card__logo {
-  width: 48px;
-  height: 48px;
-  font-size: 48px;
-  color: var(--mat-sys-primary);
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: v.$space-3;
+  border-radius: v.$radius-lg;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow:
+    0 0 0 12px color-mix(in srgb, var(--mat-sys-primary) 12%, transparent),
+    v.$shadow-raised;
+
+  mat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 36px;
+  }
 }
 
 .auth-card__title {
   margin: v.$space-2 0 0;
-  font: var(--mat-sys-headline-small);
+  font: var(--mat-sys-headline-medium);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .auth-card__subtitle {
@@ -36,6 +54,10 @@
 .auth-card__body {
   @include m.card-surface;
   padding: v.$space-5 v.$space-4;
+
+  @include m.laptop {
+    padding: v.$space-6 v.$space-5;
+  }
 }
 
 .auth-card__footer {

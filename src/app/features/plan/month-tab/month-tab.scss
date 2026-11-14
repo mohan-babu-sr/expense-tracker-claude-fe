@@ -92,3 +92,105 @@
   color: var(--mat-sys-on-secondary-container);
   font: var(--mat-sys-label-small);
 }
+
+// ---------------------------------------------------------------------------
+// v5.1 (R21 AC11, design §13.8)
+// ---------------------------------------------------------------------------
+
+// Salary rows: initials avatar instead of a generic person icon.
+.avatar {
+  @include m.icon-avatar(40px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font: var(--mat-sys-label-large);
+  font-weight: 700;
+}
+
+.avatar--former {
+  background: v.$surface-muted;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row__amount {
+  font-weight: 700;
+}
+
+// "Not entered" as a soft warning pill (icon + words).
+.row__missing {
+  padding: 2px v.$space-2 2px 6px;
+  border-radius: v.$radius-pill;
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, transparent);
+  font: var(--mat-sys-label-medium);
+  font-weight: 600;
+}
+
+// Paid progress: a conic-gradient ring (--done = % paid) with the count inside, plus the words.
+.progress {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  margin-bottom: v.$space-3;
+}
+
+.ring {
+  --done: 0%;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: conic-gradient(var(--mat-sys-primary) var(--done), #{v.$surface-muted} 0);
+}
+
+.ring__count {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: v.$surface-card;
+  font: var(--mat-sys-label-medium);
+  font-weight: 700;
+}
+
+.progress__text {
+  display: flex;
+  flex-direction: column;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+
+  strong {
+    font: var(--mat-sys-title-small);
+    font-weight: 700;
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+// Regular items as tick tiles: each row is a soft rounded tile; paid ones get a primary tint + filled check.
+.rows--tiles {
+  gap: v.$space-2;
+
+  .row {
+    padding: v.$space-1 v.$space-2 v.$space-1 v.$space-3;
+    border-radius: v.$radius-md;
+    background: v.$surface-muted;
+    @include m.motion(background-color);
+
+    & + .row {
+      border-top: 0;
+    }
+  }
+
+  .row--paid {
+    background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+
+    .row__check mat-icon {
+      font-variation-settings: 'FILL' 1;
+    }
+  }
+
+  .row__check {
+    margin-left: -(v.$space-2);
+  }
+}

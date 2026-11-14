@@ -184,17 +184,24 @@
   </section>
 }
 
-<!-- v4 (R10): Categories left the bottom nav — this is its way in on mobile (laptop also has it in the side nav). -->
+<!-- v4 (R10): Categories left the bottom nav; v5 (R10 v5): Budgets too, for the centre Add button. This is their
+     way in on the phone (the laptop side nav also lists both). -->
 @if (group()) {
   <section class="section" aria-labelledby="manage-title">
     <h2 class="section__title" id="manage-title">
       <mat-icon aria-hidden="true">tune</mat-icon>
       Manage
     </h2>
-    <a mat-stroked-button routerLink="/categories" class="manage__link">
-      <mat-icon>category</mat-icon>
-      Categories
-    </a>
+    <div class="manage">
+      <a mat-stroked-button routerLink="/budgets" class="manage__link">
+        <mat-icon>savings</mat-icon>
+        Budgets
+      </a>
+      <a mat-stroked-button routerLink="/categories" class="manage__link">
+        <mat-icon>category</mat-icon>
+        Categories
+      </a>
+    </div>
   </section>
 }
 

@@ -1,10 +1,11 @@
 import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription, filter, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { LayoutService } from '../../../core/services/layout.service';
@@ -71,6 +72,10 @@ export class ExpensesPage {
   private request?: Subscription;
 
   constructor() {
+    // v5: any Add (header button, phone bar, empty state) → refresh (design §13.3).
+    inject(ExpenseEventsService)
+      .added$.pipe(takeUntilDestroyed())
+      .subscribe(() => this.reload());
     // Reload from page 1 when the filters change (R6) or the layout switches (table ↔ cards page differently).
     effect(() => {
       this.filter();
@@ -165,9 +170,8 @@ export class ExpensesPage {
 
   /** Empty-state "Add expense" button (R2 AC4) — salary first, like the header button (R17 AC3). */
   protected onAdd(): void {
-    ExpenseFormDialog.openAdd(this.dialog, this.isMobile(), this.planService, this.auth.userMe()?.user ?? null)
-      .pipe(filter(Boolean))
-      .subscribe(() => this.reload());
+    // The list refreshes via ExpenseEventsService (constructor), like every other Add.
+    ExpenseFormDialog.openAdd(this.dialog, this.isMobile(), this.planService, this.auth.userMe()?.user ?? null).subscribe();
   }
 
   /** R3: same form as add, pre-filled. */

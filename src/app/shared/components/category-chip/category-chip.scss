@@ -37,10 +37,11 @@
   font: var(--mat-sys-body-medium);
 }
 
-// Avatar mode: bigger circle, no visible label.
+// Avatar mode (list rows): bigger rounded square, no visible label (v5, design §13.4).
 :host(.category-chip--avatar) .category-chip__dot {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
+  border-radius: v.$radius-md;
 
   mat-icon {
     width: 22px;

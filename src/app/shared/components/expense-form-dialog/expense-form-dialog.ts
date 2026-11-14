@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 import { GroupService } from '../../../core/services/group.service';
+import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { PlanService } from '../../../core/services/plan.service';
 import { PAYMENT_METHODS } from '../../constants';
@@ -40,6 +41,7 @@ export class ExpenseFormDialog {
   private readonly dialogRef = inject<MatDialogRef<ExpenseFormDialog, Expense>>(MatDialogRef);
   private readonly expenseService = inject(ExpenseService);
   private readonly notification = inject(NotificationService);
+  private readonly expenseEvents = inject(ExpenseEventsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
 
@@ -191,6 +193,7 @@ export class ExpenseFormDialog {
     request.subscribe({
       next: (saved) => {
         this.notification.success(this.isEdit ? 'Expense updated' : 'Expense added'); // R1 AC3
+        if (!this.isEdit) this.expenseEvents.notifyAdded(saved); // v5: pages refresh, whichever Add was used
         this.dialogRef.close(saved);
       },
       error: (err: HttpErrorResponse) => {

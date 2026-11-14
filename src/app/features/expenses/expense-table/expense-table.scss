@@ -19,6 +19,7 @@
   }
 }
 
+// Header/row look is global (styles.scss → "v5 tables"), shared with the admin Users table.
 .expense-table {
   width: 100%;
   background: transparent;
@@ -77,10 +78,10 @@
 }
 
 .amount {
+  @include m.amount;
   text-align: right;
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .actions {

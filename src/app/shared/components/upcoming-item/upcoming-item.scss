@@ -31,15 +31,16 @@
   }
   padding: v.$space-2;
   border: 0;
-  border-radius: v.$radius-sm;
+  border-radius: v.$radius-md;
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  @include m.motion(background-color);
 
   &:hover:not(:disabled) {
-    background: var(--mat-sys-surface-container-high);
+    background: v.$surface-muted;
   }
 
   &:focus-visible {
@@ -59,6 +60,7 @@
   @include m.truncate;
   grid-area: title;
   font: var(--mat-sys-title-small);
+  font-weight: 600;
 }
 
 .upcoming-item__meta {
@@ -69,10 +71,11 @@
 }
 
 .upcoming-item__amount {
+  @include m.amount;
   grid-area: amount;
   justify-self: end;
   font: var(--mat-sys-title-small);
-  font-variant-numeric: tabular-nums;
+  font-weight: 700;
 }
 
 .upcoming-item--done .upcoming-item__title {
@@ -94,8 +97,13 @@
 
   align-items: center;
   gap: 2px;
+  padding: 1px v.$space-2 1px 6px;
+  border-radius: v.$radius-pill;
+  // v5: soft tint of the status colour behind icon + words (still never colour alone — NFR5).
+  background: color-mix(in srgb, var(--due-color) 12%, transparent);
   color: var(--due-color);
   font: var(--mat-sys-label-medium);
+  font-weight: 600;
   white-space: nowrap;
 
   mat-icon {

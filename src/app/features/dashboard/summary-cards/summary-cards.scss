@@ -1,37 +1,53 @@
 @use 'variables' as v;
 @use 'mixins' as m;
 
-// Mobile-first: one column (R7 AC5); laptop: as many ≥ 160px columns as fit — all 5 in one row
-// on a typical laptop (≈ 980px of content), 3 + 2 at the 960px breakpoint.
+// Phone: hero full width, then a 2-column tile grid (top category spans both).
+// Laptop: hero on the left (2 rows), tiles on the right.
 .cards {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: v.$space-3;
 
   @include m.laptop {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto;
   }
 }
 
-.card {
-  @include m.card-surface;
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-1;
-  min-width: 0;
+// ---- Hero: theme primary (indigo) with a soft sheen made from theme tokens — no hard-coded colours.
+.hero {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label trend'
+    'value trend'
+    'change trend';
+  align-items: center;
+  gap: v.$space-1 v.$space-4;
+  padding: v.$space-5;
+  overflow: hidden;
+  border-radius: v.$radius-lg;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--mat-sys-on-primary) 16%, transparent), transparent 55%),
+    var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: v.$shadow-raised;
+
+  @include m.laptop {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    padding: v.$space-6;
+  }
 }
 
-.card--primary {
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-}
-
-.card__label {
+.hero__label {
+  grid-area: label;
   display: flex;
   align-items: center;
   gap: v.$space-2;
   font: var(--mat-sys-label-large);
-  opacity: 0.85;
+  opacity: 0.9;
 
   mat-icon {
     width: 18px;
@@ -40,36 +56,155 @@
   }
 }
 
-.card__value {
+.hero__value {
+  @include m.amount-xl;
   @include m.truncate;
-  font: var(--mat-sys-headline-small);
-  font-variant-numeric: tabular-nums;
+  grid-area: value;
 }
 
-.card__value--chip {
-  font: var(--mat-sys-title-medium);
+// Change vs last month: a translucent pill. The arrow + words carry the meaning (NFR5), so no red/green on indigo.
+.hero__change {
+  grid-area: change;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  max-width: 100%;
+  margin-top: v.$space-1;
+  padding: 2px v.$space-3 2px v.$space-2;
+  border-radius: v.$radius-pill;
+  background: color-mix(in srgb, var(--mat-sys-on-primary) 16%, transparent);
+  font: var(--mat-sys-label-large);
+  white-space: nowrap; // v5.1: one line ("7.2% more than Oct")
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
 }
 
-.card__sub {
-  font: var(--mat-sys-body-medium);
+// Mini 6-month trend: plain CSS bars (Chart.js isn't needed for 6 decorative bars).
+.hero__trend {
+  grid-area: trend;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 84px;
+  align-self: end;
+
+  @include m.laptop {
+    gap: v.$space-2;
+    height: 120px;
+  }
+}
+
+.hero__bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: v.$space-1;
+  width: 10px;
+  height: 100%;
+
+  @include m.laptop {
+    width: 16px;
+  }
+}
+
+.hero__bar-fill {
+  width: 100%;
+  min-height: 4px;
+  border-radius: v.$radius-pill;
+  background: color-mix(in srgb, var(--mat-sys-on-primary) 35%, transparent);
+  @include m.motion(height);
+}
+
+.hero__bar--current .hero__bar-fill {
+  background: var(--mat-sys-on-primary);
+}
+
+.hero__bar-label {
+  font: var(--mat-sys-label-small);
+  opacity: 0.8;
+}
+
+// ---- Stat tiles
+.tile {
+  @include m.card-surface;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'icon label'
+    'value value';
+  align-items: center;
+  gap: v.$space-2;
+  min-width: 0;
+
+  // Phone: half-width tiles are narrow, so the icon goes above the label (label gets the full width).
+  @include m.mobile {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'icon'
+      'label'
+      'value';
+    gap: v.$space-1;
+
+    .tile__icon {
+      margin-bottom: v.$space-1;
+    }
+  }
+
+  @include m.laptop {
+    gap: v.$space-3;
+  }
+}
+
+.tile--wide {
+  grid-column: 1 / -1;
+
+  @include m.laptop {
+    grid-column: 2 / span 2;
+  }
+}
+
+.tile__icon {
+  @include m.icon-avatar(32px, 18px);
+  grid-area: icon;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.tile__label {
+  @include m.truncate;
+  grid-area: label;
+  font: var(--mat-sys-label-large);
   color: var(--mat-sys-on-surface-variant);
 }
 
-.card__change {
+.tile__value {
+  @include m.amount;
+  @include m.truncate;
+  grid-area: value;
+  font: var(--mat-sys-headline-small);
+  font-weight: 700;
+}
+
+.tile__value--chip {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: v.$space-1;
-  font: var(--mat-sys-title-small);
+  gap: v.$space-1 v.$space-3;
+  font: var(--mat-sys-title-medium);
+  white-space: normal;
+}
 
-  &--up {
-    color: var(--mat-sys-error);
-  }
-
-  &--down {
-    color: var(--mat-sys-primary);
-  }
-
-  &--neutral {
-    color: var(--mat-sys-on-surface-variant);
-  }
+.tile__sub {
+  @include m.amount;
+  font: var(--mat-sys-body-large);
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
 }

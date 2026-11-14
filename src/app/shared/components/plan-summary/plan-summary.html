@@ -1,45 +1,66 @@
 @let p = plan();
-<dl class="summary">
-  <div class="summary__row">
-    <dt>Salary</dt>
-    <dd>{{ p.salaryTotal | inrCurrency: false }}</dd>
-  </div>
-  <div class="summary__row">
-    <dt><span class="summary__op" aria-hidden="true">−</span> Regular expenses</dt>
-    <dd>{{ p.regularTotal | inrCurrency: false }}</dd>
-  </div>
-  <div class="summary__row">
-    <dt><span class="summary__op" aria-hidden="true">−</span> Member limits</dt>
-    <dd>{{ p.limitsTotal | inrCurrency: false }}</dd>
-  </div>
-  <div class="summary__row summary__row--total" [class.summary__row--short]="p.planned < 0">
-    <dt><span class="summary__op" aria-hidden="true">=</span> Planned savings</dt>
-    <dd>
+<!-- v5.1 (R21 AC11, design §13.8): planned savings big, one bar showing how the salary splits, legend in words -->
+<div class="top">
+  <span class="eyebrow">Planned savings</span>
+  <div class="headline">
+    <span class="headline__amount" [class.headline__amount--short]="p.planned < 0">
       @if (p.planned < 0) {
         <mat-icon aria-hidden="true">error</mat-icon>
       }
       {{ p.planned | savings }}
-    </dd>
+    </span>
+    <span class="headline__of">of {{ p.salaryTotal | inrCurrency: false }} salary</span>
   </div>
 
-  <div class="summary__row summary__row--sub">
-    <dt>Spent by everyone</dt>
-    <dd>{{ p.spent | inrCurrency: false }}</dd>
+  <div class="split" [class.split--empty]="!segments().length" role="img" [attr.aria-label]="splitLabel()">
+    @for (s of segments(); track s.key) {
+      <span class="split__seg" [class]="'split__seg split__seg--' + s.key" [style.flex-grow]="s.value"></span>
+    }
   </div>
-  <div class="summary__row summary__row--actual" [class.summary__row--short]="p.actual < 0">
-    <dt>
-      {{ actualLabel() }}
-      <span class="summary__hint">salary − regular − spent</span>
-    </dt>
-    <dd>
-      <mat-icon aria-hidden="true">{{ p.actual < 0 ? 'error' : 'savings' }}</mat-icon>
-      {{ p.actual | savings }}
-    </dd>
-  </div>
-</dl>
+  @if (p.planned < 0) {
+    <p class="over">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      Regular + limits are {{ -p.planned | inrCurrency: false }} more than the salary
+    </p>
+  }
+
+  <ul class="legend">
+    <li class="legend__item">
+      <span class="legend__dot legend__dot--regular" aria-hidden="true"></span>
+      <span class="legend__label">Regular expenses</span>
+      <span class="legend__value">{{ p.regularTotal | inrCurrency: false }}</span>
+    </li>
+    <li class="legend__item">
+      <span class="legend__dot legend__dot--limits" aria-hidden="true"></span>
+      <span class="legend__label">Member limits</span>
+      <span class="legend__value">{{ p.limitsTotal | inrCurrency: false }}</span>
+    </li>
+    <li class="legend__item legend__item--total">
+      <span class="legend__dot legend__dot--savings" aria-hidden="true"></span>
+      <span class="legend__label">Planned savings</span>
+      <span class="legend__value">{{ p.planned | savings }}</span>
+    </li>
+  </ul>
+</div>
+
+<!-- R19 AC2: actual so far = salary − regular − everything spent -->
+<div class="actual" [class.actual--short]="p.actual < 0">
+  <span class="actual__icon" aria-hidden="true"><mat-icon>{{ p.actual < 0 ? 'error' : 'savings' }}</mat-icon></span>
+  <span class="actual__text">
+    <span class="actual__label">{{ actualLabel() }}</span>
+    <span class="actual__hint">salary − regular − {{ p.spent | inrCurrency: false }} spent by everyone</span>
+  </span>
+  <span class="actual__side">
+    <span class="actual__amount">{{ p.actual | savings }}</span>
+    <span class="vs" [class]="'vs vs--' + vsPlan().cls">
+      <mat-icon aria-hidden="true">{{ vsPlan().icon }}</mat-icon>
+      {{ vsPlan().text }}
+    </span>
+  </span>
+</div>
 
 @if (p.missing.length) {
-  <p class="summary__waiting">
+  <p class="waiting">
     <mat-icon aria-hidden="true">hourglass_top</mat-icon>
     Waiting for salary: {{ missingNames() }}
   </p>

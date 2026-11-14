@@ -2,7 +2,14 @@
   <!-- R16 AC2 — source of truth for every app icon (design §11.2). The ₹ is drawn with strokes, not a font,
        so it looks the same everywhere. It stays inside the central 80% circle (maskable safe zone).
        After editing: re-render the PNGs in this folder (see design §11.2). -->
-  <rect width="512" height="512" rx="112" fill="#005cbb"/>
+  <!-- v5 (R21 AC10): indigo brand = theme seed #4F46E5, with a light diagonal gradient to violet. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
   <g fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"
      transform="translate(0 -9)">
     <path d="M166 150H346"/>

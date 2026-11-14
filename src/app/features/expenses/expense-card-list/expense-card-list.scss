@@ -5,22 +5,33 @@
   margin-top: v.$space-4;
 }
 
+// v5: quiet uppercase date header with the day total on the right; rows in one rounded card per day.
 .day__header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   margin: 0 0 v.$space-2;
   padding: 0 v.$space-2;
-  font: var(--mat-sys-title-small);
-  color: var(--mat-sys-on-surface-variant);
+  @include m.eyebrow;
+  font-weight: 700;
 }
 
 .day__total {
-  font-variant-numeric: tabular-nums;
+  @include m.amount;
+  letter-spacing: 0;
+  text-transform: none;
+  font: var(--mat-sys-label-large);
+  font-weight: 700;
+  color: var(--mat-sys-on-surface);
 }
 
 .day__card {
   @include m.card-surface;
   padding: v.$space-1;
+
+  @include m.laptop {
+    padding: v.$space-1;
+  }
 }
 
 .load-more {

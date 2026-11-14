@@ -18,15 +18,16 @@
   min-width: 0;
   padding: v.$space-2;
   border: 0;
-  border-radius: v.$radius-sm;
+  border-radius: v.$radius-md;
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  @include m.motion(background-color);
 
   &:hover {
-    background: var(--mat-sys-surface-container-high);
+    background: v.$surface-muted;
   }
 
   &:focus-visible {
@@ -44,6 +45,7 @@
 .expense-item__title {
   @include m.truncate;
   font: var(--mat-sys-title-small);
+  font-weight: 600;
 }
 
 .expense-item__meta {
@@ -53,7 +55,8 @@
 }
 
 .expense-item__amount {
+  @include m.amount; // digits line up in a column
   flex: none;
   font: var(--mat-sys-title-small);
-  font-variant-numeric: tabular-nums; // digits line up in a column
+  font-weight: 700;
 }

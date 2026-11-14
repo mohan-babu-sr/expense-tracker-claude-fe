@@ -1,9 +1,11 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { BudgetService } from '../../../core/services/budget.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { BudgetStatus, BudgetSummary, Category, MemberBudget } from '../../../shared/models';
 import { currentMonth } from '../../../shared/utils/date.utils';
 import { BudgetDialog, BudgetDialogData, BudgetDialogResult } from '../budget-dialog/budget-dialog';
@@ -53,6 +55,10 @@ export class BudgetsPage {
   );
 
   constructor() {
+    // v5: any Add (header button, phone bar, empty state) → refresh (design §13.3).
+    inject(ExpenseEventsService)
+      .added$.pipe(takeUntilDestroyed())
+      .subscribe(() => this.load());
     this.categoryService.getAll().subscribe((list) => this.categories.set(list));
     // Re-fetch whenever the month changes (spending is month-specific).
     effect(() => {

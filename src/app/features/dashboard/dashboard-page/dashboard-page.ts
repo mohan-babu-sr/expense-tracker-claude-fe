@@ -1,8 +1,10 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
+import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { LayoutService } from '../../../core/services/layout.service';
 import { ExpenseFormDialog } from '../../../shared/components/expense-form-dialog/expense-form-dialog';
 import { SalaryDialog } from '../../../shared/components/salary-dialog/salary-dialog';
@@ -32,9 +34,20 @@ export class DashboardPage {
   protected readonly data = signal<Dashboard | null>(null);
   private request?: Subscription;
 
-  protected readonly subtitle = computed(() =>
+  /** "November 2026" — also used in the salary banner. */
+  protected readonly monthLabel = computed(() =>
     new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(monthToDate(this.month())),
   );
+
+  /**
+   * v5 greeting (R21 AC4). Laptop: "Hi Mohan · November 2026". Phone (v5.1): just "Hi Mohan" — the month picker
+   * beside it already shows the month, and the short text lets greeting + picker share one row.
+   */
+  protected readonly subtitle = computed(() => {
+    const first = this.auth.userMe()?.user.name.trim().split(/\s+/)[0];
+    if (!first) return this.monthLabel();
+    return this.isMobile() ? `Hi ${first}` : `Hi ${first} · ${this.monthLabel()}`;
+  });
 
   /** R8 AC4 + R15 AC6: "Over budget: Food (110%), Overall (104%), Abhinaya (over by ₹200)". */
   protected readonly overBudgetText = computed(() => {
@@ -56,6 +69,10 @@ export class DashboardPage {
   });
 
   constructor() {
+    // v5: any Add (header button, phone bar, empty state) → refresh (design §13.3).
+    inject(ExpenseEventsService)
+      .added$.pipe(takeUntilDestroyed())
+      .subscribe(() => this.load());
     effect(() => {
       this.month();
       untracked(() => this.load());
