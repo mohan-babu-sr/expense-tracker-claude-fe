@@ -1,0 +1,46 @@
+@let p = plan();
+<dl class="summary">
+  <div class="summary__row">
+    <dt>Salary</dt>
+    <dd>{{ p.salaryTotal | inrCurrency: false }}</dd>
+  </div>
+  <div class="summary__row">
+    <dt><span class="summary__op" aria-hidden="true">−</span> Regular expenses</dt>
+    <dd>{{ p.regularTotal | inrCurrency: false }}</dd>
+  </div>
+  <div class="summary__row">
+    <dt><span class="summary__op" aria-hidden="true">−</span> Member limits</dt>
+    <dd>{{ p.limitsTotal | inrCurrency: false }}</dd>
+  </div>
+  <div class="summary__row summary__row--total" [class.summary__row--short]="p.planned < 0">
+    <dt><span class="summary__op" aria-hidden="true">=</span> Planned savings</dt>
+    <dd>
+      @if (p.planned < 0) {
+        <mat-icon aria-hidden="true">error</mat-icon>
+      }
+      {{ p.planned | savings }}
+    </dd>
+  </div>
+
+  <div class="summary__row summary__row--sub">
+    <dt>Spent by everyone</dt>
+    <dd>{{ p.spent | inrCurrency: false }}</dd>
+  </div>
+  <div class="summary__row summary__row--actual" [class.summary__row--short]="p.actual < 0">
+    <dt>
+      {{ actualLabel() }}
+      <span class="summary__hint">salary − regular − spent</span>
+    </dt>
+    <dd>
+      <mat-icon aria-hidden="true">{{ p.actual < 0 ? 'error' : 'savings' }}</mat-icon>
+      {{ p.actual | savings }}
+    </dd>
+  </div>
+</dl>
+
+@if (p.missing.length) {
+  <p class="summary__waiting">
+    <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+    Waiting for salary: {{ missingNames() }}
+  </p>
+}

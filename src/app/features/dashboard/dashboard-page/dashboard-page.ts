@@ -1,9 +1,11 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, filter } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { LayoutService } from '../../../core/services/layout.service';
 import { ExpenseFormDialog } from '../../../shared/components/expense-form-dialog/expense-form-dialog';
+import { SalaryDialog } from '../../../shared/components/salary-dialog/salary-dialog';
 import { Dashboard, Expense } from '../../../shared/models';
 import { BalancePipe } from '../../../shared/pipes/balance.pipe';
 import { currentMonth, monthToDate } from '../../../shared/utils/date.utils';
@@ -24,6 +26,7 @@ export class DashboardPage {
   private readonly dialog = inject(MatDialog);
   private readonly isMobile = inject(LayoutService).isMobile;
   private readonly balance = new BalancePipe();
+  private readonly auth = inject(AuthService);
 
   protected readonly month = signal(currentMonth());
   protected readonly data = signal<Dashboard | null>(null);
@@ -45,6 +48,13 @@ export class DashboardPage {
   /** "My balance" card only when at least one member has a limit (R15 AC6). */
   protected readonly hasLimits = computed(() => (this.data()?.members ?? []).some((m) => m.limit !== null));
 
+  /** R17 AC4: banner while the signed-in member's salary for the dashboard month is missing. */
+  protected readonly mySalaryMissing = computed(() => {
+    const plan = this.data()?.plan;
+    const me = this.auth.userMe()?.user.id;
+    return !!plan?.started && !!me && plan.missing.some((u) => u.id === me);
+  });
+
   constructor() {
     effect(() => {
       this.month();
@@ -55,6 +65,14 @@ export class DashboardPage {
   protected load(): void {
     this.request?.unsubscribe();
     this.request = this.dashboardService.get(this.month()).subscribe((d) => this.data.set(d));
+  }
+
+  protected enterSalary(): void {
+    const me = this.auth.userMe()?.user;
+    if (!me) return;
+    SalaryDialog.open(this.dialog, { user: me, month: this.month(), amount: null, isMe: true })
+      .pipe(filter(Boolean))
+      .subscribe(() => this.load());
   }
 
   /** Tap a recent expense → edit it; numbers refresh after saving (R3 AC2). */

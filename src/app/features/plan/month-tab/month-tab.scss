@@ -1,0 +1,94 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+@use '../plan' as plan;
+
+:host {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+}
+
+.preview-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+  padding: 2px v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-label-medium);
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+// Phone: one column. Laptop: summary + salaries side by side, checklist below across both.
+.layout {
+  display: grid;
+  gap: v.$space-3;
+
+  @include m.laptop {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.card--wide {
+  @include m.laptop {
+    grid-column: 1 / -1;
+  }
+}
+
+@include plan.cards;
+@include plan.rows;
+
+.row--paid .row__name {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row__check {
+  flex: none;
+  margin-left: -(v.$space-2);
+
+  mat-icon {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.row--paid .row__check mat-icon {
+  color: v.$budget-ok;
+}
+
+.row__missing {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: v.$space-1;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    color: v.$budget-warning;
+  }
+}
+
+.you-chip {
+  margin-left: v.$space-1;
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-label-small);
+}

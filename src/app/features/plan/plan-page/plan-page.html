@@ -1,0 +1,25 @@
+<app-page-header title="Plan" [subtitle]="subtitle()">
+  <mat-button-toggle-group
+    class="tabs"
+    [value]="tab()"
+    (change)="select($event.value)"
+    hideSingleSelectionIndicator
+    aria-label="Plan view"
+  >
+    <mat-button-toggle value="month">Month</mat-button-toggle>
+    <mat-button-toggle value="regular">Regular</mat-button-toggle>
+    <mat-button-toggle value="savings">Savings</mat-button-toggle>
+  </mat-button-toggle-group>
+</app-page-header>
+
+@switch (tab()) {
+  @case ('regular') {
+    <app-regular-items-tab />
+  }
+  @case ('savings') {
+    <app-savings-tab />
+  }
+  @default {
+    <app-month-tab (manageRegular)="select('regular')" />
+  }
+}

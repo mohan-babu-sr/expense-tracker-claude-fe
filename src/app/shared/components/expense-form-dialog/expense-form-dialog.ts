@@ -3,7 +3,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { Observable, catchError, debounceTime, distinctUntilChanged, of, startWith, switchMap } from 'rxjs';
+import { Observable, catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
 import { errorMessage } from '../../../core/interceptors/error.interceptor';
 import { skipErrorSnackbar } from '../../../core/interceptors/http-context.tokens';
 import { AuthService } from '../../../core/services/auth.service';
@@ -11,9 +11,11 @@ import { CategoryService } from '../../../core/services/category.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 import { GroupService } from '../../../core/services/group.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { PlanService } from '../../../core/services/plan.service';
 import { PAYMENT_METHODS } from '../../constants';
 import { Expense, ExpenseInput, ExpenseUser, PaymentMethod } from '../../models';
-import { fromIsoDate, toIsoDate } from '../../utils/date.utils';
+import { currentMonth, fromIsoDate, toIsoDate } from '../../utils/date.utils';
+import { SalaryDialog } from '../salary-dialog/salary-dialog';
 import { twoDecimals } from '../../utils/validators';
 
 export interface ExpenseFormData {
@@ -39,6 +41,7 @@ export class ExpenseFormDialog {
   private readonly expenseService = inject(ExpenseService);
   private readonly notification = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly isEdit = !!this.data.expense;
   protected readonly saving = signal(false);
@@ -91,6 +94,35 @@ export class ExpenseFormDialog {
     takeUntilDestroyed(this.destroyRef),
   );
 
+  /**
+   * "Add expense" with the salary-first rule (R17 AC3, design §12.5): if the signed-in member has no salary for
+   * the current month yet, ask for it first, then open the form. Cancelling the salary step adds nothing.
+   * If the check itself fails (offline, server waking up) the form just opens — the server still enforces the rule.
+   */
+  static openAdd(
+    dialog: MatDialog,
+    isMobile: boolean,
+    plan: PlanService,
+    me: { id: string; name: string } | null,
+  ): Observable<Expense | undefined> {
+    if (!me) return ExpenseFormDialog.open(dialog, isMobile);
+    const month = currentMonth();
+    return plan.isSalaryMissing(me.id, month).pipe(
+      catchError(() => of(false)),
+      switchMap((missing) =>
+        missing
+          ? SalaryDialog.open(dialog, {
+              user: me,
+              month,
+              amount: null,
+              isMe: true,
+              reason: 'Enter your salary for this month before adding expenses — the monthly plan needs it.',
+            }).pipe(switchMap((saved) => (saved ? ExpenseFormDialog.open(dialog, isMobile) : of(undefined))))
+          : ExpenseFormDialog.open(dialog, isMobile),
+      ),
+    );
+  }
+
   /** Laptop: 520px dialog. Mobile: full-screen (R1 AC4, design §5). Emits the saved expense. */
   static open(dialog: MatDialog, isMobile: boolean, data: ExpenseFormData = {}): Observable<Expense | undefined> {
     const config: MatDialogConfig<ExpenseFormData> = isMobile
@@ -128,6 +160,13 @@ export class ExpenseFormDialog {
     }
   }
 
+  private askSalaryThenSave(userId: string, month: string, reason: string): void {
+    const user = this.userOptions().find((u) => u.id === userId) ?? { id: userId, name: 'This member' };
+    SalaryDialog.open(this.dialog, { user, month, amount: null, isMe: userId === this.defaultUserId, reason })
+      .pipe(filter(Boolean))
+      .subscribe(() => this.save());
+  }
+
   protected save(): void {
     if (this.form.invalid || this.saving()) {
       this.form.markAllAsTouched();
@@ -156,6 +195,12 @@ export class ExpenseFormDialog {
       },
       error: (err: HttpErrorResponse) => {
         this.saving.set(false);
+        // R17 AC3: the chosen member has no salary for that month (e.g. another member, or last month's date)
+        // → ask for it right here, then save again. The form keeps its values.
+        if (err.status === 409 && err.error?.code === 'SALARY_REQUIRED') {
+          this.askSalaryThenSave(err.error.userId, err.error.month, err.error.message);
+          return;
+        }
         // Server validation (400) → show each message under its field (NFR3); otherwise snackbar.
         const fieldErrors: Record<string, string> | undefined = err.error?.errors;
         let mapped = false;

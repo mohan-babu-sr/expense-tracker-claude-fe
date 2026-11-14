@@ -1,0 +1,45 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+@use '../plan' as plan;
+
+:host {
+  display: block;
+}
+
+@include plan.cards;
+@include plan.rows;
+
+.card {
+  @include m.laptop {
+    max-width: 900px;
+  }
+}
+
+.card__title {
+  align-items: center;
+}
+
+.row--ended .row__name,
+.row--ended .row__amount {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.row__next {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-1;
+
+  mat-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
+}
+
+// Phone: the two action buttons would squeeze the name — let them sit tighter.
+@include m.mobile {
+  .row {
+    gap: v.$space-1;
+  }
+}

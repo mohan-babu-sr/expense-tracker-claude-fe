@@ -5,14 +5,20 @@ export interface NavItem {
   icon: string;
 }
 
-/** The 5 main pages (R10, R14). Single source for the side nav, bottom nav and toolbar title. */
+/** The 5 main pages (R10, R14, v4 R17–R19). Single source for the side nav, bottom nav and toolbar title. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { path: '/expenses', label: 'Expenses', icon: 'receipt_long' },
   { path: '/upcoming', label: 'Upcoming', icon: 'event_upcoming' },
   { path: '/budgets', label: 'Budgets', icon: 'savings' },
-  { path: '/categories', label: 'Categories', icon: 'category' },
+  { path: '/plan', label: 'Plan', icon: 'payments' },
 ];
+
+/**
+ * v4 (R10 v4 change): Plan took Categories' place in the bottom nav (5 fit at 360px). Categories is now a
+ * secondary page like Settings: side nav (above Settings) on laptop, Settings → Categories on mobile.
+ */
+export const CATEGORIES_ITEM: NavItem = { path: '/categories', label: 'Categories', icon: 'category' };
 
 /** The admin's pages (R13 AC6); Settings (sign out) is the secondary item as for users. */
 export const ADMIN_NAV_ITEMS: readonly NavItem[] = [

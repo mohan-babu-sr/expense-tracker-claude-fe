@@ -1,0 +1,28 @@
+@use 'variables' as v;
+
+.extra-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.extra-form__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: v.$space-2 0 v.$space-2;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    color: var(--mat-sys-primary);
+  }
+}

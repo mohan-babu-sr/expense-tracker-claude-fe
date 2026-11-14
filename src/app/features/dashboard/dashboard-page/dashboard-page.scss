@@ -50,3 +50,9 @@
   margin: 0;
   font: var(--mat-sys-title-medium);
 }
+
+// R17 AC4 salary reminder: informational, not an error — secondary colors, icon + words (NFR5).
+.banner--info {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}

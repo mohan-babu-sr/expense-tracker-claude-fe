@@ -1,0 +1,60 @@
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <h2 mat-dialog-title>Add extra income</h2>
+
+  <mat-dialog-content class="extra-form">
+    <p class="extra-form__hint">
+      <mat-icon aria-hidden="true">savings</mat-icon>
+      Goes straight into overall savings — this month's salary and plan stay as they are.
+    </p>
+
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Amount</mat-label>
+      <span matTextPrefix>₹&nbsp;</span>
+      <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="amount" autocomplete="off" />
+      @if (form.controls.amount.invalid) {
+        <mat-error>{{ error('amount') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>From</mat-label>
+      <mat-select formControlName="source">
+        @for (s of sources; track s.value) {
+          <mat-option [value]="s.value">
+            <mat-icon aria-hidden="true">{{ s.icon }}</mat-icon>
+            {{ s.label }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.controls.source.invalid) {
+        <mat-error>{{ error('source') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="picker" [min]="minDate" [max]="today" formControlName="date" placeholder="dd/mm/yyyy" />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+      @if (form.controls.date.invalid) {
+        <mat-error>{{ error('date') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Note (optional)</mat-label>
+      <input matInput formControlName="note" maxlength="100" autocomplete="off" placeholder="e.g. Diwali bonus" />
+      <mat-hint align="end">{{ form.controls.note.value?.length ?? 0 }} / 100</mat-hint>
+      @if (form.controls.note.invalid) {
+        <mat-error>{{ error('note') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || busy()">
+      {{ busy() ? 'Saving…' : 'Add to savings' }}
+    </button>
+  </mat-dialog-actions>
+</form>

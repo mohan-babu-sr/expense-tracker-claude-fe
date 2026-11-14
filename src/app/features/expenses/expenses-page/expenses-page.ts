@@ -4,7 +4,9 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription, filter, switchMap, tap } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 import { ExpenseService } from '../../../core/services/expense.service';
+import { PlanService } from '../../../core/services/plan.service';
 import { LayoutService } from '../../../core/services/layout.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
@@ -34,6 +36,8 @@ export class ExpensesPage {
   private readonly expenseService = inject(ExpenseService);
   private readonly notification = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
+  private readonly planService = inject(PlanService);
+  private readonly auth = inject(AuthService);
   protected readonly isMobile = inject(LayoutService).isMobile;
 
   private readonly filterService = inject(ExpenseFilterService);
@@ -159,9 +163,9 @@ export class ExpensesPage {
     });
   }
 
-  /** Empty-state "Add expense" button (R2 AC4). */
+  /** Empty-state "Add expense" button (R2 AC4) — salary first, like the header button (R17 AC3). */
   protected onAdd(): void {
-    ExpenseFormDialog.open(this.dialog, this.isMobile())
+    ExpenseFormDialog.openAdd(this.dialog, this.isMobile(), this.planService, this.auth.userMe()?.user ?? null)
       .pipe(filter(Boolean))
       .subscribe(() => this.reload());
   }

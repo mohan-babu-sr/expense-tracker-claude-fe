@@ -1,0 +1,28 @@
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <h2 mat-dialog-title>{{ title }} · {{ monthLabel }}</h2>
+
+  <mat-dialog-content class="salary-form">
+    @if (data.reason) {
+      <p class="salary-form__reason">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>{{ data.reason }}</span>
+      </p>
+    }
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>Salary for {{ monthLabel }}</mat-label>
+      <span matTextPrefix>₹&nbsp;</span>
+      <input matInput type="number" inputmode="decimal" min="0" step="0.01" formControlName="amount" autocomplete="off" />
+      <mat-hint>Enter 0 if there was no income this month</mat-hint>
+      @if (form.controls.amount.invalid) {
+        <mat-error>{{ amountError() }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || busy()">
+      {{ busy() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>

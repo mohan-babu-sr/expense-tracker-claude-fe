@@ -1,0 +1,82 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Same structure as the upcoming / expense forms: column flex so the actions stay at the bottom on mobile.
+:host {
+  display: block;
+  height: 100%;
+}
+
+.item-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.item-form__header {
+  display: flex;
+  align-items: center;
+  gap: v.$space-1;
+}
+
+// Close (X) only on mobile full-screen, where there is no backdrop to tap.
+.item-form__close {
+  margin-left: -(v.$space-3);
+
+  @include m.laptop {
+    display: none;
+  }
+}
+
+.item-form__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  > mat-form-field:first-child {
+    margin-top: v.$space-2;
+  }
+}
+
+// Start / end month side by side when there is room.
+.item-form__months {
+  display: grid;
+  gap: v.$space-1 v.$space-3;
+
+  @include m.laptop {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.item-form__group-error,
+.item-form__info {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-2;
+  font: var(--mat-sys-body-small);
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.item-form__group-error {
+  color: var(--mat-sys-error);
+}
+
+.item-form__info {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.item-form__actions {
+  padding-bottom: calc(#{v.$space-3} + env(safe-area-inset-bottom));
+}

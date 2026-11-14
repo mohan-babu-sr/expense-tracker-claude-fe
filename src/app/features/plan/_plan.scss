@@ -1,0 +1,111 @@
+// Shared look of the Plan tabs (Month, Regular items, Savings): cards with a title + total, and list rows
+// "icon · name/meta · amount · action". Kept in the feature (not shared/styles) — only Plan uses it.
+@use 'variables' as v;
+@use 'mixins' as m;
+
+@mixin cards {
+  .card {
+    @include m.card-surface;
+    min-width: 0;
+  }
+
+  .card__title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: v.$space-2;
+    margin: 0 0 v.$space-3;
+    font: var(--mat-sys-title-medium);
+  }
+
+  .card__total {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card__hint {
+    display: flex;
+    align-items: center;
+    gap: v.$space-2;
+    margin: 0 0 v.$space-2;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+
+    mat-icon {
+      flex: none;
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+    }
+  }
+
+  .info-card {
+    @include m.card-surface;
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+    color: var(--mat-sys-on-surface-variant);
+
+    mat-icon {
+      flex: none;
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+@mixin rows {
+  .rows {
+    display: grid;
+    // minmax(0, 1fr): the implicit grid column would otherwise grow to fit a long nowrap name (e.g. an extra
+    // income note) and push the amount + delete button off a 360px screen instead of truncating with "…".
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: v.$space-2;
+    min-height: 56px;
+    padding: v.$space-1 0;
+
+    & + & {
+      border-top: 1px solid var(--mat-sys-outline-variant);
+    }
+
+    // Icon buttons keep their 48px tap area (≥ 44px, R10 AC4).
+    button {
+      flex: none;
+    }
+  }
+
+  .row__icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+
+  .row__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .row__name {
+    @include m.truncate;
+    font: var(--mat-sys-body-large);
+  }
+
+  .row__meta {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+    overflow-wrap: anywhere;
+  }
+
+  .row__amount {
+    flex: none;
+    font: var(--mat-sys-body-large);
+    font-variant-numeric: tabular-nums;
+  }
+}

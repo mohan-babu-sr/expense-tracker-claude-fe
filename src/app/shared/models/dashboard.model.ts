@@ -1,6 +1,7 @@
 import { BudgetStatus, MemberBudget } from './budget.model';
 import { Category } from './category.model';
 import { Expense } from './expense.model';
+import { DashboardPlan } from './plan.model';
 import { Upcoming } from './upcoming.model';
 
 export interface CategoryAmount {
@@ -37,4 +38,6 @@ export interface Dashboard {
   members: MemberBudget[];
   /** Up to 5 open items due in the next 30 days (overdue included) + total of all of them (R14 AC6). */
   comingUp: { items: Upcoming[]; total: number };
+  /** Salary banner for the dashboard month (R17 AC4). The Monthly plan card was removed (R19 AC7). */
+  plan: DashboardPlan;
 }

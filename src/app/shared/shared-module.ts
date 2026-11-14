@@ -42,6 +42,9 @@ import { ExpenseListItem } from './components/expense-list-item/expense-list-ite
 import { ExpenseFormDialog } from './components/expense-form-dialog/expense-form-dialog';
 import { AddExpenseButton } from './components/add-expense-button/add-expense-button';
 import { UpcomingItem } from './components/upcoming-item/upcoming-item';
+import { SavingsPipe } from './pipes/savings.pipe';
+import { PlanSummary } from './components/plan-summary/plan-summary';
+import { SalaryDialog } from './components/salary-dialog/salary-dialog';
 
 /** Every Angular Material module the app uses (design §4). Features never import these directly. */
 const MATERIAL_MODULES = [
@@ -95,6 +98,9 @@ const DECLARATIONS = [
   BalancePipe,
   DaysLeftPipe,
   UpcomingItem,
+  SavingsPipe, // v4 (R19)
+  PlanSummary, // v4 (R19 AC1–AC2): Plan page + dashboard card
+  SalaryDialog, // v4 (R17): Plan page, dashboard banner, salary-first expense flow
 ];
 
 /**

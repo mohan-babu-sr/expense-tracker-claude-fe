@@ -1,0 +1,115 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+@use '../plan' as plan;
+
+:host {
+  display: block;
+}
+
+@include plan.cards;
+@include plan.rows;
+
+.layout {
+  display: grid;
+  gap: v.$space-3;
+
+  @include m.laptop {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.card--wide {
+  @include m.laptop {
+    grid-column: 1 / -1;
+  }
+}
+
+.overall {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.overall__big {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
+  font-variant-numeric: tabular-nums;
+
+  mat-icon {
+    flex: none;
+    color: v.$budget-ok;
+  }
+}
+
+.overall__big--short,
+.overall__big--short mat-icon {
+  color: v.$budget-danger;
+}
+
+.overall__line {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.overall__month {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.overall__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+
+  button {
+    min-height: v.$touch-target;
+  }
+}
+
+// Money coming in (R20) — same "good" colour as positive savings, plus a "+" so it isn't colour-only (NFR5).
+.row__icon--in,
+.row__amount--in,
+.extra {
+  color: v.$budget-ok;
+}
+
+.so-far {
+  margin-left: v.$space-1;
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-label-small);
+}
+
+.row__amount {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-1;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.row__amount--short {
+  color: v.$budget-danger;
+}

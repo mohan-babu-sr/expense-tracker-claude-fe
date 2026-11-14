@@ -1,0 +1,14 @@
+@use 'mixins' as m;
+
+// The three-way switch stretches to the full width on phones so each option is an easy tap target.
+.tabs {
+  max-width: 100%;
+
+  mat-button-toggle {
+    flex: 1;
+  }
+
+  @include m.mobile {
+    width: 100%;
+  }
+}

@@ -1,0 +1,150 @@
+<div class="toolbar">
+  <app-month-picker [(month)]="month" [max]="maxMonth" />
+  @if (isFuture()) {
+    <span class="preview-chip"><mat-icon aria-hidden="true">visibility</mat-icon> Preview</span>
+  }
+</div>
+
+@if (plan(); as p) {
+  @if (!p.started) {
+    <div class="info-card">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      <span>
+        @if (startLabel()) {
+          The monthly plan starts in {{ startLabel() }}. Months before that have no salary or savings.
+        } @else {
+          The monthly plan hasn't started for this group yet.
+        }
+      </span>
+    </div>
+  } @else {
+    <div class="layout">
+      <!-- R19 AC1–AC2 -->
+      <section class="card" aria-labelledby="summary-title">
+        <h2 class="card__title" id="summary-title">{{ monthLabel() }}</h2>
+        <app-plan-summary [plan]="p" />
+      </section>
+
+      <!-- R17: everyone sees and can edit everyone's salary -->
+      <section class="card" aria-labelledby="salaries-title">
+        <h2 class="card__title" id="salaries-title">
+          Salaries
+          <span class="card__total">{{ p.salaryTotal | inrCurrency: false }}</span>
+        </h2>
+        <ul class="rows">
+          @for (s of salaries(); track s.user.id) {
+            <li class="row">
+              <mat-icon class="row__icon" aria-hidden="true">{{ s.former ? 'person_off' : 'person' }}</mat-icon>
+              <div class="row__text">
+                <span class="row__name">
+                  {{ s.user.name }}
+                  @if (isMe(s)) {
+                    <span class="you-chip">You</span>
+                  }
+                </span>
+                <span class="row__meta">
+                  @if (s.former) {
+                    No longer in the group
+                  } @else if (s.updatedBy) {
+                    Changed by {{ s.updatedBy.id === s.user.id ? 'themself' : s.updatedBy.name }}
+                    · {{ s.updatedAt | date: 'd MMM' }}
+                  }
+                </span>
+              </div>
+              @if (s.amount === null) {
+                <span class="row__missing"><mat-icon aria-hidden="true">hourglass_top</mat-icon> Not entered</span>
+              } @else {
+                <span class="row__amount">{{ s.amount | inrCurrency: false }}</span>
+              }
+              @if (!s.former) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  (click)="editSalary(s)"
+                  [attr.aria-label]="(s.amount === null ? 'Enter salary for ' : 'Edit salary for ') + s.user.name"
+                  [matTooltip]="s.amount === null ? 'Enter salary' : 'Edit'"
+                >
+                  <mat-icon>{{ s.amount === null ? 'add' : 'edit' }}</mat-icon>
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+
+      <!-- R18 AC3: checklist of this month's regular items -->
+      <section class="card card--wide" aria-labelledby="regular-title">
+        <h2 class="card__title" id="regular-title">
+          Regular expenses
+          <span class="card__total">{{ p.regularTotal | inrCurrency: false }}</span>
+        </h2>
+        @if (p.regular.length) {
+          @if (isFuture()) {
+            <p class="card__hint">
+              <mat-icon aria-hidden="true">visibility</mat-icon>
+              Preview from your regular items — amounts and ticks open when the month starts.
+            </p>
+          } @else {
+            <p class="card__hint">
+              <mat-icon aria-hidden="true">task_alt</mat-icon>
+              {{ paidCount() }} of {{ p.regular.length }} paid · counted in full whether ticked or not
+            </p>
+          }
+          <ul class="rows">
+            @for (e of p.regular; track e.itemId) {
+              <li class="row" [class.row--paid]="e.paidAt">
+                @if (e.id) {
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="row__check"
+                    (click)="togglePaid(e)"
+                    [disabled]="busyEntry() === e.id"
+                    [attr.aria-pressed]="!!e.paidAt"
+                    [attr.aria-label]="(e.paidAt ? 'Mark not paid: ' : 'Mark paid: ') + e.name"
+                    [matTooltip]="e.paidAt ? 'Mark not paid' : 'Mark paid'"
+                  >
+                    <mat-icon>{{ e.paidAt ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                  </button>
+                } @else {
+                  <mat-icon class="row__icon" aria-hidden="true">event_repeat</mat-icon>
+                }
+                <div class="row__text">
+                  <span class="row__name">{{ e.name }}</span>
+                  <span class="row__meta">
+                    {{ everyLabel(e.every) }}
+                    @if (e.paidAt) {
+                      · <strong>Paid</strong> by {{ e.paidBy?.name }} · {{ e.paidAt | date: 'd MMM' }}
+                    } @else if (e.id) {
+                      · Not paid yet
+                    }
+                  </span>
+                </div>
+                <span class="row__amount">{{ e.amount | inrCurrency: false }}</span>
+                @if (e.id && !e.paidAt) {
+                  <button
+                    mat-icon-button
+                    type="button"
+                    (click)="editAmount(e)"
+                    [attr.aria-label]="'Change this month\'s amount for ' + e.name"
+                    matTooltip="Change for this month"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-empty-state
+            icon="event_repeat"
+            title="No regular expenses this month"
+            message="Add rent, maintenance, LIC, subscriptions… — they are set aside first every month."
+            actionLabel="Add regular items"
+            (action)="manageRegular.emit()"
+          />
+        }
+      </section>
+    </div>
+  }
+}

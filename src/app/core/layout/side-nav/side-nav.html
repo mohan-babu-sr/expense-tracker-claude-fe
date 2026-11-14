@@ -21,6 +21,18 @@
 
 <!-- Secondary destination pinned to the bottom (R11 AC1) -->
 <nav class="side-nav side-nav--secondary" aria-label="Secondary">
+  <!-- v4: Categories moved out of the main pages (rarely changed) — group members only, not the admin -->
+  @if (isUser()) {
+    <a
+      class="side-nav__item"
+      [routerLink]="categories.path"
+      routerLinkActive="side-nav__item--active"
+      ariaCurrentWhenActive="page"
+    >
+      <mat-icon aria-hidden="true">{{ categories.icon }}</mat-icon>
+      <span>{{ categories.label }}</span>
+    </a>
+  }
   <a
     class="side-nav__item"
     [routerLink]="settings.path"

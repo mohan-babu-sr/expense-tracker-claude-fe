@@ -1,0 +1,51 @@
+@if (items(); as list) {
+  <section class="card" aria-labelledby="items-title">
+    <h2 class="card__title" id="items-title">
+      <span>Regular items</span>
+      <button mat-flat-button type="button" (click)="add()">
+        <mat-icon>add</mat-icon>
+        Add item
+      </button>
+    </h2>
+
+    @if (list.length) {
+      <p class="card__hint">
+        <mat-icon aria-hidden="true">event_repeat</mat-icon>
+        Every-month items: {{ monthlyTotal() | inrCurrency: false }} a month · others count in full in the months they're due
+      </p>
+      <ul class="rows">
+        @for (item of list; track item.id) {
+          <li class="row" [class.row--ended]="!item.nextDue">
+            <mat-icon class="row__icon" aria-hidden="true">{{ item.nextDue ? 'event_repeat' : 'event_busy' }}</mat-icon>
+            <div class="row__text">
+              <span class="row__name">{{ item.name }}</span>
+              <span class="row__meta">{{ everyLabel(item.every) }} · {{ range(item) }}</span>
+              <span class="row__meta row__next">
+                <mat-icon aria-hidden="true">{{ item.nextDue ? 'schedule' : 'block' }}</mat-icon>
+                {{ next(item) }}
+                @if (item.note) {
+                  · {{ item.note }}
+                }
+              </span>
+            </div>
+            <span class="row__amount">{{ item.amount | inrCurrency: false }}</span>
+            <button mat-icon-button type="button" (click)="edit(item)" [attr.aria-label]="'Edit ' + item.name" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="remove(item)" [attr.aria-label]="'Delete ' + item.name" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-empty-state
+        icon="event_repeat"
+        title="No regular items yet"
+        message="Rent, maintenance, LIC, subscriptions… Add them once — they're set aside first every month they're due."
+        actionLabel="Add regular item"
+        (action)="add()"
+      />
+    }
+  </section>
+}

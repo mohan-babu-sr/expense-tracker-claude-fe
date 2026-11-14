@@ -1,0 +1,141 @@
+@if (savings(); as s) {
+  @if (!s.started) {
+    <div class="info-card">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      <span>Savings start counting once the monthly plan starts.</span>
+    </div>
+  } @else {
+    <div class="layout">
+      <!-- R19 AC4 -->
+      <section class="card card--wide overall" aria-labelledby="overall-title">
+        <h2 class="card__title" id="overall-title">Overall savings</h2>
+        <p class="overall__big" [class.overall__big--short]="s.overall < 0">
+          <mat-icon aria-hidden="true">{{ s.overall < 0 ? 'error' : 'savings' }}</mat-icon>
+          {{ s.overall | savings }}
+        </p>
+        <p class="overall__line">
+          Saved {{ s.savedTotal | savings }} in finished months + extra income {{ s.extraTotal | inrCurrency: false }}
+          − withdrawn {{ s.withdrawnTotal | inrCurrency: false }}
+        </p>
+        @if (s.thisMonth; as t) {
+          <p class="overall__month">
+            <mat-icon aria-hidden="true">schedule</mat-icon>
+            <span>
+              {{ monthDate(t.month) | date: 'MMMM' }} so far: <strong>{{ t.actual | savings }}</strong>
+              (planned {{ t.planned | savings }}) — joins the total when the month ends
+            </span>
+          </p>
+        }
+        <div class="overall__actions">
+          <button mat-flat-button type="button" (click)="addExtra()">
+            <mat-icon>add_circle_outline</mat-icon>
+            Add extra income
+          </button>
+          <button mat-stroked-button type="button" (click)="withdraw()" [disabled]="s.overall <= 0">
+            <mat-icon>remove_circle_outline</mat-icon>
+            Withdraw
+          </button>
+        </div>
+      </section>
+
+      <!-- R20 AC4 -->
+      <section class="card" aria-labelledby="extra-title">
+        <h2 class="card__title" id="extra-title">
+          Extra income
+          <span class="card__total">{{ s.extraTotal | inrCurrency: false }}</span>
+        </h2>
+        @if (s.extraIncome.length) {
+          <ul class="rows">
+            @for (e of s.extraIncome; track e.id) {
+              @let src = sourceOption(e.source);
+              <li class="row">
+                <mat-icon class="row__icon row__icon--in" aria-hidden="true">{{ src.icon }}</mat-icon>
+                <div class="row__text">
+                  <span class="row__name">
+                    {{ src.label }}
+                    @if (e.note) {
+                      · {{ e.note }}
+                    }
+                  </span>
+                  <span class="row__meta">{{ e.date | date: 'd MMM y' }} · by {{ e.recordedBy.name }}</span>
+                </div>
+                <span class="row__amount row__amount--in">+{{ e.amount | inrCurrency: false }}</span>
+                <button mat-icon-button type="button" (click)="removeExtra(e)" [attr.aria-label]="'Delete extra income ' + src.label" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="card__hint">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            Money from parents, a bonus or a gift — add it here and it goes straight into savings.
+          </p>
+        }
+      </section>
+
+      <!-- R19 AC5 -->
+      <section class="card" aria-labelledby="withdrawals-title">
+        <h2 class="card__title" id="withdrawals-title">
+          Withdrawals
+          <span class="card__total">{{ s.withdrawnTotal | inrCurrency: false }}</span>
+        </h2>
+        @if (s.withdrawals.length) {
+          <ul class="rows">
+            @for (w of s.withdrawals; track w.id) {
+              <li class="row">
+                <mat-icon class="row__icon" aria-hidden="true">remove_circle_outline</mat-icon>
+                <div class="row__text">
+                  <span class="row__name">{{ w.reason }}</span>
+                  <span class="row__meta">{{ w.date | date: 'd MMM y' }} · by {{ w.recordedBy.name }}</span>
+                </div>
+                <span class="row__amount">{{ w.amount | inrCurrency: false }}</span>
+                <button mat-icon-button type="button" (click)="remove(w)" [attr.aria-label]="'Delete withdrawal ' + w.reason" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="card__hint">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            No withdrawals — use Withdraw when money is taken out of savings.
+          </p>
+        }
+      </section>
+
+      <!-- R19 AC6 -->
+      <section class="card card--wide" aria-labelledby="history-title">
+        <h2 class="card__title" id="history-title">Month by month</h2>
+        <ul class="rows">
+          @for (m of s.months; track m.month) {
+            <li class="row">
+              <mat-icon class="row__icon" aria-hidden="true">{{ m.finished ? 'calendar_month' : 'schedule' }}</mat-icon>
+              <div class="row__text">
+                <span class="row__name">
+                  {{ monthDate(m.month) | date: 'MMMM y' }}
+                  @if (!m.finished) {
+                    <span class="so-far">so far</span>
+                  }
+                </span>
+                <span class="row__meta">
+                  Salary {{ m.salaryTotal | inrCurrency: false }} · Regular {{ m.regularTotal | inrCurrency: false }} · Spent
+                  {{ m.spent | inrCurrency: false }}
+                  @if (m.extra) {
+                    · <span class="extra">Extra +{{ m.extra | inrCurrency: false }}</span>
+                  }
+                </span>
+              </div>
+              <span class="row__amount" [class.row__amount--short]="m.actual < 0">
+                @if (m.actual < 0) {
+                  <mat-icon aria-hidden="true">error</mat-icon>
+                }
+                {{ m.actual | savings }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
+}

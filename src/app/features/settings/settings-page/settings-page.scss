@@ -289,3 +289,8 @@
   font-size: 18px;
   color: var(--mat-sys-primary);
 }
+
+// ---- Manage (v4) ----
+.manage__link {
+  min-height: v.$touch-target;
+}

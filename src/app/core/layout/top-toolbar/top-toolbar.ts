@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { GroupService } from '../../services/group.service';
-import { ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
+import { ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, CATEGORIES_ITEM, NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
 
 /** Mobile top bar (R10): shows the current page name. */
 @Component({
@@ -27,6 +27,6 @@ export class TopToolbar {
   );
 
   private titleFor(url: string): string {
-    return [...NAV_ITEMS, ...ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, SETTINGS_ITEM].find((item) => url.startsWith(item.path))?.label ?? 'Expense Tracker';
+    return [...NAV_ITEMS, CATEGORIES_ITEM, ...ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, SETTINGS_ITEM].find((item) => url.startsWith(item.path))?.label ?? 'Expense Tracker';
   }
 }

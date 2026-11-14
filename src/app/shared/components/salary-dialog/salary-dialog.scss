@@ -1,0 +1,22 @@
+@use 'variables' as v;
+
+.salary-form {
+  mat-form-field {
+    width: 100%;
+    margin-top: v.$space-2;
+  }
+}
+
+.salary-form__reason {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-2;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+}

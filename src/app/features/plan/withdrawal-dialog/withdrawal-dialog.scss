@@ -1,0 +1,15 @@
+@use 'variables' as v;
+
+.withdraw-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  > mat-form-field:first-child {
+    margin-top: v.$space-2;
+  }
+}
