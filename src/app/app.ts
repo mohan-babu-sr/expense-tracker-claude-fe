@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
+import { inject as injectVercelAnalytics } from '@vercel/analytics';
 
 /** After this long without an answer, explain the wait (Render free plan wakes up slowly) — design §8.5. */
 const WAKE_UP_HINT_MS = 3000;
@@ -40,6 +41,7 @@ export class App {
       clearTimeout(timer);
       this.document.defaultView?.removeEventListener('online', onOnline);
     });
+    injectVercelAnalytics();
   }
 
   /**
