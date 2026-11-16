@@ -89,3 +89,8 @@
   text-align: right;
   white-space: nowrap;
 }
+
+// R23: someone else's expense.
+.lock {
+  color: var(--mat-sys-on-surface-variant);
+}

@@ -46,6 +46,10 @@ export class ExpenseFormDialog {
   private readonly dialog = inject(MatDialog);
 
   protected readonly isEdit = !!this.data.expense;
+  private readonly auth = inject(AuthService);
+  /** R23 AC2: someone else's expense opens as "Expense details" — every field disabled, Close only. */
+  protected readonly readOnly = this.isEdit && !this.auth.isMine(this.data.expense);
+  protected readonly ownerName = this.data.expense?.user?.name ?? 'its member';
   protected readonly saving = signal(false);
   protected readonly paymentMethods = PAYMENT_METHODS;
   protected readonly today = new Date();
@@ -63,7 +67,7 @@ export class ExpenseFormDialog {
     return own && !list.some((u) => u.id === own.id) ? [...list, own] : list;
   });
   /** New expenses default to the signed-in member (R12 v2). */
-  private readonly defaultUserId = inject(AuthService).userMe()?.user.id ?? '';
+  private readonly defaultUserId = this.auth.userMe()?.user.id ?? '';
 
   protected readonly form = inject(FormBuilder).group({
     amount: [this.data.expense?.amount ?? (null as number | null), [Validators.required, Validators.min(0.01), twoDecimals]],
@@ -75,6 +79,10 @@ export class ExpenseFormDialog {
     // Required; same name as the API field, so 400 field errors map onto it directly.
     userId: [this.data.expense?.userId ?? this.defaultUserId, Validators.required],
   });
+
+  constructor() {
+    if (this.readOnly) this.form.disable();
+  }
 
   /** Chip shown in the closed category select. */
   private readonly categoryIdValue = toSignal(this.form.controls.categoryId.valueChanges, {
@@ -170,6 +178,7 @@ export class ExpenseFormDialog {
   }
 
   protected save(): void {
+    if (this.readOnly) return;
     if (this.form.invalid || this.saving()) {
       this.form.markAllAsTouched();
       return;

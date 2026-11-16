@@ -1,0 +1,31 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="pin-head" mat-dialog-title>
+    <span class="pin-head__icon" aria-hidden="true"><mat-icon>lock</mat-icon></span>
+    <span>{{ data.title }}</span>
+  </div>
+
+  <mat-dialog-content class="pin-form">
+    <p class="pin-form__message">{{ data.message }}</p>
+    <mat-form-field appearance="outline">
+      <mat-label>Your PIN</mat-label>
+      <input
+        matInput
+        type="password"
+        inputmode="numeric"
+        autocomplete="current-password"
+        formControlName="pin"
+        maxlength="6"
+      />
+      @if (form.controls.pin.invalid) {
+        <mat-error>{{ pinError() }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="busy()">
+      {{ busy() ? 'Checking…' : data.confirmText }}
+    </button>
+  </mat-dialog-actions>
+</form>

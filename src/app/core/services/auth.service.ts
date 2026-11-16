@@ -121,6 +121,23 @@ export class AuthService {
     return this.http.put<void>(`${API_URL}/me/pin`, { currentPin, newPin }, { context });
   }
 
+  /**
+   * POST /me/verify-pin (R22 AC2) — "is this my PIN?", e.g. before Plan shows other members' salaries.
+   * Wrong PIN → 400 `{ errors: { pin } }`; counts toward the sign-in lockout.
+   */
+  verifyPin(pin: string, context?: HttpContext): Observable<void> {
+    return this.http.post<void>(`${API_URL}/me/verify-pin`, { pin }, { context });
+  }
+
+  /**
+   * R23 (design §14.2): only the member an expense belongs to may change it. The server enforces it (403);
+   * this just hides the buttons. Takes anything with a `userId` so it doesn't depend on the Expense model.
+   */
+  isMine(item: { userId: string } | null | undefined): boolean {
+    const me = this.userMe()?.user.id;
+    return !!me && !!item && item.userId === me;
+  }
+
   /** Forget the account locally (after logout, or when the server says the session ended). */
   clear(): void {
     this.state.set(null);

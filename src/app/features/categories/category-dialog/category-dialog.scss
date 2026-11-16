@@ -14,26 +14,53 @@
 
 .category-form__preview {
   display: flex;
-  justify-content: center;
-  padding: v.$space-3;
-  border-radius: v.$radius-md;
-  background: var(--mat-sys-surface-container);
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-2;
+  padding: v.$space-5 v.$space-3;
+  border-radius: v.$radius-lg;
+  background:
+    radial-gradient(90% 120% at 50% 0%, color-mix(in srgb, var(--category-color) 22%, transparent), transparent 70%),
+    v.$surface-muted;
+
+  @include m.motion(background);
 }
 
+.category-form__preview-icon {
+  @include m.icon-avatar(64px, 34px);
+  border-radius: v.$radius-lg;
+  background: var(--category-color);
+  color: var(--category-on-color);
+  box-shadow: v.$shadow-card;
+}
+
+.category-form__preview-name {
+  @include m.truncate;
+  max-width: 100%;
+  font: var(--mat-sys-title-medium);
+  font-weight: 700;
+}
+
+// Pickers sit in soft rounded panels (v6).
 .picker {
   margin: 0;
-  padding: 0;
+  padding: v.$space-3;
   border: 0;
+  border-radius: v.$radius-md;
+  background: v.$surface-muted;
   min-width: 0;
 }
 
 .picker__legend {
+  float: left; // keeps the legend inside the panel's padding instead of on its border
+  width: 100%;
   margin-bottom: v.$space-2;
   padding: 0;
   font: var(--mat-sys-title-small);
 }
 
 .picker__grid {
+  clear: both;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
   gap: v.$space-2;

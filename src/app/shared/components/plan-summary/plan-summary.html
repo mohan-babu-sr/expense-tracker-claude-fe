@@ -9,7 +9,15 @@
       }
       {{ p.planned | savings }}
     </span>
-    <span class="headline__of">of {{ p.salaryTotal | inrCurrency: false }} salary</span>
+    <span class="headline__of">
+      of
+      @if (hideSalary()) {
+        <span aria-hidden="true">₹ ••••</span><span class="cdk-visually-hidden">hidden</span>
+      } @else {
+        {{ p.salaryTotal | inrCurrency: false }}
+      }
+      salary
+    </span>
   </div>
 
   <div class="split" [class.split--empty]="!segments().length" role="img" [attr.aria-label]="splitLabel()">

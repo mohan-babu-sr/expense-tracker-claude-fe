@@ -1,0 +1,27 @@
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <div class="dialog-head" mat-dialog-title>
+    <span class="dialog-head__icon" aria-hidden="true"><mat-icon>badge</mat-icon></span>
+    <span>Your name</span>
+  </div>
+
+  <mat-dialog-content class="dialog-form">
+    <p class="dialog-form__hint">Shown to your group on expenses and the plan.</p>
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" maxlength="40" autocomplete="name" />
+      <mat-hint align="end">{{ form.controls.name.value.length }} / 40</mat-hint>
+      @if (form.controls.name.hasError('server')) {
+        <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+      } @else {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </mat-dialog-actions>
+</form>

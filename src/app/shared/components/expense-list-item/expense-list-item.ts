@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, LOCALE_ID, computed, inject, input, output } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
 import { Expense } from '../../models';
 import { PaymentMethodLabelPipe } from '../../pipes/payment-method-label.pipe';
 
@@ -11,6 +12,7 @@ import { PaymentMethodLabelPipe } from '../../pipes/payment-method-label.pipe';
  *
  * Title = merchant, else note, else category name. Tapping the row emits `edit`;
  * the ⋮ menu (when `showActions`) offers Edit / Delete.
+ * R23: someone else's expense has no menu — a lock button instead, and tapping opens it read-only.
  */
 @Component({
   selector: 'app-expense-list-item',
@@ -26,6 +28,11 @@ export class ExpenseListItem {
 
   readonly edit = output<Expense>();
   readonly delete = output<Expense>();
+
+  private readonly auth = inject(AuthService);
+  /** R23: only the member it belongs to may change it. */
+  protected readonly mine = computed(() => this.auth.isMine(this.expense()));
+  protected readonly ownerName = computed(() => this.expense().user?.name ?? 'its member');
 
   protected readonly title = computed(() => {
     const e = this.expense();

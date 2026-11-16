@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, switchMap } from 'rxjs';
@@ -27,6 +27,13 @@ export class CategoriesPage {
 
   protected readonly categories = signal<Category[]>([]);
   protected readonly loaded = signal(false);
+  /** v6 header summary (R25 AC2): "10 categories · 2 custom". */
+  protected readonly subtitle = computed(() => {
+    const list = this.categories();
+    if (!this.loaded() || !list.length) return 'Organise your expenses your way';
+    const custom = list.filter((c) => !c.isDefault).length;
+    return list.length + ' categor' + (list.length === 1 ? 'y' : 'ies') + ' · ' + custom + ' custom';
+  });
 
   constructor() {
     this.load();

@@ -22,6 +22,28 @@
     font-variant-numeric: tabular-nums;
   }
 
+  // R22: the title row is a <div> holding the <h2> + total + eye button, so the button isn't inside the heading.
+  .card__heading {
+    margin: 0;
+    font: inherit;
+  }
+
+  .card__side {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-1;
+    margin-block: -(v.$space-2); // the 40px eye button must not make the title row taller
+  }
+
+  .eye {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .masked {
+    letter-spacing: 0.08em;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
   .card__hint {
     display: flex;
     align-items: center;

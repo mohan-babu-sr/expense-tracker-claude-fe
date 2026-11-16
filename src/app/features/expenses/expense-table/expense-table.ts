@@ -1,5 +1,6 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
+import { AuthService } from '../../../core/services/auth.service';
 import { Expense } from '../../../shared/models';
 
 /**
@@ -25,4 +26,6 @@ export class ExpenseTable {
 
   protected readonly columns = ['date', 'user', 'category', 'description', 'paymentMethod', 'amount', 'actions'];
   protected readonly pageSizeOptions = [10, 25, 50];
+  /** R23: Edit/Delete only on the signed-in member's own expenses; others get a lock that opens them read-only. */
+  protected readonly auth = inject(AuthService);
 }

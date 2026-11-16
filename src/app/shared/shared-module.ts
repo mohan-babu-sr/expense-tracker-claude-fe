@@ -45,6 +45,7 @@ import { UpcomingItem } from './components/upcoming-item/upcoming-item';
 import { SavingsPipe } from './pipes/savings.pipe';
 import { PlanSummary } from './components/plan-summary/plan-summary';
 import { SalaryDialog } from './components/salary-dialog/salary-dialog';
+import { PinPromptDialog } from './components/pin-prompt-dialog/pin-prompt-dialog';
 
 /** Every Angular Material module the app uses (design §4). Features never import these directly. */
 const MATERIAL_MODULES = [
@@ -101,6 +102,7 @@ const DECLARATIONS = [
   SavingsPipe, // v4 (R19)
   PlanSummary, // v4 (R19 AC1–AC2): Plan page + dashboard card
   SalaryDialog, // v4 (R17): Plan page, dashboard banner, salary-first expense flow
+  PinPromptDialog, // v6 (R22): re-enter the sign-in PIN (Plan salary privacy)
 ];
 
 /**

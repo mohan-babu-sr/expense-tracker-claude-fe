@@ -38,6 +38,35 @@ export class AppUpdateService {
     });
   }
 
+  /**
+   * Settings → "Check for update" (R24, design §14.3): ask the worker for a new version, then throw away the
+   * cached app files and unregister the worker, and reload — so the newest version loads from the network either
+   * way. The session cookie and localStorage (theme) are not caches, so the user stays signed in.
+   * Resolves only on failure (the page reloads on success); rejects are turned into a snackbar here.
+   */
+  async checkNow(): Promise<void> {
+    try {
+      // Offline: clearing the cache would leave nothing to reload → stop before touching anything.
+      if (this.document.defaultView?.navigator.onLine === false) throw new Error('offline');
+      let found = false;
+      if (this.swUpdate.isEnabled) found = await this.swUpdate.checkForUpdate(); // throws when offline
+      this.notification.success(found ? 'Updating to the new version…' : 'You have the latest version — refreshing…');
+
+      const win = this.document.defaultView;
+      if (win && 'caches' in win) {
+        const keys = await win.caches.keys();
+        await Promise.all(keys.map((k) => win.caches.delete(k)));
+      }
+      if (win?.navigator.serviceWorker) {
+        const registrations = await win.navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((r) => r.unregister()));
+      }
+      this.reload();
+    } catch {
+      this.notification.error('Couldn’t check for updates — check your connection and try again.');
+    }
+  }
+
   private reload(): void {
     this.document.location.reload();
   }

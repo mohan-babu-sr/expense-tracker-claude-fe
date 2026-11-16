@@ -1,63 +1,116 @@
+// Categories v6 (R25 AC2, design §14.4): category cards with a large tinted icon. The colour is user data → it
+// arrives as --category-color (set per card); tints are color-mix() of it, so no hard-coded colours here.
 @use 'variables' as v;
 @use 'mixins' as m;
 
-.category-list {
-  @include m.card-surface;
+.category-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$space-3;
   margin: 0;
-  padding: v.$space-1 0;
+  padding: 0;
   list-style: none;
 
   @include m.laptop {
-    max-width: 720px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: v.$space-4;
   }
 }
 
-// Mobile-first row: chip + count on the left, actions on the right.
-.category-row {
+.category-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: v.$space-2 v.$space-3;
-  min-height: 56px;
-  padding: v.$space-1 v.$space-2 v.$space-1 v.$space-4;
+  overflow: hidden;
+  padding-right: v.$space-1;
+  background: v.$surface-card;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-card;
 
-  & + & {
-    border-top: 1px solid var(--mat-sys-outline-variant);
+  @include m.motion(box-shadow, transform);
+
+  // A thin strip of the category colour on the left edge.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--category-color, var(--mat-sys-outline));
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      box-shadow: v.$shadow-raised;
+    }
   }
 }
 
-.category-row__chip {
+.category-card__main {
+  display: flex;
   flex: 1;
+  align-items: center;
+  gap: v.$space-3;
+  min-width: 0;
+  min-height: 76px;
+  padding: v.$space-3 v.$space-2 v.$space-3 v.$space-4;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+    border-radius: v.$radius-lg;
+  }
+}
+
+.category-card__avatar {
+  @include m.icon-avatar(52px, 28px);
+  border-radius: v.$radius-md;
+  background: color-mix(in srgb, var(--category-color, var(--mat-sys-outline)) 18%, transparent);
+  color: var(--category-color, var(--mat-sys-on-surface-variant));
+}
+
+.category-card__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.category-row__count {
-  flex: none;
+.category-card__name {
+  @include m.truncate;
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
+}
+
+.category-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
   font: var(--mat-sys-body-small);
   color: var(--mat-sys-on-surface-variant);
   font-variant-numeric: tabular-nums;
 }
 
-.category-row__tag {
-  display: none; // hidden on small phones to save space; the disabled delete button + tooltip remain
+.category-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px v.$space-2;
+  border-radius: v.$radius-pill;
+  background: v.$surface-muted;
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
 
-  @include m.laptop {
-    display: inline-flex;
-    align-items: center;
-    gap: v.$space-1;
-    padding: 2px v.$space-2;
-    border-radius: v.$radius-sm;
-    background: var(--mat-sys-surface-container-highest);
-    font: var(--mat-sys-label-small);
-
-    mat-icon {
-      width: 14px;
-      height: 14px;
-      font-size: 14px;
-    }
+  mat-icon {
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
   }
-}
-
-.category-row__actions {
-  display: flex;
-  flex: none;
 }

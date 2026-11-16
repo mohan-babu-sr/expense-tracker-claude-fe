@@ -1,280 +1,247 @@
 <app-page-header title="Settings" />
 
-<!-- R11 AC4: one card per section — add new sections below as settings grow. -->
-
-<!-- Account (R13 AC4) -->
-<section class="section" aria-labelledby="account-title">
-  <h2 class="section__title" id="account-title">
-    <mat-icon aria-hidden="true">account_circle</mat-icon>
-    Account
-  </h2>
-
+<!-- v6 (R25 AC1, design §14.4): profile card + grouped lists. Same actions as before, in rows. -->
+<div class="settings">
+  <!-- ===== Profile ===== -->
   @if (userMe(); as m) {
-    <form class="account__name" [formGroup]="nameForm" (ngSubmit)="saveName()" novalidate>
-      <mat-form-field appearance="outline" class="account__name-field">
-        <mat-label>Your name</mat-label>
-        <input matInput formControlName="name" maxlength="40" autocomplete="name" />
-        @if (nameForm.controls.name.hasError('server')) {
-          <mat-error>{{ nameForm.controls.name.getError('server') }}</mat-error>
-        } @else {
-          <mat-error>Name is required</mat-error>
+    <section class="profile" aria-label="Your profile">
+      <span class="profile__avatar" aria-hidden="true">{{ initials(m.user.name) }}</span>
+      <div class="profile__text">
+        <h2 class="profile__name">{{ m.user.name }}</h2>
+        <span class="profile__meta">+91 {{ m.user.mobile }}</span>
+        @if (m.group; as g) {
+          <span class="profile__meta"><mat-icon aria-hidden="true">group</mat-icon> {{ g.name }}</span>
         }
-      </mat-form-field>
-      <button mat-stroked-button type="submit" [disabled]="nameForm.pristine || nameForm.invalid || savingName()">
-        Save
-      </button>
-    </form>
-
-    <!-- Read-only (R13 AC4): shown with a lock icon + text, not just greyed out (NFR5) -->
-    <dl class="account__facts">
-      <div class="account__fact">
-        <dt>Mobile number</dt>
-        <dd>+91 {{ m.user.mobile }}</dd>
       </div>
-      <div class="account__fact">
-        <dt>Group</dt>
-        <dd>{{ m.group?.name }} <span class="account__code">({{ m.group?.code }})</span></dd>
-      </div>
-    </dl>
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">lock</mat-icon>
-      Only the admin can change your mobile number or group.
-    </p>
-
-    <mat-divider />
-
-    @if (!showPinForm()) {
-      <button mat-stroked-button type="button" class="account__action" (click)="showPinForm.set(true)">
-        <mat-icon>pin</mat-icon>
-        Change PIN
+      <button mat-icon-button type="button" class="profile__edit" (click)="editName()" aria-label="Edit your name" matTooltip="Edit name">
+        <mat-icon>edit</mat-icon>
       </button>
-    } @else {
-      <form class="account__pin" [formGroup]="pinForm" #pinDirective="ngForm" (ngSubmit)="changePin(pinDirective)" novalidate>
-        <h3 class="account__subtitle">Change PIN</h3>
-        <mat-form-field appearance="outline">
-          <mat-label>Current PIN</mat-label>
-          <input matInput type="password" inputmode="numeric" autocomplete="current-password" formControlName="currentPin" maxlength="6" />
-          @if (pinForm.controls.currentPin.hasError('server')) {
-            <mat-error>{{ pinForm.controls.currentPin.getError('server') }}</mat-error>
-          } @else {
-            <mat-error>Enter your current PIN</mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>New PIN (4–6 digits)</mat-label>
-          <input matInput type="password" inputmode="numeric" autocomplete="new-password" formControlName="newPin" maxlength="6" />
-          @if (pinForm.controls.newPin.hasError('server')) {
-            <mat-error>{{ pinForm.controls.newPin.getError('server') }}</mat-error>
-          } @else {
-            <mat-error>PIN must be 4 to 6 digits</mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Confirm new PIN</mat-label>
-          <input matInput type="password" inputmode="numeric" autocomplete="new-password" formControlName="confirmPin" maxlength="6" />
-          @if (pinForm.controls.confirmPin.hasError('mismatch')) {
-            <mat-error>PINs don't match</mat-error>
-          } @else {
-            <mat-error>Enter the new PIN again</mat-error>
-          }
-        </mat-form-field>
-        <div class="account__pin-actions">
-          <button mat-button type="button" (click)="cancelPin(pinDirective)">Cancel</button>
-          <button mat-flat-button type="submit" [disabled]="savingPin()">
-            {{ savingPin() ? 'Saving…' : 'Change PIN' }}
-          </button>
-        </div>
-      </form>
-    }
+    </section>
   } @else if (me(); as m) {
     @if (m.kind === 'admin') {
-      <dl class="account__facts">
-        <div class="account__fact">
-          <dt>Signed in as</dt>
-          <dd>{{ m.username }} (admin)</dd>
+      <section class="profile" aria-label="Your profile">
+        <span class="profile__avatar" aria-hidden="true"><mat-icon>admin_panel_settings</mat-icon></span>
+        <div class="profile__text">
+          <h2 class="profile__name">{{ m.username }}</h2>
+          <span class="profile__meta">Administrator</span>
         </div>
-      </dl>
-      <a mat-stroked-button class="account__action" routerLink="/admin/password">
-        <mat-icon>password</mat-icon>
-        Change password
-      </a>
+      </section>
     }
   }
 
-  <div class="account__signout-actions">
-    <button mat-stroked-button type="button" class="account__action" (click)="signOut()">
-      <mat-icon>logout</mat-icon>
-      Sign out
-    </button>
-    <!-- R13 AC1a: ends every session of this account, e.g. a lost phone -->
-    <button
-      mat-stroked-button
-      type="button"
-      class="account__action"
-      [disabled]="signingOutAll()"
-      (click)="signOutAll()"
-    >
-      <mat-icon>devices</mat-icon>
-      {{ signingOutAll() ? 'Signing out…' : 'Sign out of all devices' }}
-    </button>
-  </div>
-</section>
+  <!-- ===== Account ===== -->
+  <section class="group" aria-labelledby="account-title">
+    <h2 class="group__label" id="account-title">Account</h2>
+    <ul class="group-list">
+      @if (userMe()) {
+        <li>
+          <button type="button" class="list-row" (click)="changePin()">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>pin</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Change PIN</span>
+              <span class="list-row__sub">Signs out your other devices</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+          </button>
+        </li>
+      } @else if (me()?.kind === 'admin') {
+        <li>
+          <a class="list-row" routerLink="/admin/password">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>password</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Change password</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+          </a>
+        </li>
+      }
+      <!-- R13 AC1a: ends every session of this account, e.g. a lost phone -->
+      <li>
+        <button type="button" class="list-row" [disabled]="signingOutAll()" (click)="signOutAll()">
+          <span class="list-row__icon" aria-hidden="true"><mat-icon>devices</mat-icon></span>
+          <span class="list-row__text">
+            <span class="list-row__label">{{ signingOutAll() ? 'Signing out…' : 'Sign out of all devices' }}</span>
+            <span class="list-row__sub">For a lost or shared phone</span>
+          </span>
+          <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+        </button>
+      </li>
+    </ul>
+    @if (userMe()) {
+      <p class="group__note">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        Only the admin can change your mobile number or group.
+      </p>
+    }
+  </section>
 
-<!-- Group (R13 AC7) — active members only -->
-@if (group(); as g) {
-  <section class="section" aria-labelledby="group-title">
-    <h2 class="section__title" id="group-title">
-      <mat-icon aria-hidden="true">group</mat-icon>
-      {{ g.name }}
-    </h2>
+  <!-- ===== Group (R13 AC7) — active members only ===== -->
+  @if (group(); as g) {
+    <section class="group" aria-labelledby="group-title">
+      <h2 class="group__label" id="group-title">Group · {{ g.name }}</h2>
+      <ul class="group-list">
+        <!-- Invite: share the code; joiners still need approval (R13 AC2) -->
+        <li class="list-row list-row--static">
+          <span class="list-row__icon" aria-hidden="true"><mat-icon>key</mat-icon></span>
+          <span class="list-row__text">
+            <span class="list-row__label">Invite code</span>
+            <span class="list-row__sub">Share it to invite someone</span>
+          </span>
+          <span class="code">{{ g.code }}</span>
+          <button mat-icon-button type="button" (click)="copyCode(g.code)" aria-label="Copy group code" matTooltip="Copy">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </li>
 
-    <!-- Invite: share the code; joiners still need approval (R13 AC2) -->
-    <div class="group__code">
-      <dl class="account__fact">
-        <dt>Group code</dt>
-        <dd class="group__code-value">{{ g.code }}</dd>
-      </dl>
-      <button mat-stroked-button type="button" (click)="copyCode(g.code)">
-        <mat-icon>content_copy</mat-icon>
-        Copy
-      </button>
-    </div>
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">info</mat-icon>
-      Share this code to invite someone. You approve them here before they see anything.
-    </p>
-
-    <!-- Join requests -->
-    @if (g.pending.length) {
-      <h3 class="account__subtitle">Waiting for approval ({{ g.pending.length }})</h3>
-      <ul class="people">
         @for (p of g.pending; track p.id) {
-          <li class="person person--pending">
-            <mat-icon class="person__icon" aria-hidden="true">person_add</mat-icon>
-            <div class="person__text">
-              <span class="person__name">{{ p.name }}</span>
-              <span class="person__meta">+91 {{ p.mobile }}</span>
-            </div>
-            <div class="person__actions">
+          <li class="list-row list-row--static list-row--pending">
+            <span class="list-row__icon list-row__icon--warn" aria-hidden="true"><mat-icon>person_add</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">{{ p.name }} <span class="tag">Wants to join</span></span>
+              <span class="list-row__sub">+91 {{ p.mobile }}</span>
+            </span>
+            <span class="list-row__actions">
               <button mat-button type="button" [disabled]="busyId() === p.id" (click)="reject(p)">Reject</button>
               <button mat-flat-button type="button" [disabled]="busyId() === p.id" (click)="approve(p)">Approve</button>
-            </div>
+            </span>
+          </li>
+        }
+
+        @for (p of g.members; track p.id) {
+          <li class="list-row list-row--static">
+            <span class="list-row__avatar" aria-hidden="true">{{ initials(p.name) }}</span>
+            <span class="list-row__text">
+              <span class="list-row__label">
+                {{ p.name }}
+                @if (p.id === userMe()?.user?.id) {
+                  <span class="tag">You</span>
+                }
+              </span>
+              <span class="list-row__sub">+91 {{ p.mobile }}</span>
+            </span>
+            @if (p.role === 'owner') {
+              <span class="role"><mat-icon aria-hidden="true">star</mat-icon> Owner</span>
+            } @else {
+              <span class="role role--member">Member</span>
+            }
           </li>
         }
       </ul>
-    }
+    </section>
 
-    <h3 class="account__subtitle">Members ({{ g.members.length }})</h3>
-    <ul class="people">
-      @for (p of g.members; track p.id) {
-        <li class="person">
-          <mat-icon class="person__icon" aria-hidden="true">{{ p.role === 'owner' ? 'star' : 'person' }}</mat-icon>
-          <div class="person__text">
-            <span class="person__name">
-              {{ p.name }}
-              @if (p.id === userMe()?.user?.id) {
-                <span class="person__you">(you)</span>
+    <!-- ===== Manage — Budgets / Categories way in on the phone (R10 v5) ===== -->
+    <section class="group" aria-labelledby="manage-title">
+      <h2 class="group__label" id="manage-title">Manage</h2>
+      <ul class="group-list">
+        <li>
+          <a class="list-row" routerLink="/budgets">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>savings</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Budgets</span>
+              <span class="list-row__sub">Category budgets and member limits</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+          </a>
+        </li>
+        <li>
+          <a class="list-row" routerLink="/categories">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>category</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Categories</span>
+              <span class="list-row__sub">Names, icons and colours</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+          </a>
+        </li>
+      </ul>
+    </section>
+  }
+
+  <!-- ===== App: theme (R11), Check for update (R24), install (R16 AC6) ===== -->
+  <section class="group" aria-labelledby="app-title">
+    <h2 class="group__label" id="app-title">App</h2>
+    <ul class="group-list">
+      <li class="list-row list-row--static list-row--wrap">
+        <span class="list-row__icon" aria-hidden="true"><mat-icon>palette</mat-icon></span>
+        <span class="list-row__text">
+          <span class="list-row__label" id="theme-label">Theme</span>
+          <span class="list-row__sub" id="theme-hint">Saved on this device</span>
+        </span>
+        <!-- Native radios: arrow keys + screen readers work as-is. Selected = raised pill + bold + check (NFR5). -->
+        <div class="segmented" role="radiogroup" aria-labelledby="theme-label" aria-describedby="theme-hint">
+          @for (option of themeOptions; track option.value) {
+            <label class="segmented__option">
+              <input
+                type="radio"
+                name="theme"
+                class="cdk-visually-hidden"
+                [value]="option.value"
+                [checked]="theme() === option.value"
+                (change)="setTheme(option.value)"
+              />
+              <mat-icon aria-hidden="true">{{ theme() === option.value ? 'check' : option.icon }}</mat-icon>
+              <span>{{ option.label }}</span>
+            </label>
+          }
+        </div>
+      </li>
+
+      <li>
+        <button type="button" class="list-row" [disabled]="checkingUpdate()" (click)="checkForUpdate()">
+          <span class="list-row__icon" aria-hidden="true"><mat-icon>update</mat-icon></span>
+          <span class="list-row__text">
+            <span class="list-row__label">{{ checkingUpdate() ? 'Checking…' : 'Check for update' }}</span>
+            <span class="list-row__sub">Get the newest version and refresh</span>
+          </span>
+          @if (checkingUpdate()) {
+            <mat-spinner diameter="20" aria-hidden="true" />
+          } @else {
+            <mat-icon class="list-row__chevron" aria-hidden="true">refresh</mat-icon>
+          }
+        </button>
+      </li>
+
+      @if (install.isStandalone() || install.justInstalled()) {
+        <li class="list-row list-row--static">
+          <span class="list-row__icon list-row__icon--ok" aria-hidden="true"><mat-icon>check_circle</mat-icon></span>
+          <span class="list-row__text">
+            <span class="list-row__label">Installed</span>
+            <span class="list-row__sub">
+              {{ install.isStandalone() ? 'You’re using the app' : 'Open “Expenses” from your home screen or app list' }}
+            </span>
+          </span>
+        </li>
+      } @else if (install.canInstall()) {
+        <li>
+          <button type="button" class="list-row" (click)="installApp()">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>install_mobile</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Install app</span>
+              <span class="list-row__sub">Home screen, full-screen and faster</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">download</mat-icon>
+          </button>
+        </li>
+      } @else {
+        <li class="list-row list-row--static">
+          <span class="list-row__icon" aria-hidden="true"><mat-icon>install_mobile</mat-icon></span>
+          <span class="list-row__text">
+            <span class="list-row__label">Install app</span>
+            <span class="list-row__sub list-row__sub--wrap">
+              @if (install.isIos) {
+                In Safari tap Share, then “Add to Home Screen”.
+              } @else {
+                Open your browser’s menu and choose “Install app” or “Add to Home screen”.
               }
             </span>
-            <span class="person__meta">{{ p.role === 'owner' ? 'Owner' : 'Member' }} · +91 {{ p.mobile }}</span>
-          </div>
+          </span>
         </li>
       }
     </ul>
   </section>
-}
 
-<!-- v4 (R10): Categories left the bottom nav; v5 (R10 v5): Budgets too, for the centre Add button. This is their
-     way in on the phone (the laptop side nav also lists both). -->
-@if (group()) {
-  <section class="section" aria-labelledby="manage-title">
-    <h2 class="section__title" id="manage-title">
-      <mat-icon aria-hidden="true">tune</mat-icon>
-      Manage
-    </h2>
-    <div class="manage">
-      <a mat-stroked-button routerLink="/budgets" class="manage__link">
-        <mat-icon>savings</mat-icon>
-        Budgets
-      </a>
-      <a mat-stroked-button routerLink="/categories" class="manage__link">
-        <mat-icon>category</mat-icon>
-        Categories
-      </a>
-    </div>
-  </section>
-}
-
-<!-- App (R16 AC6) — install on this device. Reuses the section/hint styles (icon + text, NFR5). -->
-<section class="section" aria-labelledby="app-title">
-  <h2 class="section__title" id="app-title">
-    <mat-icon aria-hidden="true">install_mobile</mat-icon>
-    App
-  </h2>
-
-  @if (install.isStandalone()) {
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">check_circle</mat-icon>
-      Installed — you're using the app.
-    </p>
-  } @else if (install.justInstalled()) {
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">check_circle</mat-icon>
-      Installed — open "Expenses" from your home screen or app list.
-    </p>
-  } @else if (install.canInstall()) {
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">info</mat-icon>
-      Install the app to open it from your home screen, full-screen and faster.
-    </p>
-    <button mat-flat-button type="button" class="account__action" (click)="installApp()">
-      <mat-icon>download</mat-icon>
-      Install app
-    </button>
-  } @else if (install.isIos) {
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">ios_share</mat-icon>
-      To install on iPhone or iPad: in Safari tap Share, then "Add to Home Screen".
-    </p>
-  } @else {
-    <p class="section__hint">
-      <mat-icon aria-hidden="true">more_vert</mat-icon>
-      To install, open your browser's menu and choose "Install app" or "Add to Home screen".
-    </p>
-  }
-</section>
-
-<!-- Appearance (R11) — device-local -->
-<section class="section" aria-labelledby="appearance-title">
-  <h2 class="section__title" id="appearance-title">
-    <mat-icon aria-hidden="true">palette</mat-icon>
-    Appearance
-  </h2>
-
-  <!-- Native radios (same pattern as the category icon picker): arrow keys + screen readers work as-is. -->
-  <fieldset class="theme-picker">
-    <legend class="theme-picker__legend">Theme</legend>
-    <p class="theme-picker__hint" id="theme-hint">
-      System follows your device's light or dark setting. Saved on this device only.
-    </p>
-    <div class="theme-picker__options">
-      @for (option of themeOptions; track option.value) {
-        <label class="theme-option">
-          <input
-            type="radio"
-            name="theme"
-            class="cdk-visually-hidden"
-            [value]="option.value"
-            [checked]="theme() === option.value"
-            (change)="setTheme(option.value)"
-            aria-describedby="theme-hint"
-          />
-          <mat-icon class="theme-option__icon" aria-hidden="true">{{ option.icon }}</mat-icon>
-          <span class="theme-option__label">{{ option.label }}</span>
-          <!-- Selected = ring + check mark, not color alone (NFR5) -->
-          <mat-icon class="theme-option__check" aria-hidden="true">check_circle</mat-icon>
-        </label>
-      }
-    </div>
-  </fieldset>
-</section>
+  <button mat-stroked-button type="button" class="signout" (click)="signOut()">
+    <mat-icon>logout</mat-icon>
+    Sign out
+  </button>
+</div>

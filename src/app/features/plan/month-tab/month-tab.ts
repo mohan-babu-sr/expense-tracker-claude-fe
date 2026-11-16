@@ -10,6 +10,7 @@ import { everyLabel } from '../../../shared/constants';
 import { PlanMonth, RegularEntry, SalaryRow } from '../../../shared/models';
 import { addMonths, currentMonth, monthToDate } from '../../../shared/utils/date.utils';
 import { RegularEntryDialog, RegularEntryDialogData } from '../regular-entry-dialog/regular-entry-dialog';
+import { SalaryPrivacyService } from '../salary-privacy.service';
 
 const monthName = (m: string) =>
   new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format(monthToDate(m));
@@ -32,6 +33,9 @@ export class MonthTab {
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
   private readonly myId = computed(() => this.auth.userMe()?.user.id ?? null);
+  /** R22: every salary (mine too) + totals hidden until the PIN is entered (state shared with the Savings tab). */
+  protected readonly privacy = inject(SalaryPrivacyService);
+  protected readonly hidden = computed(() => !this.privacy.revealed());
 
   /** "Add regular items" in the empty checklist → the page switches to the Regular tab. */
   readonly manageRegular = output<void>();

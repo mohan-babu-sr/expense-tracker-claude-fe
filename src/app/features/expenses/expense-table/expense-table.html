@@ -41,12 +41,26 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Actions</span></th>
         <td mat-cell *matCellDef="let e" class="actions">
-          <button mat-icon-button type="button" (click)="edit.emit(e)" [attr.aria-label]="'Edit ' + (e.merchant || e.note || 'expense')" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button type="button" (click)="delete.emit(e)" [attr.aria-label]="'Delete ' + (e.merchant || e.note || 'expense')" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
+          @if (auth.isMine(e)) {
+            <button mat-icon-button type="button" (click)="edit.emit(e)" [attr.aria-label]="'Edit ' + (e.merchant || e.note || 'expense')" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="delete.emit(e)" [attr.aria-label]="'Delete ' + (e.merchant || e.note || 'expense')" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          } @else {
+            <!-- R23 AC2: someone else's expense → view only -->
+            <button
+              mat-icon-button
+              type="button"
+              class="lock"
+              (click)="edit.emit(e)"
+              [attr.aria-label]="'View ' + (e.merchant || e.note || 'expense') + ' — only ' + (e.user?.name ?? 'its member') + ' can change it'"
+              [matTooltip]="'Only ' + (e.user?.name ?? 'its member') + ' can change this'"
+            >
+              <mat-icon>lock</mat-icon>
+            </button>
+          }
         </td>
       </ng-container>
 

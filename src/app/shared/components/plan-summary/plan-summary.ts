@@ -23,6 +23,8 @@ type SegmentKey = 'regular' | 'limits' | 'savings';
 })
 export class PlanSummary {
   readonly plan = input.required<PlanNumbers>();
+  /** R22: show "of ₹ •••• salary" — the Plan page's salary privacy screen is on. */
+  readonly hideSalary = input(false);
 
   protected readonly missingNames = computed(() => this.plan().missing.map((u) => u.name).join(', '));
   protected readonly actualLabel = computed(() => (this.plan().finished ? 'Actual savings' : 'Actual savings so far'));

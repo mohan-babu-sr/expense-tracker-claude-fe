@@ -1,0 +1,28 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.pin-head {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.pin-head__icon {
+  @include m.icon-avatar(40px, 22px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.pin-form {
+  display: flex;
+  flex-direction: column;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.pin-form__message {
+  margin: 0 0 v.$space-4;
+  color: var(--mat-sys-on-surface-variant);
+}

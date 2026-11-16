@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, switchMap } from 'rxjs';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -9,6 +9,7 @@ import { ExtraIncome, Savings, SavingsMonth, Withdrawal } from '../../../shared/
 import { monthToDate } from '../../../shared/utils/date.utils';
 import { ExtraIncomeDialog } from '../extra-income-dialog/extra-income-dialog';
 import { WithdrawalDialog } from '../withdrawal-dialog/withdrawal-dialog';
+import { SalaryPrivacyService } from '../salary-privacy.service';
 
 /**
  * Plan → Savings (R19 AC3–AC6, R20):
@@ -29,6 +30,9 @@ export class SavingsTab {
   private readonly planService = inject(PlanService);
   private readonly notification = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
+  /** R22: "Salary ₹ ••••" in Month by month until the PIN is entered (same state as the Month tab). */
+  protected readonly privacy = inject(SalaryPrivacyService);
+  protected readonly hidden = computed(() => !this.privacy.revealed());
 
   protected readonly savings = signal<Savings | null>(null);
   protected readonly monthDate = monthToDate;

@@ -22,15 +22,34 @@
       <!-- R19 AC1–AC2 -->
       <section class="card" aria-labelledby="summary-title">
         <h2 class="card__title" id="summary-title">{{ monthLabel() }}</h2>
-        <app-plan-summary [plan]="p" />
+        <app-plan-summary [plan]="p" [hideSalary]="hidden()" />
       </section>
 
-      <!-- R17: everyone sees and can edit everyone's salary -->
+      <!-- R17: everyone sees and can edit everyone's salary. R22: others' figures + the total hidden until the PIN. -->
       <section class="card" aria-labelledby="salaries-title">
-        <h2 class="card__title" id="salaries-title">
-          Salaries
-          <span class="card__total">{{ p.salaryTotal | inrCurrency: false }}</span>
-        </h2>
+        <div class="card__title">
+          <h2 class="card__heading" id="salaries-title">Salaries</h2>
+          <span class="card__side">
+            <span class="card__total">
+              @if (hidden()) {
+                <span class="masked"><span aria-hidden="true">₹ ••••</span><span class="cdk-visually-hidden">Hidden</span></span>
+              } @else {
+                {{ p.salaryTotal | inrCurrency: false }}
+              }
+            </span>
+            <button
+            mat-icon-button
+            type="button"
+            class="eye"
+            (click)="privacy.toggle()"
+            [attr.aria-pressed]="!hidden()"
+            [attr.aria-label]="hidden() ? 'Show salaries (asks for your PIN)' : 'Hide salaries'"
+            [matTooltip]="hidden() ? 'Show salaries' : 'Hide salaries'"
+          >
+            <mat-icon>{{ hidden() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          </span>
+        </div>
         <ul class="rows">
           @for (s of salaries(); track s.user.id) {
             <li class="row">
@@ -53,10 +72,13 @@
               </div>
               @if (s.amount === null) {
                 <span class="row__missing"><mat-icon aria-hidden="true">hourglass_top</mat-icon> Not entered</span>
+              } @else if (hidden()) {
+                <span class="row__amount"><span class="masked"><span aria-hidden="true">₹ ••••</span><span class="cdk-visually-hidden">Hidden</span></span></span>
               } @else {
                 <span class="row__amount">{{ s.amount | inrCurrency: false }}</span>
               }
-              @if (!s.former) {
+              <!-- R22 AC4: no Edit on a hidden salary (the dialog would show it); entering a missing one is fine -->
+              @if (!s.former && (s.amount === null || !hidden())) {
                 <button
                   mat-icon-button
                   type="button"

@@ -2,8 +2,10 @@
 
 <form [formGroup]="form" (ngSubmit)="save()" id="category-form">
   <mat-dialog-content class="category-form">
-    <div class="category-form__preview" aria-hidden="true">
-      <app-category-chip [category]="preview()" />
+    <!-- v6 (R25 AC2): large live preview — icon in its colour + name, the same tint as the Categories cards -->
+    <div class="category-form__preview" [style.--category-color]="preview().color" aria-hidden="true">
+      <span class="category-form__preview-icon"><mat-icon [fontIcon]="preview().icon" /></span>
+      <span class="category-form__preview-name">{{ preview().name }}</span>
     </div>
 
     <mat-form-field appearance="outline">

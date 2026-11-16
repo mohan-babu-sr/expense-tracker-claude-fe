@@ -1,12 +1,8 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroupDirective, Validators } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { filter, switchMap, tap } from 'rxjs';
-import { skipErrorSnackbar } from '../../../core/interceptors/http-context.tokens';
-import { errorMessage } from '../../../core/interceptors/error.interceptor';
+import { AppUpdateService } from '../../../core/services/app-update.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { GroupService } from '../../../core/services/group.service';
 import { InstallService } from '../../../core/services/install.service';
@@ -14,8 +10,8 @@ import { NotificationService } from '../../../core/services/notification.service
 import { SettingsService, ThemePreference } from '../../../core/services/settings.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { GroupMember } from '../../../shared/models';
-import { applyServerErrors } from '../../../shared/utils/server-errors';
-import { PIN_PATTERN, sameAs } from '../../../shared/utils/validators';
+import { ChangePinDialog } from '../change-pin-dialog/change-pin-dialog';
+import { EditNameDialog } from '../edit-name-dialog/edit-name-dialog';
 
 interface ThemeOption {
   value: ThemePreference;
@@ -24,11 +20,12 @@ interface ThemeOption {
 }
 
 /**
- * Settings (R11, R13 AC4). One card per section; add future preferences as new sections.
- * - Account (server): name, read-only mobile + group, change PIN, sign out. The admin sees username + sign out.
- * - Group (active members only, R13 AC7): code to invite, members, join requests to approve / reject.
- * - App (this device, R16 AC6): installed / Install app button / iPhone or browser-menu hint.
- * - Appearance (this device): theme.
+ * Settings (R11, R13 AC4; v6 grouped-list layout R25 AC1, design §14.4): profile card, then groups of rows.
+ * - Profile + Account (server): name (dialog), read-only mobile + group, change PIN (dialog), sign out (all).
+ *   The admin sees username, Change password, sign out.
+ * - Group (active members only, R13 AC7): code to invite, join requests to approve / reject, members.
+ * - Manage: Budgets / Categories (their way in on the phone).
+ * - App (this device): theme (R11), Check for update (R24), installed / Install app / install hint (R16 AC6).
  */
 @Component({
   selector: 'app-settings-page',
@@ -43,7 +40,7 @@ export class SettingsPage {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly groupService = inject(GroupService);
-  private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly appUpdate = inject(AppUpdateService);
 
   protected readonly me = this.auth.me;
   protected readonly userMe = this.auth.userMe;
@@ -51,22 +48,6 @@ export class SettingsPage {
   /** Join request being approved / rejected (disables its buttons). */
   protected readonly busyId = signal<string | null>(null);
 
-  // ---- Account: name ----
-  protected readonly nameForm = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(40)]],
-  });
-  protected readonly savingName = signal(false);
-
-  // ---- Account: change PIN ----
-  protected readonly pinForm = this.fb.group({
-    currentPin: ['', Validators.required],
-    newPin: ['', [Validators.required, Validators.pattern(PIN_PATTERN)]],
-    confirmPin: ['', [Validators.required, sameAs('newPin')]],
-  });
-  protected readonly savingPin = signal(false);
-  protected readonly showPinForm = signal(false);
-
-  // ---- Appearance ----
   protected readonly themeOptions: readonly ThemeOption[] = [
     { value: 'system', label: 'System', icon: 'brightness_auto' },
     { value: 'light', label: 'Light', icon: 'light_mode' },
@@ -75,57 +56,23 @@ export class SettingsPage {
   protected readonly theme = computed(() => this.settingsService.settings().theme);
 
   constructor() {
-    // Keep the name field in sync with the account (initial load and after saving).
-    effect(() => {
-      const name = this.userMe()?.user.name;
-      if (name !== undefined) this.nameForm.reset({ name });
-    });
     // Fresh members / join requests each time Settings opens (the cached copy may be minutes old).
     if (this.userMe()?.status === 'active') this.groupService.refresh().subscribe({ error: () => undefined });
-
-    const { newPin, confirmPin } = this.pinForm.controls;
-    newPin.valueChanges.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe(() => confirmPin.updateValueAndValidity());
   }
 
-  protected saveName(): void {
-    if (this.nameForm.invalid || this.nameForm.pristine || this.savingName()) return;
-    this.savingName.set(true);
-    this.auth.updateName(this.nameForm.getRawValue().name.trim(), skipErrorSnackbar()).subscribe({
-      next: () => {
-        this.savingName.set(false);
-        this.notification.success('Name updated');
-      },
-      error: (err: HttpErrorResponse) => {
-        this.savingName.set(false);
-        if (!applyServerErrors(this.nameForm, err)) this.notification.error(errorMessage(err));
-      },
-    });
+  /** "Mohan Babu" → "MB" — profile and member avatars. */
+  protected initials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
   }
 
-  protected changePin(formDirective: FormGroupDirective): void {
-    if (this.pinForm.invalid || this.savingPin()) {
-      this.pinForm.markAllAsTouched();
-      return;
-    }
-    const { currentPin, newPin } = this.pinForm.getRawValue();
-    this.savingPin.set(true);
-    this.auth.changePin(currentPin, newPin, skipErrorSnackbar()).subscribe({
-      next: () => {
-        this.savingPin.set(false);
-        formDirective.resetForm(); // also clears "submitted", so no red errors on the empty form
-        this.showPinForm.set(false);
-        this.notification.success('PIN changed. Your other devices were signed out.');
-      },
-      error: (err: HttpErrorResponse) => {
-        this.savingPin.set(false);
-        if (!applyServerErrors(this.pinForm, err)) this.notification.error(errorMessage(err));
-      },
-    });
+  // ---- Account (R13 AC4): name + PIN open dialogs (v6) ----
+  protected editName(): void {
+    EditNameDialog.open(this.dialog, this.userMe()?.user.name ?? '').subscribe();
   }
 
-  protected cancelPin(formDirective: FormGroupDirective): void {
-    formDirective.resetForm();
-    this.showPinForm.set(false);
+  protected changePin(): void {
+    ChangePinDialog.open(this.dialog).subscribe();
   }
 
   // ---- Group (R13 AC7) ----
@@ -203,9 +150,18 @@ export class SettingsPage {
 
   protected installApp(): void {
     void this.install.install().then((outcome) => {
-      // On success the browser shows its own confirmation and `appinstalled` switches this section to "Installed".
+      // On success the browser shows its own confirmation and `appinstalled` switches the row to "Installed".
       if (outcome === 'dismissed') this.notification.success('No problem — you can install it later from here.');
     });
+  }
+
+  // ---- Check for update (R24, design §14.3) ----
+  protected readonly checkingUpdate = signal(false);
+
+  protected checkForUpdate(): void {
+    this.checkingUpdate.set(true);
+    // On success the page reloads; we only get past this when it failed (the service shows the snackbar).
+    void this.appUpdate.checkNow().finally(() => this.checkingUpdate.set(false));
   }
 
   protected setTheme(theme: ThemePreference): void {

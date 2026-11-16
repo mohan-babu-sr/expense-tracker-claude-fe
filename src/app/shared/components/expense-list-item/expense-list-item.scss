@@ -60,3 +60,8 @@
   font: var(--mat-sys-title-small);
   font-weight: 700;
 }
+
+// R23: someone else's expense — a quiet lock in place of the ⋮ menu.
+.expense-item__lock {
+  color: var(--mat-sys-on-surface-variant);
+}

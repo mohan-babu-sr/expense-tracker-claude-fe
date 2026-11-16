@@ -52,3 +52,21 @@
 .expense-form__actions {
   padding-bottom: calc(#{v.$space-3} + env(safe-area-inset-bottom));
 }
+
+// R23 AC2: read-only view of someone else's expense.
+.expense-form__locked {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0 0 v.$space-3;
+  padding: v.$space-3;
+  border-radius: v.$radius-md;
+  background: v.$surface-muted;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    color: var(--mat-sys-primary);
+  }
+}

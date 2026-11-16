@@ -3,7 +3,7 @@
     type="button"
     class="expense-item__main"
     (click)="edit.emit(expense())"
-    [attr.aria-label]="'Edit ' + title() + ', ' + (expense().amount | inrCurrency)"
+    [attr.aria-label]="(mine() ? 'Edit ' : 'View ') + title() + ', ' + (expense().amount | inrCurrency)"
   >
     <app-category-chip [category]="expense().category" mode="avatar" />
 
@@ -17,7 +17,19 @@
     <span class="expense-item__amount">{{ expense().amount | inrCurrency }}</span>
   </button>
 
-  @if (showActions()) {
+  @if (showActions() && !mine()) {
+    <!-- R23 AC2: not mine → no Edit/Delete; the lock says why and opens it read-only -->
+    <button
+      mat-icon-button
+      type="button"
+      class="expense-item__lock"
+      (click)="edit.emit(expense())"
+      [attr.aria-label]="'View ' + title() + ' — only ' + ownerName() + ' can change it'"
+      [matTooltip]="'Only ' + ownerName() + ' can change this'"
+    >
+      <mat-icon>lock</mat-icon>
+    </button>
+  } @else if (showActions()) {
     <button mat-icon-button type="button" [matMenuTriggerFor]="menu" aria-label="More actions">
       <mat-icon>more_vert</mat-icon>
     </button>

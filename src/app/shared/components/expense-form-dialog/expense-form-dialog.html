@@ -3,10 +3,17 @@
     <button mat-icon-button type="button" mat-dialog-close aria-label="Close" class="expense-form__close">
       <mat-icon>close</mat-icon>
     </button>
-    <span>{{ isEdit ? 'Edit expense' : 'Add expense' }}</span>
+    <span>{{ readOnly ? 'Expense details' : isEdit ? 'Edit expense' : 'Add expense' }}</span>
   </div>
 
   <mat-dialog-content class="expense-form__content">
+    @if (readOnly) {
+      <!-- R23 AC2 -->
+      <p class="expense-form__locked">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        <span>Only {{ ownerName }} can edit or delete this expense.</span>
+      </p>
+    }
     <!-- Amount -->
     <!-- floatLabel="always": the ₹ prefix would otherwise sit on top of the resting label -->
     <mat-form-field appearance="outline" class="expense-form__amount" floatLabel="always">
@@ -99,10 +106,14 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="expense-form__actions">
-    <button mat-button type="button" mat-dialog-close>Cancel</button>
-    <!-- Disabled until valid (R1 AC2) -->
-    <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
-      {{ saving() ? 'Saving…' : 'Save' }}
-    </button>
+    @if (readOnly) {
+      <button mat-flat-button type="button" mat-dialog-close>Close</button>
+    } @else {
+      <button mat-button type="button" mat-dialog-close>Cancel</button>
+      <!-- Disabled until valid (R1 AC2) -->
+      <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+        {{ saving() ? 'Saving…' : 'Save' }}
+      </button>
+    }
   </mat-dialog-actions>
 </form>

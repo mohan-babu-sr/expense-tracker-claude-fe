@@ -1,191 +1,220 @@
+// Settings v6 (R25 AC1, design §14.4): profile card + grouped lists (icon · label/sub · trailing).
 @use 'variables' as v;
 @use 'mixins' as m;
 
-.section {
-  @include m.card-surface;
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
 
   @include m.laptop {
     max-width: 720px;
   }
-
-  & + & {
-    margin-top: v.$space-4;
-  }
 }
 
-.section__title {
+// ---- Profile card: the hero recipe (primary + sheen from theme tokens) ----
+.profile {
   display: flex;
   align-items: center;
-  gap: v.$space-2;
-  margin: 0 0 v.$space-4;
-  font: var(--mat-sys-title-medium);
-
-  mat-icon {
-    color: var(--mat-sys-primary);
-  }
+  gap: v.$space-4;
+  padding: v.$space-5 v.$space-4;
+  border-radius: v.$radius-lg;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--mat-sys-on-primary) 16%, transparent), transparent 55%),
+    var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: v.$shadow-raised;
 }
 
-// ---- Account ----
-.account__name {
+.profile__avatar {
+  @include m.icon-avatar(56px, 28px);
+  background: color-mix(in srgb, var(--mat-sys-on-primary) 20%, transparent);
+  font: var(--mat-sys-title-large);
+  font-weight: 700;
+}
+
+.profile__text {
   display: flex;
-  align-items: flex-start;
-  gap: v.$space-2;
-}
-
-.account__name-field {
   flex: 1;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.account__name button {
-  min-height: 56px; // same height as the outlined field next to it
+.profile__name {
+  @include m.truncate;
+  margin: 0;
+  font: var(--mat-sys-title-large);
+  font-weight: 700;
 }
 
-.account__facts {
-  display: grid;
-  gap: v.$space-3;
-  margin: 0 0 v.$space-2;
-
-  @include m.laptop {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.account__fact {
-  min-width: 0;
-
-  dt {
-    font: var(--mat-sys-label-medium);
-    color: var(--mat-sys-on-surface-variant);
-  }
-
-  dd {
-    margin: 0;
-    font: var(--mat-sys-body-large);
-    overflow-wrap: anywhere;
-  }
-}
-
-.account__code {
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.section__hint {
-  display: flex;
+.profile__meta {
+  @include m.truncate;
+  display: inline-flex;
   align-items: center;
   gap: v.$space-1;
-  margin: 0 0 v.$space-4;
-  font: var(--mat-sys-body-small);
-  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  opacity: 0.9;
 
   mat-icon {
+    flex: none;
     width: 16px;
     height: 16px;
     font-size: 16px;
   }
 }
 
-.account__action {
-  min-height: v.$touch-target;
-  margin-top: v.$space-4;
+.profile__edit {
+  flex: none;
+  color: var(--mat-sys-on-primary);
+  background: color-mix(in srgb, var(--mat-sys-on-primary) 14%, transparent);
 }
 
-// Two sign-out buttons side by side; they wrap onto two lines at 360px instead of overflowing (R10 AC4).
-.account__signout-actions {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: v.$space-3;
+// ---- Groups ----
+.group__label {
+  @include m.eyebrow;
+  margin: 0 0 v.$space-2 v.$space-4;
+  font-weight: 600;
 }
 
-.account__subtitle {
-  margin: v.$space-4 0 v.$space-3;
-  font: var(--mat-sys-title-small);
-}
-
-.account__pin {
-  display: flex;
-  flex-direction: column;
-
-  @include m.laptop {
-    max-width: 360px;
-  }
-}
-
-.account__pin-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: v.$space-2;
-}
-
-// ---- Group ----
-.group__code {
+.group__note {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: v.$space-3;
-  margin-bottom: v.$space-2;
+  gap: v.$space-1;
+  margin: v.$space-2 v.$space-4 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
 
-  .account__fact {
-    margin: 0;
-  }
-
-  button {
-    flex-shrink: 0;
-    min-height: v.$touch-target;
+  mat-icon {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
   }
 }
 
-.group__code-value {
-  font-family: monospace;
-  letter-spacing: 0.05em;
-}
-
-.people {
+.group-list {
   margin: 0;
   padding: 0;
+  overflow: hidden; // row hover backgrounds follow the rounded corners
   list-style: none;
-}
+  background: v.$surface-card;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-card;
 
-.person {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
-  padding: v.$space-2 0;
+  // Divider inset past the icon, like native settings lists.
+  > li {
+    position: relative;
+  }
 
-  & + & {
+  > li + li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 68px;
     border-top: 1px solid var(--mat-sys-outline-variant);
   }
 }
 
-// Phones: Approve / Reject wrap onto their own line under the name.
-.person--pending {
+// One row. Interactive rows are <button>/<a>; static rows are the <li> itself.
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 64px;
+  margin: 0;
+  padding: v.$space-2 v.$space-4;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+
+  @include m.motion(background-color);
+}
+
+button.list-row,
+a.list-row {
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--mat-sys-on-surface) 5%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.list-row--wrap,
+.list-row--pending {
   flex-wrap: wrap;
+  padding-block: v.$space-3;
 }
 
-.person__icon {
-  flex-shrink: 0;
-  color: var(--mat-sys-on-surface-variant);
+.list-row__icon {
+  @include m.icon-avatar(40px, 22px);
+  background: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  color: var(--mat-sys-primary);
 }
 
-.person__text {
+.list-row__icon--warn {
+  background: color-mix(in srgb, var(--budget-warning) 18%, transparent);
+}
+
+.list-row__icon--ok {
+  background: color-mix(in srgb, var(--budget-ok) 18%, transparent);
+  color: var(--budget-ok);
+}
+
+.list-row__avatar {
+  @include m.icon-avatar(40px);
+  background: v.$surface-muted;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-label-large);
+  font-weight: 700;
+}
+
+.list-row__text {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-width: 0;
 }
 
-.person__name {
+.list-row__label {
   @include m.truncate;
   font: var(--mat-sys-body-large);
+  font-weight: 600;
 }
 
-.person__you,
-.person__meta {
+.list-row__sub {
+  @include m.truncate;
   font: var(--mat-sys-body-small);
   color: var(--mat-sys-on-surface-variant);
 }
 
-.person__actions {
+.list-row__sub--wrap {
+  white-space: normal;
+}
+
+.list-row__chevron {
+  flex: none;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Approve / Reject: beside the name on laptops, on their own line (right-aligned) on phones.
+.list-row__actions {
   display: flex;
   gap: v.$space-2;
   margin-left: auto;
@@ -195,108 +224,98 @@
   }
 }
 
-// ---- Appearance ----
-.theme-picker {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.theme-picker__legend {
-  padding: 0;
-  font: var(--mat-sys-title-small);
-}
-
-.theme-picker__hint {
-  margin: v.$space-1 0 v.$space-3;
-  font: var(--mat-sys-body-small);
+.tag {
+  margin-left: v.$space-1;
+  padding: 1px v.$space-2;
+  border-radius: v.$radius-pill;
+  background: v.$surface-muted;
   color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
+  vertical-align: middle;
 }
 
-// Three equal tiles; fits 360px phones (≈ 90px each) and caps their width on laptops.
-.theme-picker__options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: v.$space-2;
+.role {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-primary);
 
-  @include m.laptop {
-    grid-template-columns: repeat(3, 140px);
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
   }
 }
 
-.theme-option {
-  @include m.touch-target;
-  position: relative;
+.role--member {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.code {
+  flex: none;
+  padding: v.$space-1 v.$space-2;
+  border-radius: v.$radius-sm;
+  background: v.$surface-muted;
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+// ---- Theme: segmented control (native radios) ----
+// Phone: wraps under the label as a full-width row; laptop: sits at the end of the row.
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex-basis: 100%;
+  gap: 2px;
+  padding: 3px;
+  border-radius: v.$radius-pill;
+  background: v.$surface-muted;
+
+  @include m.laptop {
+    flex-basis: auto;
+    width: 300px;
+  }
+}
+
+.segmented__option {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: v.$space-1;
-  min-height: 80px;
-  padding: v.$space-3 v.$space-2;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: v.$radius-md;
+  min-height: 40px;
+  border-radius: v.$radius-pill;
   color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
   cursor: pointer;
-  transition: background-color 150ms ease;
 
-  &:hover {
-    background: var(--mat-sys-surface-container-high);
+  @include m.motion(background-color, color, box-shadow);
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
   }
 
-  // Keyboard focus ring on the visually hidden radio → shown on its tile.
   &:has(input:focus-visible) {
     outline: 2px solid var(--mat-sys-primary);
-    outline-offset: 2px;
+    outline-offset: 1px;
   }
 
+  // Selected: raised pill + accent + bold + check icon (not colour alone — NFR5).
   &:has(input:checked) {
-    border-color: transparent;
-    background: var(--mat-sys-secondary-container);
-    color: var(--mat-sys-on-secondary-container);
-    box-shadow: inset 0 0 0 2px var(--mat-sys-primary);
-
-    .theme-option__label {
-      font-weight: 700;
-    }
-
-    .theme-option__check {
-      visibility: visible;
-    }
+    background: v.$surface-card;
+    color: var(--mat-sys-primary);
+    font-weight: 700;
+    box-shadow: v.$shadow-card;
   }
 }
 
-.theme-option__icon {
-  width: 28px;
-  height: 28px;
-  font-size: 28px;
-}
-
-.theme-option__label {
-  @include m.truncate;
-  max-width: 100%;
-  font: var(--mat-sys-label-large);
-}
-
-.theme-option__check {
-  position: absolute;
-  top: v.$space-1;
-  right: v.$space-1;
-  visibility: hidden;
-  width: 18px;
-  height: 18px;
-  font-size: 18px;
-  color: var(--mat-sys-primary);
-}
-
-// ---- Manage (v4) ----
-.manage {
-  display: flex;
-  flex-wrap: wrap;
-  gap: v.$space-2;
-}
-
-.manage__link {
-  min-height: v.$touch-target;
+// ---- Sign out ----
+.signout {
+  align-self: stretch;
+  min-height: 48px;
 }

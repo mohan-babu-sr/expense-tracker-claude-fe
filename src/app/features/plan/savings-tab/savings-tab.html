@@ -106,7 +106,20 @@
 
       <!-- R19 AC6 -->
       <section class="card card--wide" aria-labelledby="history-title">
-        <h2 class="card__title" id="history-title">Month by month</h2>
+        <div class="card__title">
+          <h2 class="card__heading" id="history-title">Month by month</h2>
+          <button
+          mat-icon-button
+          type="button"
+          class="eye"
+          (click)="privacy.toggle()"
+          [attr.aria-pressed]="!hidden()"
+          [attr.aria-label]="hidden() ? 'Show salaries (asks for your PIN)' : 'Hide salaries'"
+          [matTooltip]="hidden() ? 'Show salaries' : 'Hide salaries'"
+        >
+          <mat-icon>{{ hidden() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
+        </div>
         <ul class="rows">
           @for (m of s.months; track m.month) {
             <li class="row">
@@ -119,7 +132,13 @@
                   }
                 </span>
                 <span class="row__meta">
-                  Salary {{ m.salaryTotal | inrCurrency: false }} · Regular {{ m.regularTotal | inrCurrency: false }} · Spent
+                  Salary
+                  @if (hidden()) {
+                    <span class="masked"><span aria-hidden="true">₹ ••••</span><span class="cdk-visually-hidden">Hidden</span></span>
+                  } @else {
+                    {{ m.salaryTotal | inrCurrency: false }}
+                  }
+                  · Regular {{ m.regularTotal | inrCurrency: false }} · Spent
                   {{ m.spent | inrCurrency: false }}
                   @if (m.extra) {
                     · <span class="extra">Extra +{{ m.extra | inrCurrency: false }}</span>

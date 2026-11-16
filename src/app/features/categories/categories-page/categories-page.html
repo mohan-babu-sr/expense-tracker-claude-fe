@@ -1,4 +1,4 @@
-<app-page-header title="Categories" subtitle="Organise your expenses your way">
+<app-page-header title="Categories" [subtitle]="subtitle()">
   <button mat-flat-button type="button" (click)="openDialog()">
     <mat-icon>add</mat-icon>
     Add category
@@ -7,36 +7,42 @@
 
 @if (loaded()) {
   @if (categories().length) {
-    <ul class="category-list" aria-label="Categories">
+    <!-- v6 (R25 AC2, design §14.4): phone = one card per row, laptop = auto-fill grid of cards -->
+    <ul class="category-grid" aria-label="Categories">
       @for (category of categories(); track category.id) {
-        <li class="category-row">
-          <app-category-chip class="category-row__chip" [category]="category" />
-
-          <span class="category-row__count">
-            {{ category.expenseCount ?? 0 }} {{ category.expenseCount === 1 ? 'expense' : 'expenses' }}
-          </span>
-
-          @if (category.isSystem) {
-            <span class="category-row__tag" matTooltip="The fallback category — can be edited but not deleted">
-              <mat-icon aria-hidden="true">lock</mat-icon> System
+        <li class="category-card" [style.--category-color]="category.color">
+          <button
+            type="button"
+            class="category-card__main"
+            (click)="openDialog(category)"
+            [attr.aria-label]="'Edit ' + category.name"
+          >
+            <span class="category-card__avatar" aria-hidden="true"><mat-icon [fontIcon]="category.icon" /></span>
+            <span class="category-card__text">
+              <span class="category-card__name">{{ category.name }}</span>
+              <span class="category-card__meta">
+                {{ category.expenseCount ?? 0 }} {{ category.expenseCount === 1 ? 'expense' : 'expenses' }}
+                @if (category.isSystem) {
+                  <span class="category-card__badge"><mat-icon aria-hidden="true">lock</mat-icon> System</span>
+                }
+              </span>
             </span>
-          }
+          </button>
 
-          <span class="category-row__actions">
-            <button mat-icon-button type="button" (click)="openDialog(category)" [attr.aria-label]="'Edit ' + category.name" matTooltip="Edit">
+          <button mat-icon-button type="button" [matMenuTriggerFor]="menu" [attr.aria-label]="'More actions for ' + category.name">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="openDialog(category)">
               <mat-icon>edit</mat-icon>
+              <span>Edit</span>
             </button>
-            <button
-              mat-icon-button
-              type="button"
-              (click)="confirmDelete(category)"
-              [disabled]="category.isSystem"
-              [attr.aria-label]="'Delete ' + category.name"
-              [matTooltip]="category.isSystem ? 'System category cannot be deleted' : 'Delete'"
-            >
+            <!-- Other is the fallback category: disabled + the reason in words (R5 AC4, NFR5) -->
+            <button mat-menu-item (click)="confirmDelete(category)" [disabled]="category.isSystem">
               <mat-icon>delete</mat-icon>
+              <span>{{ category.isSystem ? 'Can’t delete (fallback)' : 'Delete' }}</span>
             </button>
-          </span>
+          </mat-menu>
         </li>
       }
     </ul>

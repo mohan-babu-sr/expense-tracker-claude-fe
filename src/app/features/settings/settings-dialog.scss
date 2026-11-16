@@ -1,0 +1,29 @@
+// Shared look of the Settings dialogs (Edit name, Change PIN) — v6, design §14.4.
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.dialog-head__icon {
+  @include m.icon-avatar(40px, 22px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.dialog-form__hint {
+  margin: 0 0 v.$space-4;
+  color: var(--mat-sys-on-surface-variant);
+}

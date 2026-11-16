@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
+import { SalaryPrivacyService } from '../salary-privacy.service';
 
 export type PlanTab = 'month' | 'regular' | 'savings';
 const TABS: readonly PlanTab[] = ['month', 'regular', 'savings'];
@@ -19,6 +20,8 @@ const TABS: readonly PlanTab[] = ['month', 'regular', 'savings'];
   standalone: false,
   templateUrl: './plan-page.html',
   styleUrl: './plan-page.scss',
+  // R22 AC3: one privacy state per visit to Plan, shared by its tabs (see the service).
+  providers: [SalaryPrivacyService],
 })
 export class PlanPage {
   private readonly router = inject(Router);
