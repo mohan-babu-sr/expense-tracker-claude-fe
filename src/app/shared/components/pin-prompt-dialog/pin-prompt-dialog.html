@@ -5,7 +5,20 @@
   </div>
 
   <mat-dialog-content class="pin-form">
-    <p class="pin-form__message">{{ data.message }}</p>
+    <p class="pin-form__message">{{ message() }}</p>
+
+    <!-- v7 (R27): fingerprint / Face ID, only with a registered device on a supporting browser -->
+    @if (passkeyAvailable()) {
+      @if (passkeyError(); as err) {
+        <p class="pin-form__error" role="alert"><mat-icon aria-hidden="true">error</mat-icon> {{ err }}</p>
+      }
+      <button matButton="tonal" type="button" class="pin-form__passkey" [disabled]="passkeyBusy()" (click)="usePasskey()">
+        <mat-icon>fingerprint</mat-icon>
+        {{ passkeyBusy() ? 'Waiting for your device…' : 'Use fingerprint / Face ID' }}
+      </button>
+      <p class="pin-form__divider"><span>or enter your PIN</span></p>
+    }
+
     <mat-form-field appearance="outline">
       <mat-label>Your PIN</mat-label>
       <input

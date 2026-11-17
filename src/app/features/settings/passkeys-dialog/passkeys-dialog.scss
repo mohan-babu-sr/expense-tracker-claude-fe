@@ -1,0 +1,60 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.devices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-surface-container);
+  overflow: hidden;
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  min-height: 56px;
+  padding: v.$space-2 v.$space-2 v.$space-2 v.$space-3;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.device__icon {
+  @include m.icon-avatar(36px, 20px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.device__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.device__name {
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface);
+  overflow-wrap: anywhere;
+}
+
+.device__meta {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.devices__empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.devices__spinner {
+  margin: v.$space-3 auto;
+}

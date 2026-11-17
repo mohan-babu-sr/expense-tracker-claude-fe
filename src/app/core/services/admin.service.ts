@@ -62,6 +62,11 @@ export class AdminService {
     return this.http.post<void>(`${this.url}/users/${id}/reset-pin`, { pin }, { context });
   }
 
+  /** R26 AC9: removes all of a user's fingerprint / Face ID devices (lost phone). PIN and sessions unchanged. */
+  removePasskeys(id: string): Observable<{ removed: number }> {
+    return this.http.delete<{ removed: number }>(`${this.url}/users/${id}/passkeys`);
+  }
+
   userAction(id: string, action: AdminUserAction): Observable<void> {
     return this.http.post<void>(`${this.url}/users/${id}/${action}`, {});
   }

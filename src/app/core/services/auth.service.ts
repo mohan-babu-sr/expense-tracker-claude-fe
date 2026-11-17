@@ -89,6 +89,22 @@ export class AuthService {
       .pipe(tap((me) => this.state.set(me)));
   }
 
+  /**
+   * Fingerprint / Face ID sign-in (R26 AC5, design §15.3): sends the device's signed answer; the server sets the
+   * same session cookie as a PIN sign-in. The device prompt itself runs in PasskeyService.
+   */
+  passkeyLogin(response: unknown): Observable<Me> {
+    return this.http
+      .post<Me>(`${API_URL}/webauthn/login/verify`, { response }, { context: authFormContext() })
+      .pipe(tap((me) => this.state.set(me)));
+  }
+
+  /** Keeps `me.passkeyCount` right after adding / removing a device (no extra request). */
+  setPasskeyCount(count: number): void {
+    const me = this.state();
+    if (me?.kind === 'user') this.state.set({ ...me, passkeyCount: count });
+  }
+
   adminLogin(username: string, password: string): Observable<Me> {
     return this.http
       .post<Me>(`${API_URL}/auth/admin/login`, { username, password }, { context: authFormContext() })

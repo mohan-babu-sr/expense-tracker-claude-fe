@@ -6,12 +6,14 @@ import { AppUpdateService } from '../../../core/services/app-update.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { GroupService } from '../../../core/services/group.service';
 import { InstallService } from '../../../core/services/install.service';
+import { PasskeyService } from '../../../core/services/passkey.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SettingsService, ThemePreference } from '../../../core/services/settings.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { GroupMember } from '../../../shared/models';
 import { ChangePinDialog } from '../change-pin-dialog/change-pin-dialog';
 import { EditNameDialog } from '../edit-name-dialog/edit-name-dialog';
+import { PasskeysDialog } from '../passkeys-dialog/passkeys-dialog';
 
 interface ThemeOption {
   value: ThemePreference;
@@ -73,6 +75,13 @@ export class SettingsPage {
 
   protected changePin(): void {
     ChangePinDialog.open(this.dialog).subscribe();
+  }
+
+  // ---- Fingerprint / Face ID (R26 AC3–AC4) — row hidden when the browser can't do passkeys ----
+  protected readonly passkeys = inject(PasskeyService);
+
+  protected openPasskeys(): void {
+    PasskeysDialog.open(this.dialog);
   }
 
   // ---- Group (R13 AC7) ----

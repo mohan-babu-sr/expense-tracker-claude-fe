@@ -3,7 +3,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { Observable, catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
+import { Observable, catchError, debounceTime, distinctUntilChanged, filter, finalize, of, startWith, switchMap } from 'rxjs';
 import { errorMessage } from '../../../core/interceptors/error.interceptor';
 import { skipErrorSnackbar } from '../../../core/interceptors/http-context.tokens';
 import { AuthService } from '../../../core/services/auth.service';
@@ -110,6 +110,26 @@ export class ExpenseFormDialog {
    * If the check itself fails (offline, server waking up) the form just opens — the server still enforces the rule.
    */
   static openAdd(
+    dialog: MatDialog,
+    isMobile: boolean,
+    plan: PlanService,
+    me: { id: string; name: string } | null,
+  ): Observable<Expense | undefined> {
+    // Bug fix (T85, design §12.5): the salary check below can take seconds (first request of the day, server
+    // waking). A second tap meanwhile used to start a second check → TWO forms stacked (invisible on the phone,
+    // full-screen) → saving both added the expense twice. One Add flow at a time: extra taps are ignored until
+    // the form (or the salary step) is closed.
+    if (ExpenseFormDialog.addInProgress) return of(undefined);
+    ExpenseFormDialog.addInProgress = true;
+    return ExpenseFormDialog.addFlow(dialog, isMobile, plan, me).pipe(
+      finalize(() => (ExpenseFormDialog.addInProgress = false)),
+    );
+  }
+
+  /** True from an Add tap until its form / salary step closes (shared by every Add button). */
+  private static addInProgress = false;
+
+  private static addFlow(
     dialog: MatDialog,
     isMobile: boolean,
     plan: PlanService,

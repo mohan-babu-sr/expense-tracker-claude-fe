@@ -1,1 +1,29 @@
 @use '../auth-form';
+@use 'variables' as v;
+
+// v7 (R26 AC5): fingerprint / Face ID button + "or use your PIN" divider above the PIN form.
+.passkey {
+  display: flex;
+  flex-direction: column;
+}
+
+.passkey__button {
+  width: 100%;
+  min-height: v.$touch-target;
+}
+
+.passkey__divider {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  margin: v.$space-4 0;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}

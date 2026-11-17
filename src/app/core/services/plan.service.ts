@@ -10,7 +10,7 @@ import {
   Savings,
   WithdrawalInput,
 } from '../../shared/models';
-import { SKIP_ERROR_SNACKBAR, skipLoading } from '../interceptors/http-context.tokens';
+import { SKIP_ERROR_SNACKBAR } from '../interceptors/http-context.tokens';
 import { API_URL } from './api-url';
 
 /** /api/plan, /api/regular-items, /api/savings — monthly plan, savings & extra income (R17–R20, design §12.4). */
@@ -45,7 +45,8 @@ export class PlanService {
    */
   isSalaryMissing(userId: string, month: string): Observable<boolean> {
     if (this.salaryKnown.has(`${userId}:${month}`)) return of(false);
-    const context = skipLoading().set(SKIP_ERROR_SNACKBAR, true);
+    // Progress bar ON (T85): on a slow first request the user must see that the Add tap is being handled.
+    const context = new HttpContext().set(SKIP_ERROR_SNACKBAR, true);
     return this.get(month, context).pipe(map((p) => p.started && p.missing.some((u) => u.id === userId)));
   }
 

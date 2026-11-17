@@ -26,6 +26,7 @@ export class SalaryPrivacyService {
       title: 'Show salaries',
       message: 'Enter your sign-in PIN to see the salaries and the family total.',
       confirmText: 'Show',
+      passkeyMessage: 'Use your fingerprint / Face ID or your sign-in PIN to see the salaries and the family total.',
     })
       .pipe(filter(Boolean))
       .subscribe(() => this.revealedState.set(true));

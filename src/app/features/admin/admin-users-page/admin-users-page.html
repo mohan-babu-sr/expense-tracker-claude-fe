@@ -69,6 +69,11 @@
       <mat-icon>pin</mat-icon>
       <span>Reset PIN</span>
     </button>
+    <!-- R26 AC9: lost phone -->
+    <button mat-menu-item type="button" [disabled]="!u.passkeyCount" (click)="removePasskeys(u)">
+      <mat-icon>fingerprint</mat-icon>
+      <span>Remove fingerprint / Face ID ({{ u.passkeyCount }})</span>
+    </button>
     @if (u.status === 'active') {
       <button mat-menu-item type="button" (click)="run(u, 'disable')">
         <mat-icon>block</mat-icon>

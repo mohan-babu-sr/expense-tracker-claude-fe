@@ -1,0 +1,50 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.setup-head {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.setup-head__icon {
+  @include m.icon-avatar(40px, 22px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.setup-body {
+  display: flex;
+  flex-direction: column;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.setup-body__hero {
+  @include m.icon-avatar(72px, 40px);
+  align-self: center;
+  margin: v.$space-2 0 v.$space-4;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.setup-body__text {
+  margin: 0 0 v.$space-4;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Icon + text, not colour alone (NFR5).
+.setup-body__error {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+  }
+}

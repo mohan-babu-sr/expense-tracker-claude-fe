@@ -1,4 +1,21 @@
-<app-auth-card title="Sign in" subtitle="Use your mobile number and PIN">
+<app-auth-card title="Sign in" [subtitle]="passkeys.supported() ? 'Use your fingerprint / Face ID or your PIN' : 'Use your mobile number and PIN'">
+  <!-- R26 AC5: passkey sign-in — no mobile number needed. Hidden when the browser can't do passkeys. -->
+  @if (passkeys.supported()) {
+    <div class="passkey">
+      @if (passkeyError(); as message) {
+        <p class="auth-form__error" role="alert">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          <span>{{ message }}</span>
+        </p>
+      }
+      <button matButton="tonal" type="button" class="passkey__button" [disabled]="passkeyBusy()" (click)="passkeySignIn()">
+        <mat-icon>fingerprint</mat-icon>
+        {{ passkeyBusy() ? 'Waiting for your device…' : 'Sign in with fingerprint / Face ID' }}
+      </button>
+      <p class="passkey__divider"><span>or use your PIN</span></p>
+    </div>
+  }
+
   <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     @if (formError(); as message) {
       <p class="auth-form__error" role="alert">

@@ -1,0 +1,47 @@
+<div class="setup-head" mat-dialog-title>
+  <span class="setup-head__icon" aria-hidden="true"><mat-icon>fingerprint</mat-icon></span>
+  <span>{{ data.offer ? 'Sign in faster next time?' : 'Set up fingerprint / Face ID' }}</span>
+</div>
+
+@if (step() === 'pin') {
+  <form [formGroup]="form" (ngSubmit)="next()" novalidate>
+    <mat-dialog-content class="setup-body">
+      <p class="setup-body__text">Enter your PIN to add this device. Your PIN keeps working too.</p>
+      <mat-form-field appearance="outline">
+        <mat-label>Your PIN</mat-label>
+        <input matInput type="password" inputmode="numeric" autocomplete="current-password" formControlName="pin" maxlength="6" />
+        @if (form.controls.pin.invalid) {
+          <mat-error>{{ pinError() }}</mat-error>
+        }
+      </mat-form-field>
+      @if (error(); as message) {
+        <p class="setup-body__error" role="alert"><mat-icon aria-hidden="true">error</mat-icon> {{ message }}</p>
+      }
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" mat-dialog-close>Cancel</button>
+      <button mat-flat-button type="submit" [disabled]="busy()">{{ busy() ? 'Checking…' : 'Next' }}</button>
+    </mat-dialog-actions>
+  </form>
+} @else {
+  <mat-dialog-content class="setup-body">
+    <div class="setup-body__hero" aria-hidden="true"><mat-icon>fingerprint</mat-icon></div>
+    <p class="setup-body__text">
+      @if (data.offer) {
+        Use your fingerprint, face or screen lock instead of typing your PIN on this device. Your PIN keeps working too.
+      } @else {
+        Tap <strong>Set up</strong> — your device will ask for your fingerprint, face or screen lock.
+      }
+    </p>
+    @if (error(); as message) {
+      <p class="setup-body__error" role="alert"><mat-icon aria-hidden="true">error</mat-icon> {{ message }}</p>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="notNow()">{{ data.offer ? 'Not now' : 'Cancel' }}</button>
+    <button mat-flat-button type="button" [disabled]="busy()" (click)="setUp()">
+      <mat-icon>fingerprint</mat-icon>
+      {{ busy() ? 'Please wait…' : 'Set up' }}
+    </button>
+  </mat-dialog-actions>
+}

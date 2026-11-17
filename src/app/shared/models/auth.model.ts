@@ -24,6 +24,8 @@ export interface UserMe {
   user: AppUser;
   group: GroupSummary | null;
   status: UserStatus;
+  /** Registered fingerprint / Face ID devices (R26 AC6, R27 AC1). */
+  passkeyCount: number;
 }
 
 /** GET /auth/me for the admin. */
@@ -34,6 +36,15 @@ export interface AdminMe {
 }
 
 export type Me = UserMe | AdminMe;
+
+/** A fingerprint / Face ID device in Settings (R26 AC3, design §15.3 GET /me/passkeys). */
+export interface PasskeyDevice {
+  id: string;
+  /** e.g. "Chrome on Android". */
+  deviceName: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+}
 
 export type RegisterGroup = { mode: 'create'; name: string; code: string } | { mode: 'join'; code: string };
 

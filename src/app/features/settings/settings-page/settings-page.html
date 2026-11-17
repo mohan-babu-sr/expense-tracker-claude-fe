@@ -44,6 +44,25 @@
             <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
           </button>
         </li>
+        <!-- R26 AC3: passkeys — only on browsers that can do them -->
+        @if (passkeys.supported()) {
+          <li>
+            <button type="button" class="list-row" (click)="openPasskeys()">
+              <span class="list-row__icon" aria-hidden="true"><mat-icon>fingerprint</mat-icon></span>
+              <span class="list-row__text">
+                <span class="list-row__label">Fingerprint / Face ID</span>
+                <span class="list-row__sub">
+                  @if (userMe()!.passkeyCount; as n) {
+                    On · {{ n }} {{ n === 1 ? 'device' : 'devices' }}
+                  } @else {
+                    Off
+                  }
+                </span>
+              </span>
+              <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+            </button>
+          </li>
+        }
       } @else if (me()?.kind === 'admin') {
         <li>
           <a class="list-row" routerLink="/admin/password">

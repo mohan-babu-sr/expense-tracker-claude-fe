@@ -1,0 +1,60 @@
+<div class="dialog-head" mat-dialog-title>
+  <span class="dialog-head__icon" aria-hidden="true"><mat-icon>fingerprint</mat-icon></span>
+  <span>Fingerprint / Face ID</span>
+</div>
+
+<mat-dialog-content class="dialog-form">
+  <p class="dialog-form__hint">
+    Sign in and show salaries with your fingerprint, face or screen lock. Your PIN always works too.
+  </p>
+
+  @if (devices(); as list) {
+    @if (list.length) {
+      <ul class="devices" aria-label="Your devices">
+        @for (d of list; track d.id) {
+          <li class="device">
+            <span class="device__icon" aria-hidden="true"><mat-icon>devices</mat-icon></span>
+            <span class="device__text">
+              <span class="device__name">{{ d.deviceName }}</span>
+              <span class="device__meta">
+                Added {{ d.createdAt | date: 'd MMM y' }} ·
+                {{ d.lastUsedAt ? 'Last used ' + (d.lastUsedAt | date: 'd MMM, h:mm a') : 'Not used yet' }}
+              </span>
+            </span>
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="busyId() === d.id"
+              (click)="remove(d)"
+              [attr.aria-label]="'Remove ' + d.deviceName"
+              matTooltip="Remove"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="devices__empty">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        Not set up yet.
+      </p>
+    }
+  } @else if (loadFailed()) {
+    <p class="devices__empty">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      Couldn't load your devices.
+      <button mat-button type="button" (click)="load()">Try again</button>
+    </p>
+  } @else {
+    <mat-spinner diameter="28" class="devices__spinner" aria-label="Loading devices" />
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>Close</button>
+  <button mat-flat-button type="button" (click)="setUp()" [disabled]="(devices()?.length ?? 0) >= 10">
+    <mat-icon>add</mat-icon>
+    Set up on this device
+  </button>
+</mat-dialog-actions>

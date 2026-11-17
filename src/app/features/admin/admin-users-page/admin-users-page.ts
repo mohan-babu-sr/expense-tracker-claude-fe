@@ -47,7 +47,7 @@ const DONE: Record<AdminUserAction, (u: AdminUser) => string> = {
 
 /**
  * Admin → Users (R13 AC6): search, filter by status / group, add / edit, reset PIN,
- * approve / reject, disable / enable. Table on laptop, cards on mobile (design §8.5).
+ * approve / reject, disable / enable; v7 (R26 AC9): remove fingerprint / Face ID. Table on laptop, cards on mobile (design §8.5).
  * `?groupId=` (from the Groups page) pre-selects the group filter.
  */
 @Component({
@@ -177,6 +177,30 @@ export class AdminUsersPage {
           this.refresh();
         },
         error: () => this.busyId.set(null), // the interceptor already showed the message
+      });
+  }
+
+  /** R26 AC9: for a lost phone. The user's PIN still works; it doesn't sign anyone out. */
+  protected removePasskeys(user: AdminUser): void {
+    const n = user.passkeyCount;
+    ConfirmDialog.open(this.dialog, {
+      title: `Remove ${user.name}'s fingerprint / Face ID?`,
+      message: `${n} ${n === 1 ? 'device' : 'devices'} will no longer be able to sign in or show salaries with fingerprint / Face ID. Their PIN still works.`,
+      confirmText: 'Remove',
+      destructive: true,
+    })
+      .pipe(
+        filter(Boolean),
+        tap(() => this.busyId.set(user.id)),
+        switchMap(() => this.admin.removePasskeys(user.id)),
+      )
+      .subscribe({
+        next: ({ removed }) => {
+          this.busyId.set(null);
+          this.notification.success(`Removed ${removed} fingerprint / Face ID ${removed === 1 ? 'device' : 'devices'} of ${user.name}`);
+          this.refresh();
+        },
+        error: () => this.busyId.set(null),
       });
   }
 

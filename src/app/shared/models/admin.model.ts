@@ -17,6 +17,8 @@ export interface AdminUser {
   status: UserStatus;
   group: GroupSummary | null;
   createdAt: string;
+  /** Fingerprint / Face ID devices (R26 AC9). */
+  passkeyCount: number;
 }
 
 export interface AdminUserQuery {
