@@ -1,4 +1,4 @@
-<div class="cards">
+<div class="cards" [class.cards--balance]="hasBalance()">
   <!-- v5 hero (R21 AC4): the month's total, change vs last month and a mini 6-month trend -->
   <section class="hero" aria-labelledby="hero-label">
     <span class="hero__label" id="hero-label">
@@ -21,6 +21,13 @@
       }
     </div>
   </section>
+
+  <!-- v8.1: My balance (projected by the dashboard page) sits right after the hero -->
+  @if (hasBalance()) {
+    <div class="balance-slot">
+      <ng-content />
+    </div>
+  }
 
   <div class="tile">
     <span class="tile__icon" aria-hidden="true"><mat-icon>receipt_long</mat-icon></span>

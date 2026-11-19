@@ -16,6 +16,8 @@ import { addMonths, monthToDate } from '../../../shared/utils/date.utils';
 })
 export class SummaryCards {
   readonly data = input.required<Dashboard>();
+  /** v8.1 (R21 AC4): the page projects the My balance card; it goes between the hero and the tiles. */
+  readonly hasBalance = input(false);
 
   private readonly monthFmt = new Intl.DateTimeFormat('en-IN', { month: 'long' });
   private readonly shortFmt = new Intl.DateTimeFormat('en-IN', { month: 'short' });

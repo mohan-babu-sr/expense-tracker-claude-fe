@@ -3,6 +3,17 @@
 export type UserRole = 'owner' | 'member';
 export type UserStatus = 'pending' | 'active' | 'disabled';
 
+/** "Remind me N days before" choices (R28 AC2). */
+export const NOTIFY_DAYS_BEFORE = [1, 3, 7] as const;
+export type NotifyDaysBefore = (typeof NOTIFY_DAYS_BEFORE)[number];
+
+/** What I want notifications about — account-wide, all my devices (R28 AC2, design §16.2). */
+export interface NotifyPrefs {
+  upcoming: boolean;
+  daysBefore: NotifyDaysBefore;
+  budget: boolean;
+}
+
 export interface AppUser {
   id: string;
   name: string;
@@ -10,6 +21,8 @@ export interface AppUser {
   groupId: string;
   role: UserRole;
   status: UserStatus;
+  /** Notification choices (R28); the server fills defaults. */
+  notify: NotifyPrefs;
 }
 
 export interface GroupSummary {

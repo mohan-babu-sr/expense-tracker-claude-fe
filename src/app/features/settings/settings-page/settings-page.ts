@@ -7,12 +7,14 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GroupService } from '../../../core/services/group.service';
 import { InstallService } from '../../../core/services/install.service';
 import { PasskeyService } from '../../../core/services/passkey.service';
+import { PushService } from '../../../core/services/push.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SettingsService, ThemePreference } from '../../../core/services/settings.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { GroupMember } from '../../../shared/models';
 import { ChangePinDialog } from '../change-pin-dialog/change-pin-dialog';
 import { EditNameDialog } from '../edit-name-dialog/edit-name-dialog';
+import { NotificationsDialog } from '../notifications-dialog/notifications-dialog';
 import { PasskeysDialog } from '../passkeys-dialog/passkeys-dialog';
 
 interface ThemeOption {
@@ -152,6 +154,30 @@ export class SettingsPage {
         // Error snackbar comes from the interceptor; stay signed in so the user can retry.
         error: () => this.signingOutAll.set(false),
       });
+  }
+
+  // ---- Notifications (R28 AC1) ----
+  private readonly push = inject(PushService);
+
+  protected readonly pushLabel = computed(() => {
+    switch (this.push.state()) {
+      case 'on':
+        return 'On for this device';
+      case 'off':
+        return 'Off — upcoming payments and budget warnings';
+      case 'blocked':
+        return 'Blocked in your browser settings';
+      case 'needs-install':
+        return 'Install the app first';
+      case 'unavailable':
+        return 'Not available on this server';
+      default:
+        return 'Not supported in this browser';
+    }
+  });
+
+  protected openNotifications(): void {
+    NotificationsDialog.open(this.dialog);
   }
 
   // ---- App (R16 AC6) ----

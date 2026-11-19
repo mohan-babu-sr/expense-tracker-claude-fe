@@ -1,0 +1,117 @@
+<div class="dialog-head" mat-dialog-title>
+  <span class="dialog-head__icon" aria-hidden="true"><mat-icon>notifications</mat-icon></span>
+  <span>Notifications</span>
+</div>
+
+<mat-dialog-content class="dialog-form">
+  <p class="dialog-form__hint">
+    Reminders for upcoming payments and budget warnings — even when the app is closed.
+  </p>
+
+  <!-- This device (R28 AC1): icon + text for every state (NFR5) -->
+  <div class="status" [class.status--on]="state() === 'on'" role="status">
+    @switch (state()) {
+      @case ('on') {
+        <mat-icon aria-hidden="true">notifications_active</mat-icon>
+        <span class="status__text"><strong>On</strong> for this device</span>
+        <button mat-button type="button" [disabled]="busy() !== null" (click)="turnOff()">
+          {{ busy() === 'disable' ? 'Turning off…' : 'Turn off' }}
+        </button>
+      }
+      @case ('off') {
+        <mat-icon aria-hidden="true">notifications_off</mat-icon>
+        <span class="status__text"><strong>Off</strong> for this device</span>
+        <button mat-flat-button type="button" [disabled]="busy() !== null || !push.ready()" (click)="turnOn()">
+          {{ busy() === 'enable' ? 'Turning on…' : 'Turn on' }}
+        </button>
+      }
+      @case ('blocked') {
+        <mat-icon aria-hidden="true">block</mat-icon>
+        <span class="status__text">
+          <strong>Blocked.</strong> Allow notifications for this app in your browser or phone settings, then come
+          back here.
+        </span>
+      }
+      @case ('needs-install') {
+        <mat-icon aria-hidden="true">install_mobile</mat-icon>
+        <span class="status__text">
+          <strong>Install the app first.</strong> On iPhone, notifications only work in the Home Screen app: tap
+          Share → “Add to Home Screen”, open it from there, then turn them on here.
+        </span>
+      }
+      @case ('unavailable') {
+        <mat-icon aria-hidden="true">cloud_off</mat-icon>
+        <span class="status__text">Notifications aren’t available on this server.</span>
+      }
+      @default {
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span class="status__text">This browser can’t show notifications.</span>
+      }
+    }
+  </div>
+
+  <!-- What I get (R28 AC2) — account-wide, only shown when this device is on -->
+  @if (state() === 'on') {
+    <ul class="prefs" aria-label="What to notify you about">
+      <li class="pref">
+        <span class="pref__icon" aria-hidden="true"><mat-icon>event_upcoming</mat-icon></span>
+        <span class="pref__text">
+          <span class="pref__label" id="pref-upcoming">Upcoming payments</span>
+          <span class="pref__sub">Once a day at 9 AM, before and on the due date</span>
+        </span>
+        <mat-slide-toggle
+          aria-labelledby="pref-upcoming"
+          [checked]="prefs().upcoming"
+          [disabled]="savingPrefs()"
+          (change)="setUpcoming($event.checked)"
+        />
+      </li>
+      @if (prefs().upcoming) {
+        <li class="pref pref--sub">
+          <span class="pref__sub pref__days-label" id="pref-days">Remind me before the due date</span>
+          <mat-button-toggle-group
+            class="pref__days"
+            aria-labelledby="pref-days"
+            hideSingleSelectionIndicator
+            [value]="prefs().daysBefore"
+            [disabled]="savingPrefs()"
+            (change)="setDaysBefore($event.value)"
+          >
+            @for (d of daysOptions; track d) {
+              <mat-button-toggle [value]="d" [aria-label]="d + (d === 1 ? ' day' : ' days') + ' before'">
+                {{ d }} {{ d === 1 ? 'day' : 'days' }}
+              </mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+        </li>
+      }
+      <li class="pref">
+        <span class="pref__icon" aria-hidden="true"><mat-icon>savings</mat-icon></span>
+        <span class="pref__text">
+          <span class="pref__label" id="pref-budget">Budget warnings</span>
+          <span class="pref__sub">When a budget or your limit reaches 80% or goes over</span>
+        </span>
+        <mat-slide-toggle
+          aria-labelledby="pref-budget"
+          [checked]="prefs().budget"
+          [disabled]="savingPrefs()"
+          (change)="setBudget($event.checked)"
+        />
+      </li>
+    </ul>
+    <p class="note">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      These choices apply to all your devices. On / Off is just for this one. Salaries are never shown.
+    </p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>Close</button>
+  @if (state() === 'on') {
+    <button mat-flat-button type="button" [disabled]="busy() !== null" (click)="sendTest()">
+      <mat-icon>notifications_active</mat-icon>
+      {{ busy() === 'test' ? 'Sending…' : 'Send test' }}
+    </button>
+  }
+</mat-dialog-actions>

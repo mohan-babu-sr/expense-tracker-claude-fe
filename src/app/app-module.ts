@@ -23,6 +23,7 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { AppUpdateService } from './core/services/app-update.service';
 import { AuthService } from './core/services/auth.service';
 import { InstallService } from './core/services/install.service';
+import { PushService } from './core/services/push.service';
 // Indian number/date formats for pipes: 1,23,456.00 and dd/MM/yyyy (scope decision: INR only).
 registerLocaleData(localeEnIn);
 
@@ -53,6 +54,8 @@ registerLocaleData(localeEnIn);
     provideAppInitializer(() => inject(AppUpdateService).start()), // R16 AC5: "new version · Reload"
     // R16 AC6: created at start-up so it catches the browser's one-time `beforeinstallprompt` event.
     provideAppInitializer(() => void inject(InstallService)),
+    // R28 (design §16.5): created at start-up so it re-sends this device's notification subscription after sign-in.
+    provideAppInitializer(() => void inject(PushService)),
 
     // Charts are provided in DashboardModule (lazy) so Chart.js is not in the main bundle.
 

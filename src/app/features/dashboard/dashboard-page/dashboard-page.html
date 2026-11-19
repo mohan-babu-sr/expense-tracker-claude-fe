@@ -26,13 +26,13 @@
     </div>
   }
 
-  <!-- R7 AC1 -->
-  <app-summary-cards [data]="d" />
-
-  <!-- R15 AC6 -->
-  @if (hasLimits()) {
-    <app-my-balance-card [members]="d.members" />
-  }
+  <!-- R7 AC1 + R15 AC6. v8.1 order: hero → My balance → Expenses → Daily average → Top category (R21 AC4).
+       The balance card is projected into the summary grid, right after the hero. -->
+  <app-summary-cards [data]="d" [hasBalance]="hasLimits()">
+    @if (hasLimits()) {
+      <app-my-balance-card [members]="d.members" />
+    }
+  </app-summary-cards>
 
   <!-- R14 AC6: independent of the month picker; hidden when nothing is due -->
   @if (d.comingUp.items.length) {

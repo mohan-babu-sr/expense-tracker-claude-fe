@@ -1,9 +1,10 @@
 import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, firstValueFrom, map, of, retry, tap, throwError, timer } from 'rxjs';
-import { Me, RegisterInput, UserMe } from '../../shared/models';
+import { Me, NotifyPrefs, RegisterInput, UserMe } from '../../shared/models';
 import { SKIP_AUTH_REDIRECT, SKIP_ERROR_SNACKBAR, authFormContext } from '../interceptors/http-context.tokens';
 import { API_URL } from './api-url';
+import { PushService } from './push.service';
 
 /** Where a person belongs (design §8.5): signed out → Welcome, admin → admin panel, waiting → pending page. */
 export function homeUrl(me: Me | null): string {
@@ -22,6 +23,7 @@ const isWakingUp = (err: unknown) => err instanceof HttpErrorResponse && [0, 502
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly injector = inject(Injector);
   private readonly state = signal<Me | null>(null);
   private readonly loadedState = signal(false);
   private readonly unreachableState = signal(false);
@@ -111,20 +113,49 @@ export class AuthService {
       .pipe(tap((me) => this.state.set(me)));
   }
 
-  /** Clears the cookie on the server; locally signed out even if that request fails. */
+  /**
+   * Clears the cookie on the server; locally signed out even if that request fails.
+   * R28 AC7: also stops notifications on THIS device — the server deletes its subscription, and the browser's copy
+   * is dropped, so a shared phone doesn't keep getting this person's alerts.
+   */
   logout(): Observable<unknown> {
-    return this.http.post(`${API_URL}/auth/logout`, null).pipe(
+    const push = this.push();
+    const pushEndpoint = push.currentEndpoint();
+    return this.http.post(`${API_URL}/auth/logout`, pushEndpoint ? { pushEndpoint } : null).pipe(
       catchError(() => of(null)),
-      tap(() => this.clear()),
+      tap(() => {
+        this.clear();
+        void push.forgetLocally();
+      }),
     );
   }
 
   /**
    * R13 AC1a: ends EVERY session of this account (server bumps tokenVersion). Unlike logout(), a failure is
    * NOT treated as success — the other devices would still be signed in, so the caller must know.
+   * The server also removes all notification devices (R28 AC7); this device forgets its subscription too.
    */
   logoutAll(): Observable<unknown> {
-    return this.http.post(`${API_URL}/auth/logout-all`, null).pipe(tap(() => this.clear()));
+    return this.http.post(`${API_URL}/auth/logout-all`, null).pipe(
+      tap(() => {
+        this.clear();
+        void this.push().forgetLocally();
+      }),
+    );
+  }
+
+  /** Keeps `me.user.notify` right after saving notification choices (no extra request, R28 AC2). */
+  setNotify(notify: NotifyPrefs): void {
+    const me = this.state();
+    if (me?.kind === 'user') this.state.set({ ...me, user: { ...me.user, notify } });
+  }
+
+  /**
+   * PushService injects AuthService, so AuthService can't inject PushService in its constructor (circular).
+   * Looking it up when signing out is fine — both exist by then.
+   */
+  private push(): PushService {
+    return this.injector.get(PushService);
   }
 
   /** PUT /me — own name (mobile + group can't be changed, R13 AC4). */

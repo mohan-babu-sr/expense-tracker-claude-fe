@@ -51,6 +51,11 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: v.$space-2;
+
+  > a {
+    flex: none;
+    white-space: nowrap;
+  }
 }
 
 .recent__title {

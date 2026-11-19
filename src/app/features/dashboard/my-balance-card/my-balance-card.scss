@@ -18,18 +18,30 @@
   }
 }
 
+// v8.1: lives inside the summary grid (the grid gap spaces it), filling its cell on laptop.
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .balance {
   @include m.card-surface;
   display: flex;
   flex-direction: column;
   gap: v.$space-2;
-  margin-top: v.$space-4;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .balance__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  > a {
+    flex: none;
+    white-space: nowrap;
+  }
 }
 
 .balance__title {

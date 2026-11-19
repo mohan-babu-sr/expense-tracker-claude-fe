@@ -220,6 +220,20 @@
         </button>
       </li>
 
+      <!-- R28 AC1: phone notifications — members only (the admin gets none) -->
+      @if (userMe()) {
+        <li>
+          <button type="button" class="list-row" (click)="openNotifications()">
+            <span class="list-row__icon" aria-hidden="true"><mat-icon>notifications</mat-icon></span>
+            <span class="list-row__text">
+              <span class="list-row__label">Notifications</span>
+              <span class="list-row__sub">{{ pushLabel() }}</span>
+            </span>
+            <mat-icon class="list-row__chevron" aria-hidden="true">chevron_right</mat-icon>
+          </button>
+        </li>
+      }
+
       @if (install.isStandalone() || install.justInstalled()) {
         <li class="list-row list-row--static">
           <span class="list-row__icon list-row__icon--ok" aria-hidden="true"><mat-icon>check_circle</mat-icon></span>

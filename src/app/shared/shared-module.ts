@@ -6,6 +6,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -75,6 +76,7 @@ const MATERIAL_MODULES = [
   MatDividerModule,
   MatBadgeModule,
   MatButtonToggleModule,
+  MatSlideToggleModule, // Settings → Notifications (R28)
 ];
 
 const ANGULAR_MODULES = [

@@ -12,9 +12,17 @@
   justify-content: space-between;
   gap: v.$space-2;
   margin-bottom: v.$space-1;
+
+  // v8.1: the link keeps its width and stays on one line; the title side shrinks/wraps instead.
+  > a {
+    flex: none;
+    white-space: nowrap;
+  }
 }
 
 .coming-up__title {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;

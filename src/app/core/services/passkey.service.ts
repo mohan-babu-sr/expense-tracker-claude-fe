@@ -10,6 +10,7 @@ import {
 } from '@simplewebauthn/browser';
 import { Observable, firstValueFrom, tap } from 'rxjs';
 import { Me, PasskeyDevice } from '../../shared/models';
+import { deviceName } from '../../shared/utils/device-name';
 import { authFormContext, skipErrorSnackbar } from '../interceptors/http-context.tokens';
 import { API_URL } from './api-url';
 import { AuthService } from './auth.service';
@@ -156,33 +157,6 @@ export class PasskeyService {
 
   /** "Chrome on Android", "Safari on iPhone", "Edge on Windows" — only a label in the Settings list. */
   deviceName(): string {
-    const ua = navigator.userAgent;
-    const browser = /Edg\//.test(ua)
-      ? 'Edge'
-      : /SamsungBrowser/.test(ua)
-        ? 'Samsung Internet'
-        : /OPR\//.test(ua)
-          ? 'Opera'
-          : /Firefox|FxiOS/.test(ua)
-            ? 'Firefox'
-            : /Chrome|CriOS/.test(ua)
-              ? 'Chrome'
-              : /Safari/.test(ua)
-                ? 'Safari'
-                : 'Browser';
-    const os = /iPhone/.test(ua)
-      ? 'iPhone'
-      : /iPad/.test(ua)
-        ? 'iPad'
-        : /Android/.test(ua)
-          ? 'Android'
-          : /Windows/.test(ua)
-            ? 'Windows'
-            : /Mac OS X|Macintosh/.test(ua)
-              ? 'Mac'
-              : /Linux/.test(ua)
-                ? 'Linux'
-                : 'this device';
-    return `${browser} on ${os}`.slice(0, 40);
+    return deviceName();
   }
 }

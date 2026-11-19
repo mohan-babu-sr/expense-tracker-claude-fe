@@ -1,0 +1,115 @@
+// Settings → Notifications (R28, design §16.5). Same list look as the passkeys dialog.
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-2 v.$space-3;
+  padding: v.$space-3;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-surface-container-highest); // visible on the dialog surface in dark mode too
+  color: var(--mat-sys-on-surface);
+
+  > mat-icon {
+    flex: none;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  > button {
+    margin-left: auto;
+  }
+}
+
+.status--on > mat-icon {
+  color: var(--mat-sys-primary);
+}
+
+.status__text {
+  flex: 1;
+  min-width: 0;
+  font: var(--mat-sys-body-medium);
+}
+
+.prefs {
+  margin: v.$space-4 0 0;
+  padding: 0;
+  list-style: none;
+  border-radius: v.$radius-sm;
+  background: var(--mat-sys-surface-container-highest); // visible on the dialog surface in dark mode too
+  overflow: hidden;
+}
+
+.pref {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  min-height: 64px;
+  padding: v.$space-2 v.$space-3;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.pref--sub {
+  min-height: 0;
+  padding-left: calc(#{v.$space-3} + 36px + #{v.$space-3}); // lines up with the label above
+  border-top: none !important;
+}
+
+.pref__icon {
+  @include m.icon-avatar(36px, 20px);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.pref__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pref__label {
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.pref__sub {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pref--sub {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: v.$space-2;
+  padding-bottom: v.$space-3;
+}
+
+.pref__days-label {
+  width: 100%;
+}
+
+.pref__days {
+  // Each choice ≥ 44px tall for touch (R21 / NFR5); the group keeps its pill shape from the theme.
+  --mat-standard-button-toggle-height: 44px;
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: v.$space-3 0 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}

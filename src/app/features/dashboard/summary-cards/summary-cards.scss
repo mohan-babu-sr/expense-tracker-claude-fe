@@ -170,6 +170,31 @@
   }
 }
 
+// ---- v8.1 (R21 AC4): My balance between the hero and the tiles.
+// Phone: full width under the hero. Laptop: hero | balance on row 1, the three tiles on row 2.
+.balance-slot {
+  display: grid; // the projected card stretches to the row height
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.cards--balance {
+  @include m.laptop {
+    .hero {
+      grid-row: 1;
+    }
+
+    .balance-slot {
+      grid-column: 2 / span 2;
+      grid-row: 1;
+    }
+
+    .tile--wide {
+      grid-column: auto;
+    }
+  }
+}
+
 .tile__icon {
   @include m.icon-avatar(32px, 18px);
   grid-area: icon;
