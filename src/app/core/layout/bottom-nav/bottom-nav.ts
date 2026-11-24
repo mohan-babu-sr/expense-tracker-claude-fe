@@ -4,7 +4,7 @@ import { ADMIN_NAV_ITEMS, BOTTOM_NAV_ITEMS } from '../nav-items';
 
 /**
  * Phone navigation (R10, v5 R21 AC3, design §13.3): a floating rounded bar with Dashboard · Expenses · (+) ·
- * Upcoming · Plan. The centre (+) is the phone's only "Add expense" (it replaced the FAB) and works from every page.
+ * Upcoming · Budgets (v8.2; was Plan). The centre (+) is the phone's only "Add expense" (it replaced the FAB) and works from every page.
  */
 @Component({
   selector: 'app-bottom-nav',

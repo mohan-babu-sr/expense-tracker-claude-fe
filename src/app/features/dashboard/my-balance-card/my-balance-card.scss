@@ -72,6 +72,29 @@
   font: var(--mat-sys-body-medium);
 }
 
+// R15 AC6 v8.3 "Safe to spend": a quiet hint line, the amount bold + tabular like the other numbers.
+.balance__safe {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    color: var(--mat-sys-primary);
+  }
+
+  strong {
+    color: var(--mat-sys-on-surface);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 .others {
   display: grid;
   gap: v.$space-1;

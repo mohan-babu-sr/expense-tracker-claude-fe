@@ -13,6 +13,17 @@
       <app-budget-progress [spent]="m.spent" [budget]="m.limit" [percent]="m.percent!" [status]="m.status!">
         <span class="balance__of">of {{ m.limit | inrCurrency: false }} this month</span>
       </app-budget-progress>
+      @if (safeToSpend(); as s) {
+        <!-- R15 AC6 v8.3 -->
+        <p class="balance__safe">
+          <mat-icon aria-hidden="true">calendar_today</mat-icon>
+          <span>
+            Safe to spend:
+            <strong>{{ s.perDay | inrCurrency: false }}{{ s.days > 1 ? '/day' : '' }}</strong>
+            {{ s.days > 1 ? '· ' + s.days + ' days left' : 'today' }}
+          </span>
+        </p>
+      }
     } @else {
       <p class="balance__none">You don't have a monthly limit. Spent {{ m.spent | inrCurrency: false }}.</p>
     }

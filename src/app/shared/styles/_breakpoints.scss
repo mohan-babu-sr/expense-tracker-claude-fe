@@ -7,3 +7,7 @@ $laptop-min: 960px;
 
 // Upper end of "narrow laptop" (960–1199px): side nav (240px) leaves only ~650–900px for content.
 $wide-laptop-max: 1199.98px;
+
+// v8.3 (R1 AC5, design §13.10): from this width the expense form shows its fields in 2 columns (laptop dialog, and
+// phones in landscape / small tablets). A form-width rule, not a layout breakpoint like $laptop-min.
+$form-two-col-min: 600px;

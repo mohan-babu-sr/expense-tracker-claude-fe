@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 import { GroupService } from '../../../core/services/group.service';
+import { LayoutService } from '../../../core/services/layout.service';
 import { ExpenseEventsService } from '../../../core/services/expense-events.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { PlanService } from '../../../core/services/plan.service';
@@ -44,6 +45,8 @@ export class ExpenseFormDialog {
   private readonly expenseEvents = inject(ExpenseEventsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
+  /** Laptop vs phone — only decides which element gets the first focus (R1 AC5). */
+  protected readonly layout = inject(LayoutService);
 
   protected readonly isEdit = !!this.data.expense;
   private readonly auth = inject(AuthService);
@@ -153,11 +156,14 @@ export class ExpenseFormDialog {
     );
   }
 
-  /** Laptop: 520px dialog. Mobile: full-screen (R1 AC4, design §5). Emits the saved expense. */
+  /**
+   * Laptop: 720px dialog — wide enough for the 2-column grid (R1 AC5 v8.3; was 520px, one column).
+   * Mobile: full-screen (R1 AC4, design §5). Emits the saved expense.
+   */
   static open(dialog: MatDialog, isMobile: boolean, data: ExpenseFormData = {}): Observable<Expense | undefined> {
     const config: MatDialogConfig<ExpenseFormData> = isMobile
       ? { data, width: '100vw', maxWidth: '100vw', height: '100dvh', panelClass: 'full-screen-dialog' }
-      : { data, width: '520px', maxWidth: 'calc(100vw - 32px)' };
+      : { data, width: '720px', maxWidth: 'calc(100vw - 32px)' };
     return dialog
       .open<ExpenseFormDialog, ExpenseFormData, Expense>(ExpenseFormDialog, { ...config, autoFocus: 'first-tabbable' })
       .afterClosed();

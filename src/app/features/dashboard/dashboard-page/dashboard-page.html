@@ -30,7 +30,7 @@
        The balance card is projected into the summary grid, right after the hero. -->
   <app-summary-cards [data]="d" [hasBalance]="hasLimits()">
     @if (hasLimits()) {
-      <app-my-balance-card [members]="d.members" />
+      <app-my-balance-card [members]="d.members" [month]="month()" />
     }
   </app-summary-cards>
 

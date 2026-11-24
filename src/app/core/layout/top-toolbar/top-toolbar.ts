@@ -4,7 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { GroupService } from '../../services/group.service';
 import { ADMIN_NAV_ITEMS, ADMIN_PASSWORD_ITEM, CATEGORIES_ITEM, NAV_ITEMS, SETTINGS_ITEM } from '../nav-items';
-// NAV_ITEMS includes Budgets, so its title still shows on the phone after v5 moved it out of the bar.
+// NAV_ITEMS includes every main page, so Plan's title still shows on the phone after v8.2 moved it out of the bar.
 
 /** Mobile top bar (R10): ☰ menu (v5.1) + current page name. The shell opens the drawer on `menu`. */
 @Component({

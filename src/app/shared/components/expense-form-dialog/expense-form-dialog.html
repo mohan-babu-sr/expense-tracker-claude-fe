@@ -1,9 +1,10 @@
+<!-- R1 AC5 (v8.3, design §13.10): hero amount + 2-column grid; header and action bar stay put while fields scroll. -->
 <form class="expense-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
   <div class="expense-form__header" mat-dialog-title>
+    <span class="expense-form__title">{{ readOnly ? 'Expense details' : isEdit ? 'Edit expense' : 'Add expense' }}</span>
     <button mat-icon-button type="button" mat-dialog-close aria-label="Close" class="expense-form__close">
       <mat-icon>close</mat-icon>
     </button>
-    <span>{{ readOnly ? 'Expense details' : isEdit ? 'Edit expense' : 'Add expense' }}</span>
   </div>
 
   <mat-dialog-content class="expense-form__content">
@@ -14,104 +15,121 @@
         <span>Only {{ ownerName }} can edit or delete this expense.</span>
       </p>
     }
-    <!-- Amount -->
-    <!-- floatLabel="always": the ₹ prefix would otherwise sit on top of the resting label -->
-    <mat-form-field appearance="outline" class="expense-form__amount" floatLabel="always">
-      <mat-label>Amount</mat-label>
-      <span matTextPrefix>₹&nbsp;</span>
-      <input matInput type="number" inputmode="decimal" min="0.01" step="0.01" formControlName="amount" autocomplete="off" />
-      @if (form.controls.amount.invalid) {
-        <mat-error>{{ error('amount') }}</mat-error>
-      }
-    </mat-form-field>
 
-    <!-- Category -->
-    <mat-form-field appearance="outline">
-      <mat-label>Category</mat-label>
-      <mat-select formControlName="categoryId">
-        <mat-select-trigger>
-          <app-category-chip [category]="selectedCategory()" />
-        </mat-select-trigger>
-        @for (c of categories(); track c.id) {
-          <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+    <!-- Amount "hero": big centred number on a tinted panel. Laptop focuses it first; the phone doesn't (no
+         keyboard popping over the form before the user has seen it — same as before v8.3). -->
+    <div class="expense-form__hero">
+      <label class="expense-form__hero-label" for="expense-amount">Amount</label>
+      <mat-form-field appearance="outline" class="expense-form__amount" subscriptSizing="dynamic">
+        <span matTextPrefix class="expense-form__rupee">₹&nbsp;</span>
+        <input
+          matInput
+          id="expense-amount"
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          step="0.01"
+          placeholder="0"
+          formControlName="amount"
+          autocomplete="off"
+          [attr.cdkFocusInitial]="layout.isMobile() ? null : ''"
+        />
+        @if (form.controls.amount.invalid) {
+          <mat-error>{{ error('amount') }}</mat-error>
         }
-      </mat-select>
-      @if (form.controls.categoryId.invalid) {
-        <mat-error>{{ error('categoryId') }}</mat-error>
-      }
-    </mat-form-field>
+      </mat-form-field>
+    </div>
 
-    <!-- Date: defaults to today, future dates blocked (R1 AC1) -->
-    <mat-form-field appearance="outline">
-      <mat-label>Date</mat-label>
-      <input matInput [matDatepicker]="picker" [max]="today" formControlName="date" placeholder="dd/mm/yyyy" />
-      <mat-datepicker-toggle matIconSuffix [for]="picker" />
-      <mat-datepicker #picker />
-      @if (form.controls.date.invalid) {
-        <mat-error>{{ error('date') }}</mat-error>
-      }
-    </mat-form-field>
-
-    <!-- Merchant with suggestions (R1 AC1a) -->
-    <mat-form-field appearance="outline">
-      <mat-label>Shop / Merchant</mat-label>
-      <input matInput formControlName="merchant" maxlength="50" [matAutocomplete]="merchantAuto" autocomplete="off" placeholder="e.g. Swiggy, Big Bazaar, Amazon" />
-      <mat-autocomplete #merchantAuto="matAutocomplete" autoActiveFirstOption="false">
-        @for (m of merchantOptions$ | async; track m) {
-          <mat-option [value]="m">{{ m }}</mat-option>
+    <div class="expense-form__grid">
+      <!-- Category -->
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="categoryId">
+          <mat-select-trigger>
+            <app-category-chip [category]="selectedCategory()" />
+          </mat-select-trigger>
+          @for (c of categories(); track c.id) {
+            <mat-option [value]="c.id"><app-category-chip [category]="c" /></mat-option>
+          }
+        </mat-select>
+        @if (form.controls.categoryId.invalid) {
+          <mat-error>{{ error('categoryId') }}</mat-error>
         }
-      </mat-autocomplete>
-      @if (form.controls.merchant.invalid) {
-        <mat-error>{{ error('merchant') }}</mat-error>
-      }
-    </mat-form-field>
+      </mat-form-field>
 
-    <!-- Who spent it (R13 AC9): a group member, defaults to the signed-in member -->
-    <mat-form-field appearance="outline">
-      <mat-label>User</mat-label>
-      <mat-select formControlName="userId">
-        @for (u of userOptions(); track u.id) {
-          <mat-option [value]="u.id">{{ u.name }}</mat-option>
+      <!-- Date: defaults to today, future dates blocked (R1 AC1) -->
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" [max]="today" formControlName="date" placeholder="dd/mm/yyyy" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+        @if (form.controls.date.invalid) {
+          <mat-error>{{ error('date') }}</mat-error>
         }
-      </mat-select>
-      @if (form.controls.userId.invalid) {
-        <mat-error>{{ error('userId') }}</mat-error>
-      }
-    </mat-form-field>
+      </mat-form-field>
 
-    <!-- Payment method (optional) -->
-    <mat-form-field appearance="outline">
-      <mat-label>Payment method</mat-label>
-      <mat-select formControlName="paymentMethod">
-        <mat-option [value]="null">— None —</mat-option>
-        @for (p of paymentMethods; track p.value) {
-          <mat-option [value]="p.value">
-            <!-- fontIcon: no ligature text, so the closed select shows "UPI", not "qr_code_scannerUPI" -->
-            <mat-icon [fontIcon]="p.icon" />
-            {{ p.label }}
-          </mat-option>
+      <!-- Who spent it (R13 AC9): a group member, defaults to the signed-in member -->
+      <mat-form-field appearance="outline">
+        <mat-label>User</mat-label>
+        <mat-select formControlName="userId">
+          @for (u of userOptions(); track u.id) {
+            <mat-option [value]="u.id">{{ u.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.userId.invalid) {
+          <mat-error>{{ error('userId') }}</mat-error>
         }
-      </mat-select>
-    </mat-form-field>
+      </mat-form-field>
 
-    <!-- Note -->
-    <mat-form-field appearance="outline">
-      <mat-label>Note</mat-label>
-      <textarea matInput formControlName="note" maxlength="200" rows="2" cdkTextareaAutosize></textarea>
-      <mat-hint align="end">{{ form.controls.note.value?.length ?? 0 }} / 200</mat-hint>
-      @if (form.controls.note.invalid) {
-        <mat-error>{{ error('note') }}</mat-error>
-      }
-    </mat-form-field>
+      <!-- Payment method (optional) -->
+      <mat-form-field appearance="outline">
+        <mat-label>Payment method (optional)</mat-label>
+        <mat-select formControlName="paymentMethod">
+          <mat-option [value]="null">— None —</mat-option>
+          @for (p of paymentMethods; track p.value) {
+            <mat-option [value]="p.value">
+              <!-- fontIcon: no ligature text, so the closed select shows "UPI", not "qr_code_scannerUPI" -->
+              <mat-icon [fontIcon]="p.icon" />
+              {{ p.label }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Merchant with suggestions (R1 AC1a) -->
+      <mat-form-field appearance="outline" class="expense-form__wide">
+        <mat-label>Shop / Merchant (optional)</mat-label>
+        <input matInput formControlName="merchant" maxlength="50" [matAutocomplete]="merchantAuto" autocomplete="off" placeholder="e.g. Swiggy, Big Bazaar, Amazon" />
+        <mat-autocomplete #merchantAuto="matAutocomplete" autoActiveFirstOption="false">
+          @for (m of merchantOptions$ | async; track m) {
+            <mat-option [value]="m">{{ m }}</mat-option>
+          }
+        </mat-autocomplete>
+        @if (form.controls.merchant.invalid) {
+          <mat-error>{{ error('merchant') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Note -->
+      <mat-form-field appearance="outline" class="expense-form__wide">
+        <mat-label>Note (optional)</mat-label>
+        <textarea matInput formControlName="note" maxlength="200" rows="2" cdkTextareaAutosize></textarea>
+        <mat-hint align="end">{{ form.controls.note.value?.length ?? 0 }} / 200</mat-hint>
+        @if (form.controls.note.invalid) {
+          <mat-error>{{ error('note') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="expense-form__actions">
+  <mat-dialog-actions class="expense-form__actions">
     @if (readOnly) {
-      <button mat-flat-button type="button" mat-dialog-close>Close</button>
+      <button mat-flat-button type="button" mat-dialog-close class="expense-form__primary">Close</button>
     } @else {
-      <button mat-button type="button" mat-dialog-close>Cancel</button>
+      <!-- Phone: hidden — the header ✕ is Cancel, so Save can be a full-width thumb target. -->
+      <button mat-button type="button" mat-dialog-close class="expense-form__cancel">Cancel</button>
       <!-- Disabled until valid (R1 AC2) -->
-      <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">
+      <button mat-flat-button type="submit" class="expense-form__primary" [disabled]="form.invalid || saving()">
         {{ saving() ? 'Saving…' : 'Save' }}
       </button>
     }

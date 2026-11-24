@@ -11,8 +11,9 @@ const UPCOMING_ITEM: NavItem = { path: '/upcoming', label: 'Upcoming', icon: 'ev
 const PLAN_ITEM: NavItem = { path: '/plan', label: 'Plan', icon: 'payments' };
 
 /**
- * v5 (R10 v5, R21 AC3): Budgets leaves the phone bar (room for the centre Add button) and becomes a secondary page
- * on the phone — Settings → Manage, next to Categories. The laptop side nav keeps it with the main pages.
+ * v5 (R10 v5, R21 AC3): Budgets left the phone bar (room for the centre Add button).
+ * v8.2 (R10 AC1 v8.2): it's back, in Plan's place — budgets are checked daily, the plan ~monthly. Plan is now the
+ * phone's secondary page (☰ drawer + Settings → Manage). The laptop side nav keeps both with the main pages.
  */
 export const BUDGETS_ITEM: NavItem = { path: '/budgets', label: 'Budgets', icon: 'savings' };
 
@@ -21,11 +22,11 @@ export const NAV_ITEMS: readonly NavItem[] = [DASHBOARD_ITEM, EXPENSES_ITEM, UPC
 
 /**
  * Phone bar (v5): 2 tabs · centre Add · 2 tabs. Split in halves so the template can put the Add button between
- * them while the tab order stays Dashboard → Expenses → Add → Upcoming → Plan.
+ * them while the tab order stays Dashboard → Expenses → Add → Upcoming → Budgets (v8.2; was Plan).
  */
 export const BOTTOM_NAV_ITEMS: { readonly start: readonly NavItem[]; readonly end: readonly NavItem[] } = {
   start: [DASHBOARD_ITEM, EXPENSES_ITEM],
-  end: [UPCOMING_ITEM, PLAN_ITEM],
+  end: [UPCOMING_ITEM, BUDGETS_ITEM],
 };
 
 /**
