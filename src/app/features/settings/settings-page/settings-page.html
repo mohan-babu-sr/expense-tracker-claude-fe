@@ -212,11 +212,8 @@
             <span class="list-row__label">{{ checkingUpdate() ? 'Checking…' : 'Check for update' }}</span>
             <span class="list-row__sub">Get the newest version and refresh</span>
           </span>
-          @if (checkingUpdate()) {
-            <mat-spinner diameter="20" aria-hidden="true" />
-          } @else {
-            <mat-icon class="list-row__chevron" aria-hidden="true">refresh</mat-icon>
-          }
+          <!-- v8.4 (T98): the same ↻ spins in place while checking — no swap to a smaller spinner -->
+          <mat-icon class="list-row__chevron" [class.spin]="checkingUpdate()" aria-hidden="true">refresh</mat-icon>
         </button>
       </li>
 

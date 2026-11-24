@@ -209,6 +209,25 @@ canvas {
 }
 
 // ---------------------------------------------------------------------------
+// v8.4 (T98, design §14.3): `.spin` — turn an icon about its own centre while busy (e.g. Settings → Check for
+// update's ↻). Global on purpose: component styles rename @keyframes but miss `animation:` inside @media.
+// Reduced motion → still (R21 AC7); the busy text ("Checking…") carries the meaning.
+// ---------------------------------------------------------------------------
+.spin {
+  animation: app-spin 0.9s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes app-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // v5 (R21): Material Symbols Rounded — the default icon font (MatIconRegistry in CoreModule).
 // The active nav item uses the filled variant: font-variation-settings 'FILL' 1.
 // ---------------------------------------------------------------------------

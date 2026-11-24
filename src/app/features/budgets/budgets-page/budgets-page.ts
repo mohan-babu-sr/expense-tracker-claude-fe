@@ -10,6 +10,7 @@ import { BudgetStatus, BudgetSummary, Category, MemberBudget } from '../../../sh
 import { currentMonth } from '../../../shared/utils/date.utils';
 import { BudgetDialog, BudgetDialogData, BudgetDialogResult } from '../budget-dialog/budget-dialog';
 import { MemberLimitDialog, MemberLimitDialogData } from '../member-limit-dialog/member-limit-dialog';
+import { categorySummary, overSubject } from '../category-summary';
 
 /**
  * Budgets page (R8, R15): pick a month, see
@@ -42,6 +43,12 @@ export class BudgetsPage {
   protected readonly overall = computed(() => this.summary()?.overall ?? null);
   protected readonly items = computed(() => this.summary()?.items ?? []);
   protected readonly overCount = computed(() => this.items().filter((i) => i.status === 'danger').length);
+
+  /** R8 AC6 (v8.4): words for "Overall has money left but Food is over" — null when there are no category budgets. */
+  protected readonly catSummary = computed(() =>
+    this.items().length ? categorySummary(this.items(), this.overall()) : null,
+  );
+  protected readonly overSubject = overSubject;
 
   /** The signed-in member first, then the others by name (as the server sorts them) — R15 AC4. */
   protected readonly members = computed(() => {

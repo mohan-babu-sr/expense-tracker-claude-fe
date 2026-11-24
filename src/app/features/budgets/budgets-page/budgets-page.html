@@ -83,6 +83,68 @@
         <span class="over-badge"><mat-icon aria-hidden="true">error</mat-icon> {{ overCount() }} over budget</span>
       }
     </h2>
+    <!-- R8 AC6 (v8.4, design §13.11): explain category totals vs. the family total in words -->
+    @if (catSummary(); as s) {
+      <div class="summary-card" role="group" aria-label="Category budgets summary">
+        <!-- A: totals -->
+        <p class="summary-row">
+          <mat-icon aria-hidden="true">category</mat-icon>
+          <span>
+            <strong>{{ s.spentTotal | inrCurrency: false }}</strong> of
+            <strong>{{ s.budgetTotal | inrCurrency: false }}</strong> spent across category budgets ·
+            <strong>{{ s.left | balance }}</strong>
+          </span>
+        </p>
+        <!-- A: who is over and whether the rest covers it -->
+        @if (s.over.amount > 0) {
+          <p class="summary-row" [class.summary-row--danger]="s.unused < s.over.amount">
+            <mat-icon aria-hidden="true">{{ s.unused >= s.over.amount ? 'info' : 'error' }}</mat-icon>
+            <span>
+              {{ overSubject(s.over.names) }} <strong>{{ s.over.amount | inrCurrency: false }}</strong> over —
+              @if (s.unused >= s.over.amount) {
+                covered by <strong>{{ s.unused | inrCurrency: false }}</strong> unused in the other categories.
+              } @else {
+                more than the <strong>{{ s.unused | inrCurrency: false }}</strong> unused in the other categories.
+              }
+            </span>
+          </p>
+        }
+        <!-- B: category budgets vs. the family total (only when member limits exist) -->
+        @switch (s.check) {
+          @case ('equal') {
+            <p class="summary-row summary-row--ok">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              <span>Category budgets add up to the family total ({{ overall()!.budget | inrCurrency: false }}).</span>
+            </p>
+          }
+          @case ('short') {
+            <p class="summary-row">
+              <mat-icon aria-hidden="true">info</mat-icon>
+              <span>
+                <strong>{{ s.diff | inrCurrency: false }}</strong> of the family total
+                ({{ overall()!.budget | inrCurrency: false }}) isn't in any category budget.
+              </span>
+            </p>
+          }
+          @case ('more') {
+            <p class="summary-row summary-row--warning">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              <span>
+                Category budgets are <strong>{{ s.diff | inrCurrency: false }}</strong> more than the family total
+                ({{ overall()!.budget | inrCurrency: false }}).
+              </span>
+            </p>
+          }
+        }
+        @if (s.unbudgetedSpent) {
+          <p class="summary-row">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            <span><strong>{{ s.unbudgetedSpent | inrCurrency: false }}</strong> was spent in categories without a budget.</span>
+          </p>
+        }
+      </div>
+    }
+
     @if (items().length) {
       <ul class="budget-list">
         @for (b of items(); track b.id) {

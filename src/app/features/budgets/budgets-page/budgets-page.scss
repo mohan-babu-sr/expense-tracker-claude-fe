@@ -73,6 +73,48 @@
   }
 }
 
+// R8 AC6 (v8.4): category summary — muted sentences, bold tabular amounts; colour only on icons, always with words.
+.summary-card {
+  @include m.card-surface;
+  display: grid;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+}
+
+.summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: v.$space-2;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    color: var(--mat-sys-primary);
+  }
+
+  strong {
+    @include m.amount;
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+.summary-row--ok mat-icon {
+  color: v.$budget-ok;
+}
+
+.summary-row--warning mat-icon {
+  color: v.$budget-warning;
+}
+
+.summary-row--danger mat-icon {
+  color: v.$budget-danger;
+}
+
 .hint-card {
   @include m.card-surface;
   display: flex;
